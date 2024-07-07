@@ -1,0 +1,673 @@
+{%load static%}
+<!DOCTYPE html>
+<html lang="zxx">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="description" content="Ogani Template">
+    <meta name="keywords" content="Ogani, unica, creative, html">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Tivona</title>
+
+    <!-- Google Font -->
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@200;300;400;600;900&display=swap" rel="stylesheet">
+
+    <!-- Owl Carousel CSS -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/OwlCarousel2/2.3.4/assets/owl.carousel.min.css">
+    <link rel="stylesheet"
+        href="https://cdnjs.cloudflare.com/ajax/libs/OwlCarousel2/2.3.4/assets/owl.theme.default.min.css">
+
+    <!-- Css Styles -->
+    <link rel="stylesheet" href="{%static 'css/bootstrap.min.css'%}" type="text/css">
+    <link rel="stylesheet" href="{%static 'css/font-awesome.min.css'%}" type="text/css">
+    <link rel="stylesheet" href="{%static 'css/elegant-icons.css'%}" type="text/css">
+    <link rel="stylesheet" href="{%static 'css/nice-select.css'%}" type="text/css">
+    <link rel="stylesheet" href="{%static 'css/jquery-ui.min.css'%}" type="text/css">
+    <link rel="stylesheet" href="{%static 'css/owl.carousel.min.css'%}" type="text/css">
+    <link rel="stylesheet" href="{%static 'css/slicknav.min.css'%}" type="text/css">
+    <link rel="stylesheet" href="{%static 'css/style.css'%}" type="text/css">
+
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js"></script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
+
+    <style>
+        .product__details__pic__item--large {
+            width: 100%;
+            height: auto;
+            display: block;
+        }
+
+        .zoomContainer {
+            z-index: 9999;
+        }
+    </style>
+
+</head>
+
+<body>
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            {% if messages %}
+            {% for message in messages %}
+            Swal.fire('{{ message }}');
+            {% endfor %}
+            {% endif %}
+        });
+    </script>
+
+    <!-- Page Preloder -->
+    <div id="preloder">
+        <div class="loader"></div>
+    </div>
+
+    <!-- Humberger Begin -->
+    <div class="humberger__menu__overlay"></div>
+    <div class="humberger__menu__wrapper">
+        <div class="humberger__menu__logo">
+            <a href="#"><img src="img/logo.png" alt=""></a>
+        </div>
+        <div class="humberger__menu__cart">
+            <ul>
+                <li><a href="{%url 'wishlist'%}"><i class="fa fa-heart"></i> <span>1</span></a></li>
+                <li><a href="{%url 'shoping-cart'%}"><i class="fa fa-shopping-bag"></i> <span>3</span></a></li>
+            </ul>
+            <div class="header__cart__price">item: <span>$150.00</span></div>
+        </div>
+        <div class="humberger__menu__widget">
+            <div class="header__top__right__language">
+                <img src="img/language.png" alt="">
+                <div>English</div>
+                <span class="arrow_carrot-down"></span>
+                <ul>
+                    <li><a href="#">Spanis</a></li>
+                    <li><a href="#">English</a></li>
+                </ul>
+            </div>
+            <div class="header__top__right__auth">
+                {% if user.is_authenticated %}
+                <a href="{% url 'profile page' user.id %}"><i class="fa fa-user"></i>{{ user.username }}</a>
+                {% else %}
+                <a href="{% url 'login page' %}"><i class="fa fa-user"></i> Login/Signup</a>
+                {% endif %}
+            </div>
+        </div>
+        <nav class="humberger__menu__nav mobile-menu">
+            <ul>
+                <li class="active"><a href="{%url 'home page'%}">Home</a></li>
+                <li><a href="{%url 'shop page'%}">Shop</a></li>
+                <li><a href="#">Pages</a>
+                    <ul class="header__menu__dropdown">
+                        {% for category in categories %}
+                        {% if category.is_listed %}
+                        <li><a href="{% url 'category_detail' category.slug %}">{{ category.name }}</a></li>
+                        {% endif %}
+                        {% endfor %}
+                    </ul>
+                </li>
+                <li><a href="./blog.html">Blog</a></li>
+                <li><a href="./contact.html">Contact</a></li>
+            </ul>
+        </nav>
+        <div id="mobile-menu-wrap"></div>
+        <div class="header__top__right__social">
+            <a href="#"><i class="fa fa-facebook"></i></a>
+            <a href="#"><i class="fa fa-twitter"></i></a>
+            <a href="#"><i class="fa fa-linkedin"></i></a>
+            <a href="#"><i class="fa fa-pinterest-p"></i></a>
+        </div>
+        <div class="humberger__menu__contact">
+            <ul>
+                <li><i class="fa fa-envelope"></i> hello@colorlib.com</li>
+                <li>Free Shipping for all Order of $99</li>
+            </ul>
+        </div>
+    </div>
+    <!-- Humberger End -->
+
+    <!-- Header Section Begin -->
+    <header class="header">
+        <div class="header__top">
+            <div class="container">
+                <div class="row">
+                    <div class="col-lg-6">
+                        <div class="header__top__left">
+                            <!-- <ul>
+                                <li><i class="fa fa-envelope"></i> hello@colorlib.com</li>
+                                <li>Free Shipping for all Order of $99</li>
+                            </ul> -->
+                        </div>
+                    </div>
+                    <div class="col-lg-6">
+                        <div class="header__top__right">
+                            <div class="header__top__right__social">
+                                <a href="#"><i class="fa fa-facebook"></i></a>
+                                <a href="#"><i class="fa fa-twitter"></i></a>
+                                <a href="#"><i class="fa fa-linkedin"></i></a>
+                                <a href="#"><i class="fa fa-pinterest-p"></i></a>
+                            </div>
+                            <div class="header__top__right__language">
+                                <img src="{%static 'img/language.png'%}" alt="">
+                                <div>English</div>
+                                <span class="arrow_carrot-down"></span>
+                                <ul>
+                                    <li><a href="#">Spanis</a></li>
+                                    <li><a href="#">English</a></li>
+                                </ul>
+                            </div>
+                            <div class="header__top__right__auth">
+                                {% if user.is_authenticated %}
+                                <a href="{% url 'profile page' user.id %}"><i class="fa fa-user"></i>
+                                    {{user.username}}</a>
+                                {% else %}
+                                <a href="{% url 'login page' %}"><i class="fa fa-user"></i> Login/Signup</a>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="container">
+            <div class="row">
+                <div class="col-lg-3">
+                    <div class="header__logo">
+                        <a href="{%url 'home page'%}"><img src="{%static 'img/logo.png'%}" alt=""></a>
+                    </div>
+                </div>
+                <div class="col-lg-6" style="padding: 20px;">
+                    <nav class="header__menu">
+                        <ul>
+                            <li><a href="{%url 'home page'%}">Home</a></li>
+                            <li><a href="{%url 'shop page'%}">Store</a>
+                                <ul class="header__menu__dropdown">
+                                    {% for category in categories %}
+                                    {%if category.is_listed%}
+                                    <li><a href="{% url 'category_detail' category.slug %}">{{ category.name }}</a></li>
+                                    {%endif%}
+                                    {% endfor %}
+                                </ul>
+                            </li>
+                            <!-- <li><a href="./blog.html">Blog</a></li> -->
+                            <li><a href="{%url 'shoping-cart'%}">Shoping Cart</a></li>
+                            <!-- <li><a href="./checkout.html">Check Out</a></li> -->
+                            <li><a href="{%url 'contact page'%}">Contact</a></li>
+                        </ul>
+                    </nav>
+                </div>
+                <div class="col-lg-3" style="padding:20px;">
+                    <div class="header__cart">
+                        <ul>
+                            <li><a href="{%url 'wishlist'%}"><i class="fa fa-heart"></i></a></li>
+                            <li><a href="{%url 'shoping-cart'%}"><i class="fa fa-shopping-bag"></i> <span>3</span></a>
+                            </li>
+                        </ul>
+                        <div class="header__cart__price">item: <span>$150.00</span></div>
+                    </div>
+                </div>
+            </div>
+            <div class="humberger__open">
+                <i class="fa fa-bars"></i>
+            </div>
+        </div>
+    </header>
+    <!-- Header Section End -->
+
+    <!-- Product_details Section Begin -->
+    <section class="product-details spad">
+        <div class="container">
+            <div class="row">
+                <div class="col-lg-6 col-md-6">
+                    <div class="product__details__pic">
+                        <div id="main-carousel" class="owl-carousel owl-theme product-carousel">
+                            {% for image in variants.first.images.all %}
+                            <div class="product__details__pic__item">
+                                <img class="product__details__pic__item--large" src="{{ image.image.url }}"
+                                    alt="{{ product.name }}">
+                            </div>
+                            {% endfor %}
+                        </div>
+                        <div class="product__details__pic__slider owl-carousel">
+                            {% for variant in variants %}
+                            {%if variants.count != 1 %}
+                            <img class="variant-image" data-imgbigurl="{{ variant.images.first.image.url }}"
+                                data-variant-id="{{ variant.id }}" data-variant-price="{{ variant.price }}"
+                                src="{{ variant.images.first.image.url }}" alt="{{ product.name }}">
+                            {%endif%}
+                            {% endfor %}
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-lg-6 col-md-6">
+                    <div class="product__details__text">
+                        <h3>{{ product.name }}</h3>
+                        <div class="product__details__rating">
+                            <i class="fa fa-star"></i>
+                            <i class="fa fa-star"></i>
+                            <i class="fa fa-star"></i>
+                            <i class="fa fa-star"></i>
+                            <i class="fa fa-star-half-o"></i>
+                            <span>(18 reviews)</span>
+                        </div>
+                        <div id="variant-price" class="product__details__price">Rs {{ variants.first.price }}</div>
+                        <p>{{ product.description }}</p>
+
+                        <!-- Color Variants -->
+                        <div class="product__details__color">
+                            <span>Available Colors:</span>
+                            <div class="color-variants">
+                                {% for var in variants %}
+                                <a href="#" class="color-variant" data-variant-id="{{ var.id }}"
+                                    data-variant-price="{{ var.price }}"
+                                    data-variant-image="{{ var.images.first.image.url }}">
+                                    <svg width="24" height="24">
+                                        <circle cx="12" cy="12" r="10" fill="{{ var.color }}"></circle>
+                                    </svg>
+                                </a>
+                                {% endfor %}
+                            </div>
+                        </div>
+
+                        <div class="product__details__quantity">
+                            <div class="quantity">
+                                <div class="pro-qty">
+                                    <input type="number" id="quantity" name="quantity" value="1" min="1">
+                                </div>
+                            </div>
+                        </div>
+                        <a href="#" class="add_cart primary-btn" id="add-cart-btn">ADD TO CART</a>
+                        <a href="#" class="buy-now warning-btn" id="buy-now-btn">Buy now</a>
+                        <a href="#" class="heart-icon" id="heart-icon"><span class="icon_heart_alt"></span></a>
+                        <ul>
+                            <li><b>Availability</b> <span id="variant-stock">{% if variants.first.stock == 0 %}
+                                    Out of Stock {% else %} In Stock {% endif %}</span></li>
+                            <li><b>Shipping</b><span>01 day shipping.<samp> Free pickup today</samp></span></li>
+                            <li><b>Weight</b><span>0.5 kg</span></li>
+                            <li><b>Share on</b>
+                                <div class="share">
+                                    <a href="#"><i class="fa fa-facebook"></i></a>
+                                    <a href="#"><i class="fa fa-twitter"></i></a>
+                                    <a href="#"><i class="fa fa-instagram"></i></a>
+                                    <a href="#"><i class="fa fa-pinterest"></i></a>
+                                </div>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+                <div class="col-lg-12">
+                    <div class="product__details__tab">
+                        <ul class="nav nav-tabs" role="tablist">
+                            <li class="nav-item">
+                                <a class="nav-link active" data-toggle="tab" href="#tabs-1" role="tab"
+                                    aria-selected="true">Description</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" data-toggle="tab" href="#tabs-2" role="tab"
+                                    aria-selected="false">Information</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" data-toggle="tab" href="#tabs-3" role="tab"
+                                    aria-selected="false">Reviews <span>(1)</span></a>
+                            </li>
+                        </ul>
+                        <div class="tab-content">
+                            <div class="tab-pane active" id="tabs-1" role="tabpanel">
+                                <div class="product__details__tab__desc">
+                                    <h6>Products Information</h6>
+                                    <p>{{ product.description }}</p>
+                                </div>
+                            </div>
+                            <div class="tab-pane" id="tabs-2" role="tabpanel">
+                                <div class="product__details__tab__desc">
+                                    <h6>Products Information</h6>
+                                    <p>{{ product.description }}</p>
+                                </div>
+                            </div>
+                            <div class="tab-pane" id="tabs-3" role="tabpanel">
+                                <div class="product__details__tab__desc">
+                                    <h6>Products Information</h6>
+                                    <p>Best Product</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+    <!-- Product Details Section End -->
+
+    <!-- Related Product Section Begin -->
+    <section class="related-product">
+        <div class="container">
+            <div class="row">
+                <div class="col-lg-12">
+                    <div class="section-title related__product__title">
+                        <h2>Related Product</h2>
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-lg-3 col-md-4 col-sm-6">
+                    <div class="product__item">
+                        <div class="product__item__pic set-bg" data-setbg="{%static 'img/product/product-8.jpg'%}">
+                            <ul class="product__item__pic__hover">
+                                <li><a href="{%url 'wishlist'%}"><i class="fa fa-heart"></i></a></li>
+                                <li><a href="{%url 'shoping-cart'%}"><i class="fa fa-shopping-cart"></i></a></li>
+                            </ul>
+                        </div>
+                        <div class="product__item__text">
+                            <h6><a href="#">Crab Pool Security</a></h6>
+                            <h5>$30.00</h5>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-lg-3 col-md-4 col-sm-6">
+                    <div class="product__item">
+                        <div class="product__item__pic set-bg" data-setbg="{%static 'img/product/product-2.png'%}">
+                            <ul class="product__item__pic__hover">
+                                <li><a href="{%url 'wishlist'%}"><i class="fa fa-heart"></i></a></li>
+                                <li><a href="{%url 'shoping-cart'%}"><i class="fa fa-shopping-cart"></i></a></li>
+                            </ul>
+                        </div>
+                        <div class="product__item__text">
+                            <h6><a href="#">Crab Pool Security</a></h6>
+                            <h5>$30.00</h5>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-lg-3 col-md-4 col-sm-6">
+                    <div class="product__item">
+                        <div class="product__item__pic set-bg" data-setbg="{%static 'img/product/product-7.jpg'%}">
+                            <ul class="product__item__pic__hover">
+                                <li><a href="{%url 'wishlist'%}"><i class="fa fa-heart"></i></a></li>
+                                <li><a href="{%url 'shoping-cart'%}"><i class="fa fa-shopping-cart"></i></a></li>
+                            </ul>
+                        </div>
+                        <div class="product__item__text">
+                            <h6><a href="#">Crab Pool Security</a></h6>
+                            <h5>$30.00</h5>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-lg-3 col-md-4 col-sm-6">
+                    <div class="product__item">
+                        <div class="product__item__pic set-bg" data-setbg="{%static 'img/product/flower2.jpg'%}">
+                            <ul class="product__item__pic__hover">
+                                <li><a href="{%url 'wishlist'%}"><i class="fa fa-heart"></i></a></li>
+                                <li><a href="{%url 'shoping-cart'%}"><i class="fa fa-shopping-cart"></i></a></li>
+                            </ul>
+                        </div>
+                        <div class="product__item__text">
+                            <h6><a href="#">Crab Pool Security</a></h6>
+                            <h5>$30.00</h5>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+    <!-- Related Product Section End -->
+
+    <!-- Footer Section Begin -->
+    <footer class="footer spad">
+        <div class="container">
+            <div class="row">
+                <div class="col-lg-3 col-md-6 col-sm-6">
+                    <div class="footer__about">
+                        <div class="footer__about__logo">
+                            <a href="{%url 'home page'%}"><img src="{%static 'img/logo.png'%}" alt=""></a>
+                        </div>
+                        <ul>
+                            <li>Address: 60-49 Road 11378 New York</li>
+                            <li>Phone: +65 11.188.888</li>
+                            <li>Email: hello@colorlib.com</li>
+                        </ul>
+                    </div>
+                </div>
+                <div class="col-lg-4 col-md-6 col-sm-6 offset-lg-1">
+                    <div class="footer__widget">
+                        <h6>Useful Links</h6>
+                        <ul>
+                            <li><a href="#">About Us</a></li>
+                            <li><a href="#">About Our Shop</a></li>
+                            <li><a href="#">Secure Shopping</a></li>
+                            <li><a href="#">Delivery infomation</a></li>
+                            <li><a href="#">Privacy Policy</a></li>
+                            <li><a href="#">Our Sitemap</a></li>
+                        </ul>
+                        <ul>
+                            <li><a href="#">Who We Are</a></li>
+                            <li><a href="#">Our Services</a></li>
+                            <li><a href="#">Projects</a></li>
+                            <li><a href="#">Contact</a></li>
+                            <li><a href="#">Innovation</a></li>
+                            <li><a href="#">Testimonials</a></li>
+                        </ul>
+                    </div>
+                </div>
+                <div class="col-lg-4 col-md-12">
+                    <div class="footer__widget">
+                        <h6>Join Our Newsletter Now</h6>
+                        <p>Get E-mail updates about our latest shop and special offers.</p>
+                        <form action="#">
+                            <input type="text" placeholder="Enter your mail">
+                            <button type="submit" class="site-btn">Subscribe</button>
+                        </form>
+                        <div class="footer__widget__social">
+                            <a href="#"><i class="fa fa-facebook"></i></a>
+                            <a href="#"><i class="fa fa-instagram"></i></a>
+                            <a href="#"><i class="fa fa-twitter"></i></a>
+                            <a href="#"><i class="fa fa-pinterest"></i></a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </footer>
+    <!-- Footer Section End -->
+
+    <!-- Js Plugins -->
+    <script src="{%static 'js/jquery-3.3.1.min.js'%}"></script>
+    <script src="{%static 'js/bootstrap.min.js'%}"></script>
+    <script src="{%static 'js/jquery.nice-select.min.js'%}"></script>
+    <script src="{%static 'js/jquery-ui.min.js'%}"></script>
+    <script src="{%static 'js/jquery.slicknav.js'%}"></script>
+    <script src="{%static 'js/mixitup.min.js'%}"></script>
+    <script src="{%static 'js/owl.carousel.min.js'%}"></script>
+    <script src="{%static 'js/main.js'%}"></script>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            const colorSelectors = document.querySelectorAll('.color-variant');
+            const variantSelectors = document.querySelectorAll('.variant-image');
+            const quantityInput = document.getElementById('quantity');
+            const mainCarousel = $('#main-carousel');
+            const addToCartButton = document.getElementById('add-cart-btn');
+            const addToWishlist = document.getElementById('heart-icon');
+            let selectedVariantId = null;
+            let selectedColor = null;
+            let selectedImage = null;
+
+            // Initialize the carousel on page load
+            mainCarousel.owlCarousel({
+                items: 1,
+                loop: true,
+                nav: true,
+                dots: false
+            });
+
+            // Function to update the main carousel with new images
+            function updateMainCarousel(images) {
+                mainCarousel.trigger('destroy.owl.carousel'); // Destroy the existing carousel
+                mainCarousel.html(''); // Clear the current content
+
+                const carouselContent = images.map(image => `
+                <div class="product__details__pic__item">
+                    <img class="product__details__pic__item--large" src="${image}" alt="{{ product.name }}">
+                </div>
+            `);
+
+                mainCarousel.append(carouselContent.join('')); // Add new images
+                mainCarousel.owlCarousel({ // Re-initialize the carousel
+                    items: 1,
+                    loop: true,
+                    nav: true,
+                    dots: false
+                });
+            }
+
+            colorSelectors.forEach(selector => {
+                selector.addEventListener('click', function (e) {
+                    e.preventDefault();
+                    selectedVariantId = this.getAttribute('data-variant-id');
+                    selectedColor = this.getAttribute('data-variant-price');
+                    selectedImage = this.getAttribute('data-variant-image');
+
+                    document.getElementById('variant-price').textContent = 'Rs ' + selectedColor;
+                    document.getElementById('variant-stock').textContent = 'In Stock'; // Assuming stock is available
+
+                    // Fetch the images for the selected variant
+                    $.ajax({
+                        url: '{% url "fetch_variant_images" %}',
+                        method: 'GET',
+                        data: {
+                            'variant_id': selectedVariantId
+                        },
+                        success: function (response) {
+                            if (response.images) {
+                                updateMainCarousel(response.images);
+                            } else {
+                                console.error('No images found for the selected color.');
+                            }
+                        },
+                        error: function (err) {
+                            console.error('Error fetching images:', err);
+                        }
+                    });
+                });
+            });
+
+            variantSelectors.forEach(selector => {
+                selector.addEventListener('click', function (e) {
+                    e.preventDefault();
+                    selectedVariantId = this.getAttribute('data-variant-id');
+                    selectedColor = this.getAttribute('data-variant-price');
+                    selectedImage = this.getAttribute('data-variant-image');
+
+                    document.getElementById('variant-price').textContent = 'Rs ' + selectedColor;
+                    document.getElementById('variant-stock').textContent = 'In Stock';
+
+                    // Fetch the images for the selected variant
+                    $.ajax({
+                        url: '{% url "fetch_variant_images" %}',
+                        method: 'GET',
+                        data: {
+                            'variant_id': selectedVariantId
+                        },
+                        success: function (response) {
+                            if (response.images) {
+                                // Update the main carousel with the images of the selected variant
+                                updateMainCarousel(response.images);
+                            } else {
+                                console.error('No images found for the selected color.');
+                            }
+                        },
+                        error: function (err) {
+                            console.error('Error fetching images:', err);
+                        }
+                    });
+                });
+            });
+
+            quantityInput.addEventListener('input', function () {
+                let quantity = parseInt(this.value);
+                if (isNaN(quantity) || quantity < 1) {
+                    quantity = 1; // Reset to 1 if input is invalid
+                }
+                this.value = quantity;
+            });
+
+            addToCartButton.addEventListener('click', function (event) {
+                event.preventDefault();
+
+                if (!selectedVariantId || !selectedImage || !selectedColor) {
+                    const defaultVariant = document.querySelector('.color-variant');
+                    selectedVariantId = defaultVariant.getAttribute('data-variant-id');
+                    selectedColor = defaultVariant.getAttribute('data-variant-price');
+                    selectedImage = defaultVariant.getAttribute('data-variant-image');
+                }
+
+                if (selectedVariantId && selectedColor && selectedImage) {
+
+                    const quantity = quantityInput.value;
+
+                    $.ajax({
+                        url: '/add_cart/' + selectedVariantId,
+                        method: 'GET',
+                        data: {
+                            'color': selectedColor,
+                            'image': selectedImage,
+                            'variant_id': selectedVariantId,
+                            'quantity': quantity,
+                        },
+                        success: function (response) {
+                            console.log("AJAX success:", response);
+                            location.reload();
+                        },
+                        error: function (err) {
+                            console.error('Error adding product to cart:', err);
+                        }
+                    });
+                } else {
+                    console.error('No variant selected.');
+                }
+            });
+
+            addToWishlist.addEventListener('click', function (event) {
+                event.preventDefault();
+
+                if (!selectedVariantId || !selectedImage || !selectedColor) {
+                    const defaultVariant = document.querySelector('.color-variant');
+                    selectedVariantId = defaultVariant.getAttribute('data-variant-id');
+                    selectedColor = defaultVariant.getAttribute('data-variant-price');
+                    selectedImage = defaultVariant.getAttribute('data-variant-image');
+                }
+
+                if (selectedVariantId && selectedColor && selectedImage) {
+                    $.ajax({
+                        url: '/add_wishlist/' + selectedVariantId,
+                        method: 'GET',
+                        data: {
+                            'color': selectedColor,
+                            'image': selectedImage,
+                            'variant_id': selectedVariantId
+                        },
+                        success: function (response) {
+                            console.log("AJAX success:", response);
+                            location.reload();
+                        },
+                        error: function (err) {
+                            console.error('Error adding product to wishlist:', err);
+                        }
+                    });
+                } else {
+                    console.error('No variant selected.');
+                }
+            });
+
+            document.addEventListener("DOMContentLoaded", function () {
+                initializeProductDetailPage();
+            });
+
+        });
+
+    </script>
+
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.all.min.js"></script>
+
+</body>
+
+</html>

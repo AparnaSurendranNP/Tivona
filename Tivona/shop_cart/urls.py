@@ -1,0 +1,16 @@
+from django.urls import path
+from django.conf import settings
+from django.conf.urls.static import static
+from shop_cart import views
+
+urlpatterns =[
+    path('add_cart/<int:variant_id>',views.add_cart,name='add_cart'),
+    path('remove_cart/<int:cartItem_id>',views.remove_cart,name='remove_cart'),
+    path('shoping-cart/',views.shoping_cart,name='shoping-cart'),
+    path('make_order/',views.make_order,name='make_order'),
+    path('place_order/',views.place_order,name='place_order'),
+    path('order_success/<int:order_id>/', views.order_success, name='order_success'),
+]
+
+if settings.DEBUG:
+    urlpatterns += static(settings.MEDIA_URL,document_root=settings.MEDIA_ROOT)
