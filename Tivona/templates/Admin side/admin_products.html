@@ -17,6 +17,7 @@
     <script src="{%static 'js/charts-pie.js'%}" defer></script>
     <link rel="stylesheet" href="{%static 'css/prostyle.css'%}">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/Jcrop/0.9.15/css/jquery.Jcrop.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.12/cropper.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.12/cropper.min.css" />
 
@@ -27,6 +28,17 @@
         display: flex;
         align-items: center;
     }
+    .product__pagination a {
+      margin: 0 5px;
+      padding: 0px 5px;
+      text-decoration: none;
+      border: 1px solid #ddd;
+      color: rgb(22, 165, 65);
+  }
+  .product__pagination a.active {
+      background-color: rgb(22, 165, 65);
+      color: #fff;
+  }
 </style>
 
 <body>
@@ -233,10 +245,14 @@
                             <button class="align-middle rounded-full focus:shadow-outline-purple focus:outline-none"
                                 @click="toggleProfileMenu" @keydown.escape="closeProfileMenu" aria-label="Account"
                                 aria-haspopup="true">
-                                <img class="object-cover w-8 h-8 rounded-full"
-                                    src="https://images.unsplash.com/photo-1502378735452-bc7d86632805?ixlib=rb-0.3.5&q=80&fm=jpg&crop=entropy&cs=tinysrgb&w=200&fit=max&s=aa3a807e1bbdfd4364d1f449eaa96d82"
-                                    alt="" aria-hidden="true" />
+                                <svg class="w-6 h-6 text-purple-600 dark:text-purple-300" fill="currentColor"
+                                    viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
+                                    <path fill-rule="evenodd"
+                                        d="M10 2a6 6 0 00-6 6v1a6 6 0 1012 0V8a6 6 0 00-6-6zm-4 8a4 4 0 118 0v1a4 4 0 11-8 0V10zm4 6a6 6 0 00-5.14 3h10.28A6 6 0 0010 16z"
+                                        clip-rule="evenodd"></path>
+                                </svg>
                             </button>
+                            <span>{{admin}}</span>
                             <template x-if="isProfileMenuOpen">
                                 <ul x-transition:leave="transition ease-in duration-150"
                                     x-transition:leave-start="opacity-100" x-transition:leave-end="opacity-0"
@@ -272,7 +288,7 @@
                                     </li>
                                     <li class="flex">
                                         <a class="inline-flex items-center w-full px-2 py-1 text-sm font-semibold transition-colors duration-150 rounded-md hover:bg-gray-100 hover:text-gray-800 dark:hover:bg-gray-800 dark:hover:text-gray-200"
-                                            href="#">
+                                            href="{%url 'admin_logout'%}">
                                             <svg class="w-4 h-4 mr-3" aria-hidden="true" fill="none"
                                                 stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                                 viewBox="0 0 24 24" stroke="currentColor">
@@ -312,13 +328,12 @@
                                                     <th scope="col">Product Name</th>
                                                     <th scope="col">Description</th>
                                                     <th scope="col">Category</th>
-                                                    <th scope="col">Quantity</th>
                                                     <th scope="col">Variant details</th>
                                                     <th scope="col">Action</th>
                                                 </tr>
                                             </thead>
                                             <tbody>
-                                                {%for product in products%}
+                                                {%for product in page_obj.object_list%}
                                                 <tr>
                                                     <th scope="row">{{ forloop.counter }}</th>
                                                     <td><img src="{{ product.image.url }}" alt="{{ product.name }}"
@@ -326,12 +341,11 @@
                                                     <td>{{ product.name }}</td>
                                                     <td>{{ product.description }}</td>
                                                     <td>{{ product.category.name }}</td>
-                                                    <td>{{ product.product_count}}</td>
                                                     <td>
                                                         {% for variant in product.variants.all %}
                                                         {% for color_name,color_code in colors %}
                                                         {% if variant.color == color_code %}
-                                                        <span style="color: {{ color_code }};">{{ color_name}}</span><br>
+                                                        <span style="color: {{ color_code }};">{{color_name}}</span><br>
                                                         {% endif %}
                                                         {% endfor %}
                                                         Price: {{ variant.price }}<br>
@@ -386,7 +400,32 @@
                                             </tbody>
                                         </table>
                                     </div>
-                                    <!-- End Table with stripped rows -->
+                                </div>
+                                <div class="grid px-4 py-4 text-xs font-semibold tracking-wide text-gray-500 uppercase border-t dark:border-gray-700 bg-gray-50 sm:grid-cols-9 dark:text-gray-400 dark:bg-gray-800">
+                                    <!-- <span class="flex items-center col-span-3">
+                                    Showing 21-30 of 100
+                                    </span> -->
+                                    <span class="col-span-4"></span>
+                                    <!-- Pagination -->
+                                    <div class="product__pagination">
+                                        {% if page_obj.has_previous %}
+                                        <a href="?page={{ page_obj.previous_page_number }}"><i
+                                                class="fa fa-long-arrow-left"></i></a>
+                                        {% endif %}
+
+                                        {% for num in page_obj.paginator.page_range %}
+                                        {% if page_obj.number == num %}
+                                        <a href="#" class="active">{{ num }}</a>
+                                        {% else %}
+                                        <a href="?page={{num }}">{{ num }}</a>
+                                        {% endif %}
+                                        {% endfor %}
+
+                                        {% if page_obj.has_next %}
+                                        <a href="?page={{ page_obj.next_page_number }}"><i
+                                                class="fa fa-long-arrow-right"></i></a>
+                                        {% endif %}
+                                    </div>
                                 </div>
                             </div>
                         </div>

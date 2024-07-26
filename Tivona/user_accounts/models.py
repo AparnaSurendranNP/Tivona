@@ -30,6 +30,7 @@ class Address(models.Model):
     pin_code = models.CharField(max_length=20)
     country = models.CharField(max_length=100)
     primary_address=models.BooleanField(default=False)
+    is_listed=models.BooleanField(default=True)
 
     def __str__(self):
         return f"{self.name},{self.phone},{self.address},{self.street},{self.city},{self.state},{self.pin_code},{self.country}"

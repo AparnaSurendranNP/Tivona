@@ -12,5 +12,6 @@ urlpatterns =[
     path('get_address_details/<str:pin_code>/',views.get_address_details, name='get_address_details'),
     path('order_history/',views.order_history,name='order_history'),
     path('order/<int:order_id>/', views.order_detail, name='order_detail'),
+    path('order_cancel/<int:order_id>/',views.order_cancel,name='order_cancel')
 
 ]

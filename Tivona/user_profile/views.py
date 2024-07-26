@@ -5,10 +5,12 @@ from user_accounts.utils import is_valid_phone,is_strong_password
 from django.contrib import messages
 from user_accounts.models import CustomUser,Address
 from shop_cart.models import Order,OrderItem
-from products.models import Product
+from datetime import timedelta
 from django.contrib.auth import update_session_auth_hash
 from django.contrib.auth.decorators import login_required
 from django.views.decorators.cache import never_cache
+from products.utils import colors
+from django.core.paginator import Paginator
 
 # Create your views here.
 @never_cache
@@ -30,6 +32,10 @@ def update_profile(request,user_id):
 
         if " " in username or " " in phone:
             messages.error(request, "White spaces are not allowed in username or phone.")
+            return redirect('update_profile',user_id=user_id)
+        
+        if not username.isalpha():
+            messages.error(request,"username should contain only letters.")
             return redirect('update_profile',user_id=user_id)
 
         if not is_valid_phone(phone):
@@ -96,24 +102,44 @@ def add_address(request,user_id):
         user=get_object_or_404(CustomUser,id=user_id)
 
         if not all([customer_name,customer_phone,customer_address,street,city,state,pin_code,country]):
-            messages.error(request, "All fields are required.")
-            return redirect('address_manage',user_id=user_id)
+            if source_page == 'make_order':
+                messages.error(request, "All fields are required.")
+                return redirect ('make_order',{'address':address})   
+            else:
+                messages.error(request, "All fields are required.")
+                return redirect('address_manage',user_id=user_id)
 
-        if " " in customer_phone:
-            messages.error(request, "White spaces are not allowed in phone.")
-            return redirect('address_manage',user_id=user_id)
+        if " " in customer_phone or customer_phone =='0000000000':
+            if source_page == 'make_order':
+                messages.error(request, "Invalid number format. Please enter a valid phone number.")
+                return redirect ('make_order',{'address':address})   
+            else:
+                messages.error(request, "Invalid number format. Please enter a valid phone number.")
+                return redirect('address_manage',user_id=user_id)
 
         if not is_valid_phone(customer_phone):
-            messages.error(request, "Invalid phone number format. Please enter a valid phone number.")
-            return redirect('address_manage',user_id=user_id)
+            if source_page == 'make_order':
+                messages.error(request, "Invalid phone number format. Please enter a valid phone number.")
+                return redirect ('make_order',{'address':address})
+            else:
+                messages.error(request, "Invalid phone number format. Please enter a valid phone number.")
+                return redirect('address_manage',user_id=user_id)
         
         if not city.isalpha() or not state.isalpha() or not country.isalpha():
-            messages.error(request,"city or state or country should contain only letters.")
-            return redirect('address_manage',user_id=user_id)
+            if source_page == 'make_order':
+                messages.error(request,"city or state or country should contain only letters.")
+                return redirect ('make_order',{'address':address})   
+            else:
+                messages.error(request,"city or state or country should contain only letters.")
+                return redirect('address_manage',user_id=user_id)
         
-        if not pin_code.isdigit() or len(pin_code) != 6:
-            messages.error(request,"Invalid pin code. Please enter a valid 6-digit pin code.") 
-            return redirect('address_manage',user_id=user_id)
+        if not pin_code.isdigit() or len(pin_code) != 6: 
+            if source_page == 'make_order':
+                messages.error(request,"Invalid pin code. Please enter a valid 6-digit pin code.")
+                return redirect ('make_order',{'address':address})   
+            else:
+                messages.error(request,"Invalid pin code. Please enter a valid 6-digit pin code.")
+                return redirect('address_manage',user_id=user_id)
 
         #change the existing primary address as normal address
         Address.objects.filter(user_id=user_id,primary_address=True).update(primary_address=False)
@@ -131,7 +157,8 @@ def add_address(request,user_id):
             primary_address=True
             )
         if source_page == 'make_order':
-            return redirect ('make_order')   
+            messages.success(request, "Address added successfully.")
+            return redirect ('make_order',{'address':address})   
         else:
             messages.success(request, "Address added successfully.")
             return redirect('address_manage',user_id=user_id)
@@ -163,9 +190,12 @@ def edit_address(request,address_id):
             messages.error(request, "All fields are required.")
             return redirect('address_manage',user_id=user_id)
 
-        if " " in customer_phone:
-            messages.error(request, "White spaces are not allowed in phone.")
-            return redirect('address_manage',user_id=user_id)
+        if " " or '0000000000' in customer_phone:
+            messages.error(request, "Incorrect phone number.")
+            if source_page == 'make_order':
+                return redirect('make_order')
+            else:
+                return redirect('address_manage', user_id=request.user.id)
 
         if not is_valid_phone(customer_phone):
             messages.error(request, "Invalid phone number format. Please enter a valid phone number.")
@@ -190,8 +220,6 @@ def edit_address(request,address_id):
         address.country = country
         address.save()
 
-        source_page = request.POST.get('source_page')
-        print(f"Source page: {source_page}")
         if source_page == 'make_order':
             return redirect('make_order')
         else:
@@ -208,7 +236,9 @@ def delete_address(request, address_id):
     user_id = address.user_id
 
     if request.method == 'POST':
-        address.delete()
+        address.is_listed = not address.is_listed  # Toggle the is_listed flag
+        address.primary_address=False
+        address.save() 
         addresses = Address.objects.filter(user_id=user_id)
         if not addresses.filter(primary_address=True).exists() and addresses.exists():
             last_address = addresses.last()
@@ -261,16 +291,38 @@ def change_password(request,user_id):
 @login_required
 def order_history(request):
     user = request.user
-    orders = Order.objects.filter(user=user)
-    return render(request, 'User side/order_history.html', {'orders': orders})
+    orders = Order.objects.filter(user=user).order_by('-created_at')
+    paginator = Paginator(orders,5)
+    page_number=request.GET.get('page')
+    page_obj=paginator.get_page(page_number)
+    context={
+        'page_obj':page_obj,
+    }
+    return render(request, 'User side/order_history.html',context)
 
 @login_required
 @never_cache
 def order_detail(request,order_id):
     order = get_object_or_404(Order, id=order_id)
-    order_items=OrderItem.objects.filter(order=order)
+    order_items = OrderItem.objects.filter(order=order) 
+    sub_total = (order.total_amount + order.discount) - order.tax_amount 
+    expected_date = order.created_at + timedelta(days=5)
     context = {
         'order': order,
-        'order_items':order_items
+        'order_items':order_items,
+        'expected_date':expected_date,
+        'sub_total':sub_total,
+        'colors':colors
     }
     return render(request,'User side/order_detail.html',context)
+
+@login_required
+def order_cancel(request,order_id):
+    order=get_object_or_404(Order,pk=order_id)
+    if request.method=='POST':
+        order.is_listed=not order.is_listed
+        order.status=" order cancelled "
+        order.save()
+        return redirect('order_history')
+    return redirect('order_history')
+    

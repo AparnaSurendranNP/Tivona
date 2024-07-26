@@ -22,9 +22,15 @@
     <link rel="stylesheet" href="{%static 'css/owl.carousel.min.css'%}" type="text/css">
     <link rel="stylesheet" href="{%static 'css/slicknav.min.css'%}" type="text/css">
     <link rel="stylesheet" href="{%static 'css/style.css'%}" type="text/css">
+
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js"></script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
+    
 </head>
 
 <body>
+    
     <!-- Page Preloder -->
     <div id="preloder">
         <div class="loader"></div>
@@ -127,8 +133,8 @@
                             </div>
                             <div class="header__top__right__auth">
                                 {% if user.is_authenticated %}
-                                <a href="{% url 'profile page' user.id%}"><i class="fa fa-user"></i>
-                                    {{ user.username}}</a>
+                                <a href="{% url 'profile page' user.id%}"><i
+                                        class="fa fa-user"></i>{{user.username}}</a>
                                 {% else %}
                                 <a href="{% url 'login page' %}"><i class="fa fa-user"></i> Login/Signup</a>
                                 {% endif %}
@@ -169,10 +175,10 @@
                     <div class="header__cart">
                         <ul>
                             <li><a href="{%url 'wishlist'%}"><i class="fa fa-heart"></i></a></li>
-                            <li><a href="{%url 'shoping-cart'%}"><i class="fa fa-shopping-bag"></i> <span>3</span></a>
+                            <li><a href="{%url 'shoping-cart'%}"><i class="fa fa-shopping-bag"></i></a>
                             </li>
                         </ul>
-                        <div class="header__cart__price">item: <span>$150.00</span></div>
+                        <!-- <div class="header__cart__price">item: <span>$150.00</span></div> -->
                     </div>
                 </div>
             </div>
@@ -185,7 +191,7 @@
     <!-- Header Section End -->
 
     <!-- Breadcrumb Section Begin -->
-    <section class="breadcrumb-section set-bg" data-setbg="{%static 'img/breadcrumb.jpg'%}">
+    <!-- <section class="breadcrumb-section set-bg" data-setbg="{%static 'img/breadcrumb.jpg'%}">
         <div class="container">
             <div class="row">
                 <div class="col-lg-12 text-center">
@@ -199,92 +205,88 @@
                 </div>
             </div>
         </div>
-    </section>
+    </section> -->
     <!-- Breadcrumb Section End -->
 
     <!-- Shoping Cart Section Begin -->
     <section class="shoping-cart spad">
         <div class="container">
-            <div class="row">
-                <div class="col-lg-12">
-                    <div class="shoping__cart__table">
-                        <table>
-                            <thead>
-                                <tr>
-                                    <th class="shoping__product " style="display: flex; justify-content: space-around;">
-                                        Products</th>
-                                    <th>Price</th>
-                                    <th>Quantity</th>
-                                    <th>Total</th>
-                                    <th></th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                {% for cartItem in cartItems %}
-                                <tr>
-                                    <td class="shoping__cart__item ">
-                                        <div class="shoping__cart__detail"
-                                            style="display:flex; justify-content: center; align-items: center;justify-content: space-between; padding-right: 50%">
-                                            <div style="width: 100px; height: 100px;">
-                                                <img src="{{cartItem.variant.images.first.image.url}}" alt="">
+            <form method="POST" action="{% url 'make_order'%}">
+                {% csrf_token %}
+                <input type="hidden" name="form_type" value="make_order">
+                <div class="row">
+                    <div class="col-lg-12">
+                        <div class="shoping__cart__table">
+                            <table>
+                                <thead>
+                                    <tr>
+                                        <th class="shoping__product" style="display: flex; justify-content: space-around;">Products</th>
+                                        <th>Price</th>
+                                        <th>Quantity</th>
+                                        <th>Total</th>
+                                        <th></th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for cartItem in cartItems %}
+                                    <tr>
+                                        <td class="shoping__cart__item">
+                                            <div class="shoping__cart__detail" style="display:flex; justify-content: center; align-items: center; justify-content: space-between; padding-right: 50%">
+                                                <div style="width: 100px; height: 100px;">
+                                                    <img src="{{ cartItem.variant.images.first.image.url }}" alt="">
+                                                </div>
+                                                <h5><a href="{% url 'product_detail' cartItem.product.slug %}" 
+                                                    style="color: black;">{{ cartItem.product.name }}</a></h5>
                                             </div>
-                                            <h5><a href="{%url 'product_detail' cartItem.product.slug%}"
-                                                    style="color: black;"> {{cartItem.product.name}} </a></h5>
-                                        </div>
-                                    </td>
-                                    <td class="shoping__cart__price">
-                                        {{ cartItem.variant.price }}
-                                    </td>
-                                    <td class="shoping__cart__quantity">
-                                        {{ cartItem.quantity }}
-                                    </td>
-                                    <td class="shoping__cart__total">
-                                        {{ cartItem.total_item_price }}
-                                    </td>
-                                    <td class="shoping__cart__item__close">
-                                        <form method="POST" action="{% url 'remove_cart' cartItem.id %}"
-                                            style="display:inline;">
-                                            {% csrf_token %}
-                                            <button type="submit" class="btn btn-danger mb-2">Remove</button>
-                                        </form>
-                                    </td>
-                                </tr>
-                                {%endfor%}
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
-            </div>
-            <div class="row">
-                <div class="col-lg-12">
-                    <div class="shoping__cart__btns">
-                        <a href="{%url 'shop page'%}" class="primary-btn cart-btn">CONTINUE SHOPPING</a>
-                    </div>
-                </div>
-                <div class="col-lg-6">
-                    <div class="shoping__continue">
-                        <div class="shoping__discount">
-                            <h5>Discount Codes</h5>
-                            <form action="#">
-                                <input type="text" placeholder="Enter your coupon code">
-                                <button type="submit" class="site-btn">APPLY COUPON</button>
-                            </form>
+                                        </td>
+                                        <td class="shoping__cart__price">
+                                            {{ cartItem.variant.price }}
+                                        </td>
+                                        <td class="shoping__cart__quantity">
+                                            <div class="quantity">
+                                                <div class="pro-qty">
+                                                    <input type="hidden" name="cart_item_id_{{ cartItem.id }}" value="{{ cartItem.id }}">
+                                                    <input type="number" id="quantity_{{ cartItem.id }}" name="quantity_{{ cartItem.id }}" value="{{ cartItem.quantity }}" min="1">
+                                                </div>
+                                            </div>
+                                        </td>
+                                        <td class="shoping__cart__total">
+                                            {{ cartItem.total_item_price }}
+                                        </td>
+                                        <td class="shoping__cart__item__close">
+                                            <a href="{% url 'remove_cart' cartItem.id %}" class="btn btn-danger mb-2">Remove </a>
+                                            <!-- <form method="POST" action="{% url 'remove_cart' cartItem.id %}" style="display:inline;">
+                                                {% csrf_token %}
+                                                <button type="submit" class="btn btn-danger mb-2">Remove</button>
+                                            </form> -->
+                                        </td>
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
                         </div>
                     </div>
                 </div>
-                <div class="col-lg-6">
-                    <div class="shoping__checkout">
-                        <h5>Cart Total</h5>
-                        <ul>
-                            <!-- <li>Subtotal <span>Rs {{total}}</span></li> -->
-                            <li>Total <span>Rs {{total}}</span></li>
-                        </ul>
-                        <a href="{%url 'make_order'%}" class="primary-btn">PROCEED TO CHECKOUT</a>
+                <div class="row">
+                    <div class="col-lg-12">
+                        <div class="shoping__cart__btns">
+                            <a href="{% url 'shop page' %}" class="primary-btn cart-btn">CONTINUE SHOPPING</a>
+                        </div>
+                    </div>
+                    <div class="col-lg-6">
+                        <div class="shoping__checkout">
+                            <h5>Cart Total</h5>
+                            <ul>
+                                <li>Total <span>Rs {{ total }}</span></li>
+                            </ul>
+                            <button type="submit" class="primary-btn">PROCEED TO CHECKOUT</button>
+                        </div>
                     </div>
                 </div>
-            </div>
+            </form>
         </div>
     </section>
+
     <!-- Shoping Cart Section End -->
 
     <!-- Footer Section Begin -->
@@ -354,6 +356,17 @@
     <script src="{%static 'js/mixitup.min.js'%}"></script>
     <script src="{%static 'js/owl.carousel.min.js'%}"></script>
     <script src="{%static 'js/main.js'%}"></script>
+
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.all.min.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            {% if messages %}
+                {% for message in messages %}
+                    Swal.fire('{{ message }}');
+                {% endfor %}
+            {% endif %}
+        });
+    </script>
 
 
 </body>

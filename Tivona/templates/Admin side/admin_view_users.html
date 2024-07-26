@@ -11,6 +11,7 @@
   <script src="https://cdn.jsdelivr.net/gh/alpinejs/alpine@v2.x.x/dist/alpine.min.js" defer></script>
   <script src="{%static 'js/init-alpine.js'%}"></script>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.9.3/Chart.min.css" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
   <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.9.3/Chart.min.js" defer></script>
   <script src="{%static 'js/charts-lines.js'%}" defer></script>
   <script src="{%static 'js/charts-pie.js'%}" defer></script>
@@ -23,6 +24,19 @@
 
   .unblock-button {
     color: red;
+  }
+
+  .product__pagination a {
+    margin: 0 5px;
+    padding: 0px 5px;
+    text-decoration: none;
+    border: 1px solid #ddd;
+    color: rgb(120, 5, 197);
+  }
+
+  .product__pagination a.active {
+    background-color: rgb(120, 5, 197);
+    color: #fff;
   }
 </style>
 
@@ -222,6 +236,62 @@
                 </ul>
               </template>
             </li>
+            <!-- Profile menu -->
+            <li class="relative">
+              <button class="align-middle rounded-full focus:shadow-outline-purple focus:outline-none"
+                @click="toggleProfileMenu" @keydown.escape="closeProfileMenu" aria-label="Account" aria-haspopup="true">
+                <svg class="w-6 h-6 text-purple-600 dark:text-purple-300" fill="currentColor" viewBox="0 0 20 20"
+                  xmlns="http://www.w3.org/2000/svg">
+                  <path fill-rule="evenodd"
+                    d="M10 2a6 6 0 00-6 6v1a6 6 0 1012 0V8a6 6 0 00-6-6zm-4 8a4 4 0 118 0v1a4 4 0 11-8 0V10zm4 6a6 6 0 00-5.14 3h10.28A6 6 0 0010 16z"
+                    clip-rule="evenodd"></path>
+                </svg>
+              </button>
+              <span>{{admin}}</span>
+              <template x-if="isProfileMenuOpen">
+                <ul x-transition:leave="transition ease-in duration-150" x-transition:leave-start="opacity-100"
+                  x-transition:leave-end="opacity-0" @click.away="closeProfileMenu" @keydown.escape="closeProfileMenu"
+                  class="absolute right-0 w-56 p-2 mt-2 space-y-2 text-gray-600 bg-white border border-gray-100 rounded-md shadow-md dark:border-gray-700 dark:text-gray-300 dark:bg-gray-700"
+                  aria-label="submenu">
+                  <li class="flex">
+                    <a class="inline-flex items-center w-full px-2 py-1 text-sm font-semibold transition-colors duration-150 rounded-md hover:bg-gray-100 hover:text-gray-800 dark:hover:bg-gray-800 dark:hover:text-gray-200"
+                      href="#">
+                      <svg class="w-4 h-4 mr-3" aria-hidden="true" fill="none" stroke-linecap="round"
+                        stroke-linejoin="round" stroke-width="2" viewBox="0 0 24 24" stroke="currentColor">
+                        <path d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z">
+                        </path>
+                      </svg>
+                      <span>Profile</span>
+                    </a>
+                  </li>
+                  <li class="flex">
+                    <a class="inline-flex items-center w-full px-2 py-1 text-sm font-semibold transition-colors duration-150 rounded-md hover:bg-gray-100 hover:text-gray-800 dark:hover:bg-gray-800 dark:hover:text-gray-200"
+                      href="#">
+                      <svg class="w-4 h-4 mr-3" aria-hidden="true" fill="none" stroke-linecap="round"
+                        stroke-linejoin="round" stroke-width="2" viewBox="0 0 24 24" stroke="currentColor">
+                        <path
+                          d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z">
+                        </path>
+                        <path d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
+                      </svg>
+                      <span>Settings</span>
+                    </a>
+                  </li>
+                  <li class="flex">
+                    <a class="inline-flex items-center w-full px-2 py-1 text-sm font-semibold transition-colors duration-150 rounded-md hover:bg-gray-100 hover:text-gray-800 dark:hover:bg-gray-800 dark:hover:text-gray-200"
+                      href="{%url 'admin_logout'%}">
+                      <svg class="w-4 h-4 mr-3" aria-hidden="true" fill="none" stroke-linecap="round"
+                        stroke-linejoin="round" stroke-width="2" viewBox="0 0 24 24" stroke="currentColor">
+                        <path
+                          d="M11 16l-4-4m0 0l4-4m-4 4h14m-5 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h7a3 3 0 013 3v1">
+                        </path>
+                      </svg>
+                      <span>Log out</span>
+                    </a>
+                  </li>
+                </ul>
+              </template>
+            </li>
           </ul>
         </div>
       </header>
@@ -241,7 +311,7 @@
                   </tr>
                 </thead>
                 <tbody class="bg-white divide-y dark:divide-gray-700 dark:bg-gray-800">
-                  {% for customer in customers %}
+                  {% for customer in page_obj.object_list %}
                   <tr class="text-gray-700 dark:text-gray-400">
                     <td class="px-4 py-3">
                       <div class="flex items-center text-sm">
@@ -269,7 +339,9 @@
                     </td>
                     <td class="px-4 py-3">
                       <div class="flex items-center space-x-4 text-sm">
-                        <form action="{% url 'block_user' customer.id %}" method="post" x-data="{ isActive: {{ customer.is_active|lower }} }" @submit.prevent="toggleUserStatus($event)">
+                        <form action="{% url 'block_user' customer.id %}" method="post"
+                          x-data="{ isActive: {{ customer.is_active|lower }} }"
+                          @submit.prevent="toggleUserStatus($event)">
                           {% csrf_token %}
                           <button type="submit" :class="{ 'block-button': isActive, 'unblock-button': !isActive }">
                             <span x-text="isActive ? 'Block User' : 'Unblock User'"></span>
@@ -283,6 +355,31 @@
               </table>
             </div>
           </div>
+          <div
+            class="grid px-4 py-3 text-xs font-semibold tracking-wide text-gray-500 uppercase border-t dark:border-gray-700 bg-gray-50 sm:grid-cols-9 dark:text-gray-400 dark:bg-gray-800">
+            <!-- <span class="flex items-center col-span-3">
+                        Showing 21-30 of 100
+                      </span> -->
+            <span class="col-span-2"></span>
+            <!-- Pagination -->
+            <div class="product__pagination">
+              {% if page_obj.has_previous %}
+              <a href="?page={{ page_obj.previous_page_number }}"><i class="fa fa-long-arrow-left"></i></a>
+              {% endif %}
+
+              {% for num in page_obj.paginator.page_range %}
+              {% if page_obj.number == num %}
+              <a href="#" class="active">{{ num }}</a>
+              {% else %}
+              <a href="?page={{num }}">{{ num }}</a>
+              {% endif %}
+              {% endfor %}
+
+              {% if page_obj.has_next %}
+              <a href="?page={{ page_obj.next_page_number }}"><i class="fa fa-long-arrow-right"></i></a>
+              {% endif %}
+            </div>
+          </div>
         </div>
       </main>
     </div>
@@ -293,27 +390,27 @@
 
 <script>
   function toggleUserStatus(event) {
-      const form = event.target.closest('form');
-      const isActive = form.__x.$data.isActive;
+    const form = event.target.closest('form');
+    const isActive = form.__x.$data.isActive;
 
-      fetch(form.action, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/x-www-form-urlencoded',
-          'X-CSRFToken': form.querySelector('[name=csrfmiddlewaretoken]').value
-        },
-        body: new URLSearchParams(new FormData(form))
+    fetch(form.action, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/x-www-form-urlencoded',
+        'X-CSRFToken': form.querySelector('[name=csrfmiddlewaretoken]').value
+      },
+      body: new URLSearchParams(new FormData(form))
+    })
+      .then(response => {
+        if (response.ok) {
+          // Toggle the isActive state
+          form.__x.$data.isActive = !isActive;
+        } else {
+          console.error('Failed to update user status');
+        }
       })
-        .then(response => {
-          if (response.ok) {
-            // Toggle the isActive state
-            form.__x.$data.isActive = !isActive;
-          } else {
-            console.error('Failed to update user status');
-          }
-        })
-        .catch(error => console.error('Error:', error));
-    }
+      .catch(error => console.error('Error:', error));
+  }
 </script>
 
 </html>

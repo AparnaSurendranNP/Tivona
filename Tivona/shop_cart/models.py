@@ -27,21 +27,44 @@ class CartItem(models.Model):
 
     def get_total_price(self):
         return self.product.price * self.quantity
+    
+
+class Coupon(models.Model):
+    code = models.CharField(max_length=50, unique=True)
+    discount = models.DecimalField(max_digits=5, decimal_places=2)
+    min_amount = models.PositiveIntegerField(default=100)
+    max_amount = models.PositiveIntegerField(default=500)
+    valid_from = models.DateTimeField()
+    valid_to = models.DateTimeField()
+    active = models.BooleanField(default=False)
+    used = models.BooleanField(default=False)
+
+    def __str__(self):
+        return self.code
 
 
 class Order(models.Model):
     user = models.ForeignKey(CustomUser, on_delete=models.CASCADE)
     created_at = models.DateTimeField(auto_now_add=True)
     status = models.CharField(max_length=20, default='Pending')
-    address = models.ForeignKey(Address, on_delete=models.SET_NULL, null=True, blank=True)
+    razorpay_order_id = models.CharField(max_length=10,blank=True,null=True)
+    order_address = models.ForeignKey(Address,on_delete=models.CASCADE, null=True, blank=True)
     payment_method = models.CharField(max_length=50, null=True, blank=True)
+    coupon = models.ForeignKey(Coupon, on_delete=models.SET_NULL, null=True, blank=True)
+    discount = models.DecimalField(max_digits=10, decimal_places=2, default=0.00)
     total_amount = models.DecimalField(max_digits=10, decimal_places=2, default=0)
+    tax_amount=models.DecimalField(max_digits=10, decimal_places=2, default=0)
+    is_listed = models.BooleanField(default=True)
 
     def __str__(self):
         return f'Order-id {self.id} by {self.user.username}'
 
     def get_total_cost(self):
-        return sum(item.get_cost() for item in self.order_items.all())
+        total_cost = sum(item.get_cost() for item in self.order_items.all())
+        if self.coupon:
+            total_cost -= self.discount
+        return total_cost
+    
 
 class OrderItem(models.Model):
     order = models.ForeignKey(Order, related_name='order_items', on_delete=models.CASCADE)

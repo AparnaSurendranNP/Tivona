@@ -14,6 +14,7 @@ from datetime import datetime, timedelta
 from django.contrib.auth.decorators import login_required
 import random
 from django.http import Http404
+from django.core.paginator import Paginator
 
 
 # Create your views here.
@@ -38,8 +39,13 @@ def block_user(request, pk):
 @never_cache
 @login_required(login_url='/admin_login/')
 def admin_users(request):
-    client=CustomUser.objects.all()
+    customers=CustomUser.objects.all()
+    paginator = Paginator(customers,10)
+    page_number=request.GET.get('page')
+    page_obj=paginator.get_page(page_number)
+    admin_user = request.session.get('admin_user', None)
     context={
-        'customers':client
+        'page_obj':page_obj,
+        'admin':admin_user
     }
     return render(request,'Admin side/admin_view_users.html',context)

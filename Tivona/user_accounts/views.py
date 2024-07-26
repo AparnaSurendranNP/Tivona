@@ -133,7 +133,7 @@ def loginn(request):
         password = request.POST.get('password')
         user = authenticate(request, username=username, password=password)
         
-        if user is not None:
+        if user is not None and not user.is_superuser:
 
             if user.is_active:
                 login(request, user)

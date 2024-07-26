@@ -139,41 +139,41 @@
             <div class="row">
                 <div class="col-lg-3">
                     <div class="header__logo">
-                        <a href="{%url 'home page'%}"><img src="{%static 'img/logo.png'%}" alt=""></a>
+                        <a href="{% url 'home page' %}"><img src="{% static 'img/logo.png' %}" alt=""></a>
                     </div>
                 </div>
-                <div class="col-lg-6" style="padding: 20px;" >
+                <div class="col-lg-6" style="padding: 20px;">
                     <nav class="header__menu">
                         <ul>
-                            <li><a href="{%url 'home page'%}">Home</a></li>
-                            <li><a href="{%url 'shop page'%}">Store</a>
-                                
+                            <li><a href="{% url 'home page' %}">Home</a></li>
+                            <li><a href="{% url 'shop page' %}">Store</a>
                                 <ul class="header__menu__dropdown">
-                                    {%for category in categories%}
-                                    {%if category.is_listed%}
-                                    <li><a href="{%url 'category_detail' category.slug %}">{{category.name}}</a></li>
-                                    {%endif%}
-                                    {%endfor%}
+                                    {% for category in categories %}
+                                    {% if category.is_listed %}
+                                    <li><a href="{% url 'category_detail' category.slug %}">{{ category.name }}</a></li>
+                                    {% endif %}
+                                    {% endfor %}
                                 </ul>
-                                
                             </li>
-                            <!-- <li><a href="./blog.html">Blog</a></li> -->
-                            <li><a href="{%url 'shoping-cart'%}">Shoping Cart</a></li>
-                            <!-- <li><a href="./checkout.html">Check Out</a></li> -->
-                            <li><a href="{%url 'contact page'%}">Contact</a></li>
-                            
+                            <li><a href="{% url 'shoping-cart' %}">Shopping Cart</a></li>
+                            <li><a href="{% url 'contact page' %}">Contact</a></li>
                         </ul>
                     </nav>
                 </div>
-                <div class="col-lg-3" style="padding: 20px;">
-                    <div class="header__cart">
-                        <ul>
-                            <li><a href="{%url 'wishlist'%}"><i class="fa fa-heart"></i></a></li>
-                            <li><a href="{%url 'shoping-cart'%}"><i class="fa fa-shopping-bag"></i> <span>3</span></a></li>
+                    <div class="header__cart" style="display: flex;margin-top: 25px;">
+                        <div class="header__search">
+                            <form id="search-form" action="{% url 'search' %}" method="get">
+                                <input type="text" id="search-input" name="search" placeholder="Search for products..." autocomplete="off">
+                                <button type="submit"><i class="fa fa-search"></i></button>
+                            </form>
+                            <ul id="suggestions"></ul>
+                        </div>
+                        <ul style="margin-left: 10px;">
+                            <li><a href="{% url 'wishlist' %}"><i class="fa fa-heart"></i></a></li>
+                            <li><a href="{% url 'shoping-cart' %}"><i class="fa fa-shopping-bag"></i></a></li>
                         </ul>
-                        <div class="header__cart__price">item: <span>$150.00</span></div>
                     </div>
-                </div>
+                
             </div>
             <div class="humberger__open">
                 <i class="fa fa-bars"></i>
@@ -234,10 +234,10 @@
                     <div class="featured__controls">
                         <ul>
                             <li class="active" data-filter="*">All</li>
-                            <li data-filter=".indoor">Indoor Plants</li>
-                            <li data-filter=".outdoor">Outdoor Plants</li>
-                            <li data-filter=".flowering">Flowering Plants</li>
-                            <li data-filter=".cactus">Cactus</li>
+                            <li data-filter="indoor">Indoor Plants</li>
+                            <li data-filter="outdoor">Outdoor Plants</li>
+                            <li data-filter="flowering">Flowering Plants</li>
+                            <li data-filter="cactus">Cactus</li>
                         </ul>
                     </div>
                 </div>
@@ -255,7 +255,7 @@
                         </div>
                         <div class="featured__item__text">
                             <h6><a href="{%url 'product_detail' product.slug %}">{{product.name}}</a></h6>
-                            <h5>{{product.price}}</h5>
+                            <h5>{{product.variants.price}}</h5>
                         </div>
                     </div>
                 </div>
@@ -291,64 +291,19 @@
                     <div class="latest-product__text">
                         <h4>Latest Products</h4>
                         <div class="latest-product__slider owl-carousel">
+                            {%for latest_product in latest_products%}
                             <div class="latest-prdouct__slider__item">
-                                <a href="#" class="latest-product__item">
+                                <a href="{%url 'product_detail' latest_product.slug %}" class="latest-product__item">
                                     <div class="latest-product__item__pic">
-                                        <img src="{%static 'img/latest-product/lp-1.jpg'%}" alt="">
+                                        <img src="{{ latest_product.image.url }}" alt="">
                                     </div>
                                     <div class="latest-product__item__text">
-                                        <h6>Crab Pool Security</h6>
-                                        <span>$30.00</span>
-                                    </div>
-                                </a>
-                                <a href="#" class="latest-product__item">
-                                    <div class="latest-product__item__pic">
-                                        <img src="{%static 'img/latest-product/lp-2.png'%}" alt="">
-                                    </div>
-                                    <div class="latest-product__item__text">
-                                        <h6>Crab Pool Security</h6>
-                                        <span>$30.00</span>
-                                    </div>
-                                </a>
-                                <a href="#" class="latest-product__item">
-                                    <div class="latest-product__item__pic">
-                                        <img src="{%static 'img/latest-product/lp-3.jpg'%}" alt="">
-                                    </div>
-                                    <div class="latest-product__item__text">
-                                        <h6>Crab Pool Security</h6>
-                                        <span>$30.00</span>
+                                        <h6>{{ latest_product.name }}</h6>
+                                        <span>{{ latest_product.variants.price }}</span>
                                     </div>
                                 </a>
                             </div>
-                            <div class="latest-prdouct__slider__item">
-                                <a href="#" class="latest-product__item">
-                                    <div class="latest-product__item__pic">
-                                        <img src="{%static 'img/latest-product/lp-4.jpg'%}" alt="">
-                                    </div>
-                                    <div class="latest-product__item__text">
-                                        <h6>Crab Pool Security</h6>
-                                        <span>$30.00</span>
-                                    </div>
-                                </a>
-                                <a href="#" class="latest-product__item">
-                                    <div class="latest-product__item__pic">
-                                        <img src="{%static 'img/latest-product/lp-5.jpg'%}" alt="">
-                                    </div>
-                                    <div class="latest-product__item__text">
-                                        <h6>Crab Pool Security</h6>
-                                        <span>$30.00</span>
-                                    </div>
-                                </a>
-                                <a href="#" class="latest-product__item">
-                                    <div class="latest-product__item__pic">
-                                        <img src="{%static 'img/latest-product/lp-6.jpg'%}" alt="">
-                                    </div>
-                                    <div class="latest-product__item__text">
-                                        <h6>Crab Pool Security</h6>
-                                        <span>$30.00</span>
-                                    </div>
-                                </a>
-                            </div>
+                            {%endfor%}
                         </div>
                     </div>
                 </div>
@@ -626,6 +581,41 @@
             {% endif %}
         });
     </script>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script>
+    $(document).ready(function() {
+        $('#search-input').on('input', function() {
+            var query = $(this).val();
+            if (query.length > 2) {
+                $.ajax({
+                    url: '{% url "suggest_products" %}',
+                    data: {
+                        'search': query
+                    },
+                    success: function(data) {
+                        $('#suggestions').empty();
+                        if (data.length > 0) {
+                            data.forEach(function(item) {
+                                $('#suggestions').append('<li>' + item.name + '</li>');
+                            });
+                        } else {
+                            $('#suggestions').append('<li>No suggestions found</li>');
+                        }
+                    }
+                });
+            } else {
+                $('#suggestions').empty();
+            }
+        });
+    
+        $(document).on('click', '#suggestions li', function() {
+            var text = $(this).text();
+            $('#search-input').val(text);
+            $('#search-form').submit();
+        });
+    });
+    </script>
+    
 
 </body>
 

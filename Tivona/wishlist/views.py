@@ -1,5 +1,6 @@
 from django.shortcuts import render,redirect
 from wishlist.models import Wishlist,WishlistItem
+from categories.models import Category
 from products.models import Variant
 from django.shortcuts import get_object_or_404
 from django.contrib import messages
@@ -12,10 +13,15 @@ def wishlist(request):
     user= request.user
     wishlist = Wishlist.objects.filter(user=user).first()
     wishlistItems=WishlistItem.objects.filter(wishlist=wishlist)
-    return render(request,'User side/wishlist.html',{'wishlistItems': wishlistItems})
+    categories=Category.objects.all()
+    context={
+        'categories':categories,
+        'wishlistItems':wishlistItems,
+    }
+    return render(request,'User side/wishlist.html',context)
 
 @never_cache
-def add_wishlist(request,variant_id):
+def add_wishlist(request,variant_id): 
     if request.method == 'GET':
         print("Received request to add to wishlist")
         variant = get_object_or_404(Variant, id=variant_id)

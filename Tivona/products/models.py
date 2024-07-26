@@ -9,7 +9,6 @@ class Product(models.Model):
     name = models.CharField(max_length=20)
     image = models.ImageField(upload_to='product_image/', blank=False, null=False)
     cropping = ImageRatioField('image', '430x360')
-    product_count = models.IntegerField(default=0)
     description = models.TextField()
     category = models.ForeignKey(Category, on_delete=models.CASCADE, related_name='products')
     is_listed = models.BooleanField(default=True)
@@ -26,7 +25,7 @@ class Product(models.Model):
 
 class Variant(models.Model):
     color = models.CharField(max_length=100,default=None)
-    price = models.DecimalField(max_digits=10, decimal_places=2,default=100)
+    price = models.PositiveIntegerField()
     stock = models.PositiveIntegerField(default=1)
     product = models.ForeignKey(Product, on_delete=models.CASCADE, related_name='variants')
     is_listed = models.BooleanField(default=True)

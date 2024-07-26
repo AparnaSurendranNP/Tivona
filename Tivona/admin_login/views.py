@@ -5,8 +5,11 @@ from django.contrib import messages
 from django.views.decorators.cache import never_cache
 from django.core.validators import validate_email
 from django.contrib.auth import logout as auth_logout
-from django.contrib.auth.decorators import login_required
+from django.contrib.auth.decorators import login_required,user_passes_test
 from django.conf import settings
+
+def is_superuser(user):
+    return user.is_superuser
 
 @never_cache
 def admin_login(request):
@@ -37,6 +40,7 @@ def admin_forgot_password(request):
 
 @never_cache
 @login_required(login_url='/admin_login/')
-def logout(request):
+@user_passes_test(is_superuser)
+def admin_logout(request):
     auth_logout(request)
     return render(request,'Admin side/admin_login.html')

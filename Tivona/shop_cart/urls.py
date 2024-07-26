@@ -7,7 +7,9 @@ urlpatterns =[
     path('add_cart/<int:variant_id>',views.add_cart,name='add_cart'),
     path('remove_cart/<int:cartItem_id>',views.remove_cart,name='remove_cart'),
     path('shoping-cart/',views.shoping_cart,name='shoping-cart'),
+    path('apply_coupon/',views.apply_coupon,name='apply_coupon'),
     path('make_order/',views.make_order,name='make_order'),
+    path('payment_success/',views.payment_success,name='payment_success/'),
     path('place_order/',views.place_order,name='place_order'),
     path('order_success/<int:order_id>/', views.order_success, name='order_success'),
 ]

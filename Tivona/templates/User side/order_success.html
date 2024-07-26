@@ -156,9 +156,9 @@
                     <div class="header__cart">
                         <ul>
                             <li><a href="{%url 'wishlist'%}"><i class="fa fa-heart"></i></a></li>
-                            <li><a href="{%url 'shoping-cart'%}"><i class="fa fa-shopping-bag"></i> <span>3</span></a></li>
+                            <li><a href="{%url 'shoping-cart'%}"><i class="fa fa-shopping-bag"></i></a></li>
                         </ul>
-                        <div class="header__cart__price">item: <span>$150.00</span></div>
+                        <!-- <div class="header__cart__price">item: <span>$150.00</span></div> -->
                     </div>
                 </div>
             </div>
@@ -199,6 +199,7 @@
                         <ul class="list-group mb-3">
                             <li class="list-group-item"><strong>Order ID:</strong> {{ order.id }}</li>
                             <li class="list-group-item"><strong>Order Date:</strong> {{ order.created_at }}</li>
+                            <li class="list-group-item"><strong>Discount:</strong> {{ order.discount }}</li>
                             <li class="list-group-item"><strong>Total Amount:</strong> Rs {{ order.total_amount }}</li>
                             <li class="list-group-item"><strong>Payment Method:</strong> {{ order.payment_method }}</li>
                             <li class="list-group-item"><strong>Status:</strong> {{ order.status }}</li>

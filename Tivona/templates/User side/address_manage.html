@@ -166,10 +166,10 @@
                     <div class="header__cart">
                         <ul>
                             <li><a href="{%url 'contact page'%}"><i class="fa fa-heart"></i></a></li>
-                            <li><a href="{%url 'shoping-cart'%}"><i class="fa fa-shopping-bag"></i> <span>3</span></a>
+                            <li><a href="{%url 'shoping-cart'%}"><i class="fa fa-shopping-bag"></i></a>
                             </li>
                         </ul>
-                        <div class="header__cart__price">item: <span>$150.00</span></div>
+                        <!-- <div class="header__cart__price">item: <span>$150.00</span></div> -->
                     </div>
                 </div>
             </div>
@@ -217,6 +217,7 @@
                                     </div>
                                     <div class="form-group">
                                         {% for address in addresses %}
+                                        {% if address.is_listed %}
                                         <div
                                             class="address-box border-0 {% if address.primary_address %} primary-address {% endif %}">
                                             <input type="radio" id="address_select{{ forloop.counter }}"
@@ -246,6 +247,7 @@
                                                 </div>
                                             </div>
                                         </div>
+                                        {% endif %}
                                         {% endfor %}
                                     </div>
                                     {% if messages %}

@@ -47,15 +47,6 @@
 </head>
 
 <body>
-    <script>
-        document.addEventListener('DOMContentLoaded', function () {
-            {% if messages %}
-            {% for message in messages %}
-            Swal.fire('{{ message }}');
-            {% endfor %}
-            {% endif %}
-        });
-    </script>
 
     <!-- Page Preloder -->
     <div id="preloder">
@@ -200,10 +191,10 @@
                     <div class="header__cart">
                         <ul>
                             <li><a href="{%url 'wishlist'%}"><i class="fa fa-heart"></i></a></li>
-                            <li><a href="{%url 'shoping-cart'%}"><i class="fa fa-shopping-bag"></i> <span>3</span></a>
+                            <li><a href="{%url 'shoping-cart'%}"><i class="fa fa-shopping-bag"></i></a>
                             </li>
                         </ul>
-                        <div class="header__cart__price">item: <span>$150.00</span></div>
+                        <!-- <div class="header__cart__price">item: <span>$150.00</span></div> -->
                     </div>
                 </div>
             </div>
@@ -583,9 +574,9 @@
             });
 
             quantityInput.addEventListener('input', function () {
-                let quantity = parseInt(this.value);
+              const quantity = parseInt(this.value);
                 if (isNaN(quantity) || quantity < 1) {
-                    quantity = 1; // Reset to 1 if input is invalid
+                    quantity = 1;
                 }
                 this.value = quantity;
             });
@@ -667,6 +658,15 @@
     </script>
 
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.all.min.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            {% if messages %}
+                {% for message in messages %}
+                    Swal.fire('{{ message }}');
+                {% endfor %}
+            {% endif %}
+        });
+    </script>
 
 </body>
 

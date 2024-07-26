@@ -14,15 +14,17 @@ from django.utils.text import slugify
 import time
 from .utils import colors
 from django.http import JsonResponse
+from django.core.paginator import Paginator
 
 
 @never_cache
-def product_detail(request,product_slug):
+def product_detail(request,product_slug): 
     product = get_object_or_404(Product,slug=product_slug)
     variants = product.variants.filter(product=product)
     categories= Category.objects.all()
     return render(request, 'User side/shop-details.html', {'product': product,'categories':categories,'variants':variants})
 
+@never_cache
 def fetch_variant_images(request):
     variant_id = request.GET.get('variant_id')
     variant = get_object_or_404(Variant, id=variant_id)
@@ -30,6 +32,7 @@ def fetch_variant_images(request):
     image_urls = [image.image.url for image in images]
     return JsonResponse({'images': image_urls})
 
+@never_cache
 @login_required(login_url='/admin_login/')
 def unlist_product(request, product_id):
     product = get_object_or_404(Product, pk=product_id)
@@ -46,16 +49,21 @@ def unlist_product(request, product_id):
 @never_cache
 @login_required(login_url='/admin_login/')
 def admin_products(request):
-    products=Product.objects.all()
+    admin_user = request.session.get('admin_user', None)
+    products=Product.objects.all().order_by('-id')
+    paginator = Paginator(products,5)
+    page_number=request.GET.get('page')
+    page_obj=paginator.get_page(page_number)
     categories=Category.objects.all()
     context={
-        'products':products ,
+        'admin':admin_user,
+        'page_obj':page_obj,
         'categories':categories,
         'colors':colors,
     }
     return render(request,'Admin side/admin_products.html',context)
 
-
+@never_cache
 @login_required(login_url='/admin_login/')
 def add_products(request):
     if request.method == 'POST':
@@ -79,7 +87,6 @@ def add_products(request):
             name=name,
             image=cropped_image,
             description=description,
-            product_count=0,
             category=category,
         )
 
@@ -89,9 +96,6 @@ def add_products(request):
             stock=stock,
             product=product,
         )
-
-        product.product_count = sum(variant.stock for variant in product.variants.all())
-        product.save()
 
         extra_cropped_images = request.POST.getlist('additional_cropped_images[]')
         for index, img_data in enumerate(extra_cropped_images):
@@ -105,8 +109,12 @@ def add_products(request):
             else:
                 print(f"Empty image data at index {index}")
 
-        category.product_count = sum(product.product_count for product in category.products.all())
+        category=variant.product.category
+        category.product_count = category.products.count()
         category.save()
+
+        # category.product_count = Variant.objects.filter(product__category=category).count()
+        # category.save()
         return redirect('admin_products')
 
     categories = Category.objects.all()
@@ -114,8 +122,10 @@ def add_products(request):
     return render(request, 'Admin side/admin_products.html', {'categories': categories, 'products': products})
 
 
+@never_cache
 @login_required(login_url='/admin_login/')
 def edit_product(request, product_id):
+    admin_user = request.session.get('admin_user', None)
     product = get_object_or_404(Product, id=product_id)
     variants = Variant.objects.filter(product_id=product_id)
     categories = Category.objects.all()
@@ -128,9 +138,12 @@ def edit_product(request, product_id):
         product.category = category
 
         for variant in variants:
-            variant.price = request.POST.get('variant_price')
-            variant.color = request.POST.get('variant_color')
-            variant.stock = request.POST.get('variant_stock')
+            variant.price = request.POST.get(f'variant_price_{variant.id}')
+            variant.color = request.POST.get(f'variant_color_{variant.id}')
+            variant.stock = request.POST.get(f'variant_stock_{variant.id}')
+            
+            if f'variant_image_{variant.id}' in request.FILES:
+                variant.image = request.FILES[f'variant_image_{variant.id}']
             variant.save()
 
         if 'product_image' in request.FILES:
@@ -157,10 +170,18 @@ def edit_product(request, product_id):
                     image.save()
 
         return redirect('admin_products')
+    context={
+            'admin':admin_user,
+            'product':product,
+            'variants':variants,
+            'categories':categories,
+            'colors':colors,
+        }
+    return render(request, 'Admin side/edit_product.html',context)
 
-    return render(request, 'Admin side/edit_product.html', {'product': product, 'variants': variants, 'categories': categories,'colors':colors})
 
-
+@never_cache
+@login_required(login_url='/admin_login/')
 def add_variant(request,product_id):
     product = get_object_or_404(Product,id=product_id)
     category = product.category
@@ -176,9 +197,6 @@ def add_variant(request,product_id):
             stock=stock,
             product=product,
         )
-        
-        product.product_count = sum(variant.stock for variant in product.variants.all())
-        product.save()
        
         extra_cropped_images = request.POST.getlist('additional_cropped_images[]')
         for index, img_data in enumerate(extra_cropped_images):
@@ -192,15 +210,13 @@ def add_variant(request,product_id):
             else:
                 print(f"Empty image data at index {index}")
 
-        
-        category.product_count = sum(product.product_count for product in category.products.all())
-        category.save()
-
         return redirect('admin_products')
 
     return render(request, 'Admin side/add_variant.html',{'colors':colors})
 
 
+@never_cache
+@login_required(login_url='/admin_login/')
 def unlist_variant(request,variant_id):
     variant=get_object_or_404(Variant,id=variant_id)
     if request.method == 'POST':
