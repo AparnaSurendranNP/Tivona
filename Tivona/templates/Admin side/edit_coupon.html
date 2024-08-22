@@ -107,6 +107,16 @@
                         </a>
                     </li>
                     <li class="relative px-6 py-3">
+                        <a class="inline-flex items-center w-full text-sm font-semibold transition-colors duration-150 hover:text-gray-800 dark:hover:text-gray-200"
+                            href="{%url 'admin_offers'%}">
+                            <svg class="w-5 h-5" aria-hidden="true" fill="none" stroke-linecap="round"
+                                stroke-linejoin="round" stroke-width="2" viewBox="0 0 24 24" stroke="currentColor">
+                                <path d="M4 6h16M4 10h16M4 14h16M4 18h16"></path>
+                            </svg>
+                            <span class="ml-4">Offers</span>
+                        </a>
+                    </li>
+                    <li class="relative px-6 py-3">
                         <a class="inline-flex items-center w-full text-sm font-semibold transition-colors duration-150 text-gray-800 hover:text-gray-800 dark:hover:text-gray-200"
                             href="{%url 'admin_coupons'%}">
                             <svg class="w-5 h-5" aria-hidden="true" fill="none" stroke-linecap="round"
@@ -128,6 +138,18 @@
                         </a>
                     </li>
                 </ul>
+                <li class="relative px-6 py-3">
+                    <a class="inline-flex items-center w-full text-sm font-semibold transition-colors duration-150 hover:text-gray-800 dark:hover:text-gray-200"
+                      href="{%url 'report'%}">
+                      <svg class="w-5 h-5" aria-hidden="true" fill="none" stroke-linecap="round" stroke-linejoin="round"
+                        stroke-width="2" viewBox="0 0 24 24" stroke="currentColor">
+                        <path
+                          d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01">
+                        </path>
+                      </svg>
+                      <span class="ml-4">Report</span>
+                    </a>
+                </li>
             </div>
         </aside>
 
@@ -306,23 +328,23 @@
                                         <br>
                                         <div class="form-group">
                                             <label for="code">Code : </label>
-                                            <input type="text" class="form-control border-2 mb-2" id="coupon_code" name="coupon_code" value="{{ coupon.code }}">
+                                            <input type="text" class="form-control border-2 mb-2" id="coupon_code" name="coupon_code" value="{{ coupon.code }}" {%if coupon.used %} disabled {% endif %} > 
                                         </div>
                                         <div class="form-group">
                                             <label for="discount">Discount : </label>
-                                            <input type="number" class="form-control border-2 mb-2" id="discount" name="discount" value="{{ coupon.discount }}">
+                                            <input type="number" class="form-control border-2 mb-2" id="discount" name="discount" value="{{ coupon.discount }}" {%if coupon.used %} disabled {% endif %} >
                                         </div>
                                         <div class="form-group">
                                             <label for="min_amount">Min Amount : </label>
-                                            <input type="number" class="form-control border-2 mb-2" id="min_amount" name="min_amount" value="{{ coupon.min_amount }}">
+                                            <input type="number" class="form-control border-2 mb-2" id="min_amount" name="min_amount" value="{{ coupon.min_amount }}" {%if coupon.used %} disabled {% endif %} >
                                         </div>
                                         <div class="form-group">
                                             <label for="max_amount">Max Amount : </label>
-                                            <input type="number" class="form-control border-2 mb-2" id="max_amount" name="max_amount" value="{{ coupon.max_amount }}">
+                                            <input type="number" class="form-control border-2 mb-2" id="max_amount" name="max_amount" value="{{ coupon.max_amount }}" {%if coupon.used %} disabled {% endif %} >
                                         </div>
                                         <div class="form-group">
                                             <label for="valid_from">Valid From : </label>
-                                            <input type="date" class="form-control border-2 mb-2" id="valid_from" name="valid_from" value="{{ coupon.valid_from|date:'Y-m-d' }}">
+                                            <input type="date" class="form-control border-2 mb-2" id="valid_from" name="valid_from" value="{{ coupon.valid_from|date:'Y-m-d' }}" {%if coupon.used %} disabled {% endif %} >
                                         </div>
                                         <div class="form-group">
                                             <label for="valid_to">Valid To : </label>

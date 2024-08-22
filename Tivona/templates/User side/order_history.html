@@ -144,7 +144,7 @@
             </h4> {% endcomment %}
             <div class="card overflow-hidden ">
                 <div class="row no-gutters row-bordered row-border-light">
-                    <div class="col-md-3 pt-0">
+                    <div class="col-md-2 pt-0">
                         <div class="list-group list-group-flush account-settings-links">
                             <a class="list-group-item list-group-item-action " data-toggle="list"
                                 href="{%url 'profile page' user.id%}">Profile</a>
@@ -157,7 +157,10 @@
                             <a class="list-group-item list-group-item-action active btn-success" data-toggle="list"
                                 href="{%url 'order_history'%}">Order history</a>
 
-                            <div class="p-3 pl-6 px-6 my-6">
+                            <a class="list-group-item list-group-item-action" data-toggle="list"
+                                href="{%url 'wallet_details'%}">Wallet</a>
+
+                            <div class="p-3 pl-6 px-5 my-6">
                                 <a class="btn text-danger" href="{%url 'logout'%}">Logout</a>
                             </div>
                             <!-- {% comment %} <a class="list-group-item list-group-item-action" data-toggle="list" href="#account-social-links">Social links</a>
@@ -186,17 +189,16 @@
                                             {% for order in page_obj.object_list %}
                                             <tbody>
                                                 <tr>
-                                                    <td >{{ order.id }}</td>
-                                                    <td>{{ order.user.username }}</td>
-                                                    <td>{{order.order_address.name}}<br>{{ order.order_address.street }}, {{ order.order_address.city }}, 
-                                                        {{order.order_address.state }}, {{ order.order_address.pin_code }}</td>
-                                                    <td>{{ order.created_at }}</td>
-                                                    <td>Rs {{ order.total_amount }}</td>
+                                                    <td >{{order.id}}</td>
+                                                    <td>{{order.user.username}}</td>
+                                                    <td>{{order.order_address}}</td>
+                                                    <td>{{order.created_at}}</td>
+                                                    <td>Rs {{order.total_amount}}</td>
                                                     {%if order.is_listed%}
                                                     <td {%if order.status == "Pending" %} style="color: red;" {%elif order.status == "Delivered" %} style="color:green;"
-                                                    {%else%} style="color:orange;" {%endif%}> {{ order.status }} </td>
+                                                    {%else%} style="color:orange;" {%endif%}>{{order.status}} </td>
                                                     {%else%}
-                                                    <td style="color: red;">Order Cancelled by Customer</td>
+                                                    <td style="color: red;">Order Cancelled</td>
                                                     {%endif%}
                                                     <td><a href="{% url 'order_detail' order.id %}"
                                                         class="btn btn-secondary ms-1">View</a></td>

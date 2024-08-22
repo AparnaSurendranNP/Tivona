@@ -21,6 +21,10 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/Jcrop/0.9.15/js/jquery.Jcrop.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.6/dist/umd/popper.min.js"></script>
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
+
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js"></script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
 </head>
 <style>
     .modal-bg {
@@ -192,6 +196,16 @@
                     </li>
                     <li class="relative px-6 py-3">
                         <a class="inline-flex items-center w-full text-sm font-semibold transition-colors duration-150 hover:text-gray-800 dark:hover:text-gray-200"
+                            href="{%url 'admin_offers'%}">
+                            <svg class="w-5 h-5" aria-hidden="true" fill="none" stroke-linecap="round"
+                                stroke-linejoin="round" stroke-width="2" viewBox="0 0 24 24" stroke="currentColor">
+                                <path d="M4 6h16M4 10h16M4 14h16M4 18h16"></path>
+                            </svg>
+                            <span class="ml-4">Offers</span>
+                        </a>
+                    </li>
+                    <li class="relative px-6 py-3">
+                        <a class="inline-flex items-center w-full text-sm font-semibold transition-colors duration-150 hover:text-gray-800 dark:hover:text-gray-200"
                             href="{%url 'admin_coupons'%}">
                             <svg class="w-5 h-5" aria-hidden="true" fill="none" stroke-linecap="round"
                                 stroke-linejoin="round" stroke-width="2" viewBox="0 0 24 24" stroke="currentColor">
@@ -209,6 +223,18 @@
                                 <path d="M4 6h16M4 10h16M4 14h16M4 18h16"></path>
                             </svg>
                             <span class="ml-4">Banners</span>
+                        </a>
+                    </li>
+                    <li class="relative px-6 py-3">
+                        <a class="inline-flex items-center w-full text-sm font-semibold transition-colors duration-150 hover:text-gray-800 dark:hover:text-gray-200"
+                          href="{%url 'report'%}">
+                          <svg class="w-5 h-5" aria-hidden="true" fill="none" stroke-linecap="round" stroke-linejoin="round"
+                            stroke-width="2" viewBox="0 0 24 24" stroke="currentColor">
+                            <path
+                              d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01">
+                            </path>
+                          </svg>
+                          <span class="ml-4">Report</span>
                         </a>
                     </li>
                 </ul>
@@ -389,17 +415,14 @@
                                 <br>
                                 <p><strong>Order ID:</strong> {{ order.id }}</p>
                                 <p><strong>User:</strong> {{ order.user.username }}</p>
-                                <p><strong>Address:</strong>{{order.order_address.name}}<br>
-                                    {{order.order_address.street}},
-                                    {{order.order_address.city }},{{ order.order_address.state }},
-                                    {{ order.order_address.pin_code }}</p>
+                                <p><strong>Address:</strong>{{order.order_address}}</p>
                                 <p><strong>Order Date:</strong> {{ order.created_at }}</p>
                                 {%if order.is_listed%}
                                 <p {%if order.status == "Pending" %} style="color: red;" {%elif order.status == "Delivered" %} style="color:green;"
-                                 {%else%} style="color:orange;" {%endif%}
+                                {%else%} style="color:orange;" {%endif%}
                                 ><strong>Status:</strong> {{ order.status }}</p>
                                 {%else%}
-                                <h4 style="color: red;">Order Cancelled by Customer</h4>
+                                <h4 style="color: red;">Order Cancelled</h4>
                                 {%endif%}
                                 <!-- Display order items -->
                                 <p>----------------------------------------</p>
@@ -428,11 +451,18 @@
                                 <p><strong>Total Amount (including tax):</strong> Rs {{ order.total_amount }}</p>
                                 <a href="{% url 'admin_orders' %}"><button class="btn btn-danger">Back</button></a>
                                 {%if order.is_listed and order.status != "Delivered" %}
+                                {%if order.status != "Return processed" %}
                                 <button type="button" class="btn btn-success" data-toggle="modal"
                                     data-target="#changeStatusModal">
                                     Change Status
                                 </button>
                                 {%endif%}
+                                {%if order.refund_requested and not order.refund_granted %}
+                                <a href="{% url 'approve_refund' order.id %}"><button class="btn btn-success">Approve Refund</button></a>
+                                {%endif%}
+                                {%endif%}
+                                <!-- <a href="{% url 'admin_orders' %}"><button class="btn btn-danger">Back</button></a> -->
+                                
                             </div>
                         </div>
                     </div>
@@ -484,6 +514,17 @@
     <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.3/dist/umd/popper.min.js"></script>
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.all.min.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            {% if messages %}
+                {% for message in messages %}
+                    Swal.fire('{{ message }}');
+                {% endfor %}
+            {% endif %}
+        });
+    </script>
 </body>
 
 </html>

@@ -8,6 +8,7 @@ https://docs.djangoproject.com/en/5.0/topics/settings/
 
 For the full list of settings and their values, see
 https://docs.djangoproject.com/en/5.0/ref/settings/
+
 """
 
 import os
@@ -47,7 +48,8 @@ EMAIL_HOST_USER = env('EMAIL_HOST_USER')
 EMAIL_HOST_PASSWORD = env('EMAIL_HOST_PASSWORD')
 
 RAZORPAY_KEY_ID = 'rzp_test_A5kGTWFna2tp56'
-RAZORPAY_KEY_SECRET = 'JKVwBfTrbKuinkU72jkPunIP'
+RAZORPAY_SECRET_KEY = 'JKVwBfTrbKuinkU72jkPunIP'
+ 
 
 # Application definition
 
@@ -105,7 +107,6 @@ SOCIAL_AUTH_GOOGLE_OAUTH2_SECRET = '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'
 LOGIN_URL = 'login page'
 LOGOUT_URL = 'logout'
 LOGIN_REDIRECT_URL = 'home page'
-
 
 ROOT_URLCONF = 'Tivona.urls'
 
@@ -196,3 +197,4 @@ DATA_UPLOAD_MAX_MEMORY_SIZE = 52428800  # 10 MB
 
 # Increase the maximum file upload size to 10 MB
 FILE_UPLOAD_MAX_MEMORY_SIZE = 52428800  # 10 MB
+

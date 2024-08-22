@@ -12,6 +12,7 @@ class Product(models.Model):
     description = models.TextField()
     category = models.ForeignKey(Category, on_delete=models.CASCADE, related_name='products')
     is_listed = models.BooleanField(default=True)
+    offer_applied =models.BooleanField(default=False)
     slug = models.SlugField(unique=True, blank=True)
 
     def save(self, *args, **kwargs):
@@ -28,6 +29,7 @@ class Variant(models.Model):
     price = models.PositiveIntegerField()
     stock = models.PositiveIntegerField(default=1)
     product = models.ForeignKey(Product, on_delete=models.CASCADE, related_name='variants')
+    discounted_price = models.DecimalField(max_digits=10, decimal_places=2, null=True, blank=True)
     is_listed = models.BooleanField(default=True)
     slug = models.SlugField(unique=False,blank=True)
 

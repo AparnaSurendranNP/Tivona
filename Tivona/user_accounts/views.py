@@ -52,102 +52,119 @@ def signup(request):
         
         if CustomUser.objects.filter(phone=phone).exists():
             messages.error(request, "Phone Number already exists.")
+            return redirect('signup page')
         
-        else:
-            otp = generate_otp()
-            send_otp_to_email(email, otp)
-            request.session['otp_timestamp'] = time.time()
-            request.session['otp'] = otp
-            request.session['email'] = email
-            request.session['username'] = uname
-            request.session['phone'] = phone
-            request.session['password'] = pass1
-            return render(request, 'User side/otp.html')
+
+        user = CustomUser.objects.create_user(username=uname, email=email, password=pass1,phone=phone)
+        user.is_active = False #until email verification
+        user.email_verified = False
+        user.save()
+
+        otp = generate_otp()
+        send_otp_to_email(email, otp)
+        
+        return render(request, 'User side/otp.html', {
+            'generated_otp': otp,
+            'otp_timestamp': time.time(),
+            'email': email,
+            'user_id': user.id
+        })
 
     return render(request,'User side/signup.html')
 
 @never_cache
 def resend_otp(request):
     if request.method=='POST':
-        email = request.session.get('email')
+        user_id = request.POST.get('user_id')
+        user = CustomUser.objects.get(id=user_id)
+        email = user.email
         otp = generate_otp()
-        request.session['otp'] = otp
-        request.session['otp_timestamp'] = time.time()
         send_otp_to_email(email, otp)
-        return render(request, 'User side/otp.html', {'duration': 60})   
+        
+        return render(request, 'User side/otp.html', {
+            'generated_otp': otp,
+            'otp_timestamp': time.time(),
+            'email': email,
+            'user_id': user.id
+        })
 
 @never_cache
 def send_otp(request):
     if request.method == 'POST':
-        email = request.session.get('email')
-        otp_timestamp = request.session.get('otp_timestamp', 0)
-        generated_otp = request.session.get('otp')
+        user_id = request.POST.get('user_id')
+        user = CustomUser.objects.get(id=user_id)
+        email = user.email
+        generated_otp = request.POST.get('generated_otp')
+        otp_timestamp = float(request.POST.get('otp_timestamp', 0))
         input_OTP = request.POST.get('otp')
 
         current_time = time.time()
         if current_time - otp_timestamp > 60:
             # OTP has expired
-            messages.error(request, "OTP has been expired , we already send new one" )
-            del request.session['otp']
-            del request.session['otp_timestamp']
-            resend_otp(request)
-            return render(request, 'User side/otp.html', {'email': email})
+            messages.error(request, "OTP has expired, a new one has been sent.")
+            otp = generate_otp()
+            send_otp_to_email(email, otp)
+            return render(request, 'User side/otp.html', {
+                'email': email, 
+                'generated_otp': otp, 
+                'otp_timestamp': time.time(),
+                'user_id': user.id
+                })
         
         if input_OTP == generated_otp:
-            user = request.session.get('username')
-            phone=request.session.get('phone')
-            password = request.session.get('password')
-            
-            user = CustomUser.objects.create_user(username=user, email=email, password=password,phone=phone)
+            user.email_verified = True
+            user.is_active = True
             user.save()
-
-            # Clear session data
-            del request.session['otp']
-            del request.session['username']
-            del request.session['email']
-            del request.session['password']
-            del request.session['phone']
-            
-            # Authenticate and log in the user
-            user = authenticate(request, username=user, password=password)
-            if user is not None:
-                login(request,user)
-                messages.success(request, "Logined Successfully")
-                return redirect('home page')
-            else:
-                messages.error(request, "There was an error logging you in. Please try logging in manually.")
-                return redirect('login page')
+            backend='django.contrib.auth.backends.ModelBackend' # for multiple authentication confusion 
+            login(request, user,backend=backend) # Log in the user with the specified backend
+            messages.success(request, "Logged in Successfully")
+            return redirect('home page')
         
         else:
             messages.error(request, "Invalid OTP")
-            return render(request, 'User side/otp.html', {'email': email, 'duration': 60}) 
+            return render(request, 'User side/otp.html', {'email': email, 'duration': 60})
 
     return render(request, 'User side/otp.html', {'duration': 60})
 
 
 @never_cache
-def loginn(request):
-     
+def loginn(request):  
     if request.method == 'POST':
         username = request.POST.get('user')
         password = request.POST.get('password')
-        user = authenticate(request, username=username, password=password)
         
-        if user is not None and not user.is_superuser:
+        user = authenticate(request, username=username, password=password)
 
-            if user.is_active:
-                login(request, user)
-                messages.success(request, "Logined Successfully")
-                return redirect('home page')
+        if user is not None:
+            if user.email_verified:
+                if not user.is_superuser:
+                    if user.is_active:
+                        backend='django.contrib.auth.backends.ModelBackend'
+                        login(request, user,backend=backend)
+                        messages.success(request, "Logged in Successfully")
+                        return redirect('home page')
+                    else:
+                        messages.error(request, "User is Blocked")
+                        return redirect('login page')
+                else:
+                    messages.error(request, "Superuser login is not allowed")
+                    return redirect('login page')
             else:
-                messages.error(request,"User is Blocked")
-                return redirect('login page')
-            
+                email = user.email
+                otp = generate_otp()
+                send_otp_to_email(email, otp)
+        
+                return render(request, 'User side/otp.html', {
+                    'generated_otp': otp,
+                    'otp_timestamp': time.time(),
+                    'email': email,
+                    'user_id': user.id
+                })
         else:
             messages.error(request, "Invalid username or password")
             return redirect('login page')
         
-    return render(request,'User side/login.html')
+    return render(request, 'User side/login.html')
 
 
 @never_cache

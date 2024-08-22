@@ -212,25 +212,35 @@
                 <div class="col-lg-6 col-md-6">
                     <div class="product__details__pic">
                         <div id="main-carousel" class="owl-carousel owl-theme product-carousel">
-                            {% for image in variants.first.images.all %}
-                            <div class="product__details__pic__item">
-                                <img class="product__details__pic__item--large" src="{{ image.image.url }}"
-                                    alt="{{ product.name }}">
-                            </div>
-                            {% endfor %}
+                            {% if variant_data %}
+                                {% for item in variant_data %}
+                                    {% for image in item.variant.images.all %}
+                                    <div class="product__details__pic__item">
+                                        <img class="product__details__pic__item--large" src="{{ image.image.url }}"
+                                            alt="{{ product.name }}">
+                                    </div>
+                                    {% endfor %}
+                                {% endfor %}
+                            {% else %}
+                                <p>No images available.</p>
+                            {% endif %}
                         </div>
                         <div class="product__details__pic__slider owl-carousel">
-                            {% for variant in variants %}
-                            {%if variants.count != 1 %}
-                            <img class="variant-image" data-imgbigurl="{{ variant.images.first.image.url }}"
-                                data-variant-id="{{ variant.id }}" data-variant-price="{{ variant.price }}"
-                                src="{{ variant.images.first.image.url }}" alt="{{ product.name }}">
-                            {%endif%}
-                            {% endfor %}
+                            {% if variant_data %}
+                                {% for item in variant_data %}
+                                    {% if variant_data|length != 1 %}
+                                    <img class="variant-image" data-imgbigurl="{{ item.variant.images.first.image.url }}"
+                                        data-variant-id="{{ item.variant.id }}" data-variant-price="{% if item.discounted_price %}{{ item.discounted_price }}{% else %}{{ item.original_price }}{% endif %}"
+                                        src="{{ item.variant.images.first.image.url }}" alt="{{ product.name }}">
+                                    {% endif %}
+                                {% endfor %}
+                            {% else %}
+                                <p>No variant images available.</p>
+                            {% endif %}
                         </div>
                     </div>
                 </div>
-
+    
                 <div class="col-lg-6 col-md-6">
                     <div class="product__details__text">
                         <h3>{{ product.name }}</h3>
@@ -242,25 +252,44 @@
                             <i class="fa fa-star-half-o"></i>
                             <span>(18 reviews)</span>
                         </div>
-                        <div id="variant-price" class="product__details__price">Rs {{ variants.first.price }}</div>
+                        <div id="variant-price" class="product__details__price">
+                            {% if variant_data %}
+                                {% with item=variant_data.0 %}
+                                    <div class="price-item">
+                                        {% if item.discounted_price %}
+                                            <h4><strong>Rs <span style="text-decoration: line-through;">{{ item.original_price|floatformat:2 }}</span> {{ item.discounted_price|floatformat:2 }} 
+                                            <span style="color: red;">{{ item.discount_percentage }}% OFF</span></strong></h4>
+                                        {% else %}
+                                            <h4><strong>Rs {{ item.original_price|floatformat:2 }}</strong></h4>
+                                        {% endif %}
+                                    </div>
+                                {% endwith %}
+                            {% else %}
+                                <p>No price information available.</p>
+                            {% endif %}
+                        </div>
                         <p>{{ product.description }}</p>
-
+    
                         <!-- Color Variants -->
                         <div class="product__details__color">
                             <span>Available Colors:</span>
                             <div class="color-variants">
-                                {% for var in variants %}
-                                <a href="#" class="color-variant" data-variant-id="{{ var.id }}"
-                                    data-variant-price="{{ var.price }}"
-                                    data-variant-image="{{ var.images.first.image.url }}">
+                                {% if variant_data %}
+                                    {% for item in variant_data %}
+                                    <a href="#" class="color-variant" data-variant-id="{{ item.variant.id }}"
+                                    data-variant-price="{% if item.discounted_price %}{{ item.discounted_price }}{% else %}{{ item.original_price }}{% endif %}"
+                                    data-variant-image="{{ item.variant.images.first.image.url }}">
                                     <svg width="24" height="24">
-                                        <circle cx="12" cy="12" r="10" fill="{{ var.color }}"></circle>
+                                    <circle cx="12" cy="12" r="10" fill="{{ item.variant.color }}"></circle>
                                     </svg>
-                                </a>
-                                {% endfor %}
+                                    </a>
+                                    {% endfor %}
+                                {% else %}
+                                <p>No color variants available.</p>
+                                {% endif %}
                             </div>
                         </div>
-
+    
                         <div class="product__details__quantity">
                             <div class="quantity">
                                 <div class="pro-qty">
@@ -272,8 +301,9 @@
                         <a href="#" class="buy-now warning-btn" id="buy-now-btn">Buy now</a>
                         <a href="#" class="heart-icon" id="heart-icon"><span class="icon_heart_alt"></span></a>
                         <ul>
-                            <li><b>Availability</b> <span id="variant-stock">{% if variants.first.stock == 0 %}
-                                    Out of Stock {% else %} In Stock {% endif %}</span></li>
+                            <li class="flex"><b>Availability</b> <span id="variant-stock">{% if variant_data.first.variant.stock == 0 %}
+                                <b style="color: red;">Out of Stock</b>
+                                {% else %} <b style="color: green;"> In Stock </b> {% endif %}</span></li>
                             <li><b>Shipping</b><span>01 day shipping.<samp> Free pickup today</samp></span></li>
                             <li><b>Weight</b><span>0.5 kg</span></li>
                             <li><b>Share on</b>
@@ -328,6 +358,7 @@
             </div>
         </div>
     </section>
+    
     <!-- Product Details Section End -->
 
     <!-- Related Product Section Begin -->
@@ -469,6 +500,7 @@
     <script src="{%static 'js/mixitup.min.js'%}"></script>
     <script src="{%static 'js/owl.carousel.min.js'%}"></script>
     <script src="{%static 'js/main.js'%}"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.all.min.js"></script>
 
     <script>
         document.addEventListener("DOMContentLoaded", function () {
@@ -652,20 +684,13 @@
             document.addEventListener("DOMContentLoaded", function () {
                 initializeProductDetailPage();
             });
-
-        });
-
-    </script>
-
-    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.all.min.js"></script>
-    <script>
-        document.addEventListener('DOMContentLoaded', function() {
             {% if messages %}
-                {% for message in messages %}
-                    Swal.fire('{{ message }}');
-                {% endfor %}
+            {% for message in messages %}
+                Swal.fire('{{ message }}');
+            {% endfor %}
             {% endif %}
         });
+
     </script>
 
 </body>

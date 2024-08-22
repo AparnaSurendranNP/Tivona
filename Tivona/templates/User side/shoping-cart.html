@@ -239,14 +239,27 @@
                                                     style="color: black;">{{ cartItem.product.name }}</a></h5>
                                             </div>
                                         </td>
+                                        {%if cartItem.variant.discounted_price and cartItem.product.offer_applied %}
+                                        <td class="shoping__cart__price">
+                                            {{ cartItem.variant.discounted_price }}
+                                        </td>
+                                        {%else%}
                                         <td class="shoping__cart__price">
                                             {{ cartItem.variant.price }}
                                         </td>
+                                        {%endif%}
                                         <td class="shoping__cart__quantity">
                                             <div class="quantity">
                                                 <div class="pro-qty">
                                                     <input type="hidden" name="cart_item_id_{{ cartItem.id }}" value="{{ cartItem.id }}">
                                                     <input type="number" id="quantity_{{ cartItem.id }}" name="quantity_{{ cartItem.id }}" value="{{ cartItem.quantity }}" min="1">
+                                                    <!-- <div class="product__details__quantity">
+                                                        <div class="quantity">
+                                                            <div class="pro-qty">
+                                                                <input type="number" id="quantity" name="quantity" value="1" min="1">
+                                                            </div>
+                                                        </div>
+                                                    </div> -->
                                                 </div>
                                             </div>
                                         </td>

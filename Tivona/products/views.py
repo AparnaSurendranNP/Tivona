@@ -10,6 +10,7 @@ from .models import Product, ProductImage,Variant
 import base64
 from django.core.files.base import ContentFile
 from io import BytesIO
+from admin_dashboard.models import ProductOffer
 from django.utils.text import slugify
 import time
 from .utils import colors
@@ -18,11 +19,44 @@ from django.core.paginator import Paginator
 
 
 @never_cache
-def product_detail(request,product_slug): 
-    product = get_object_or_404(Product,slug=product_slug)
+def product_detail(request, product_slug):
+    product = get_object_or_404(Product, slug=product_slug)
     variants = product.variants.filter(product=product)
-    categories= Category.objects.all()
-    return render(request, 'User side/shop-details.html', {'product': product,'categories':categories,'variants':variants})
+    
+    variant_data = []
+    
+    if product.offer_applied:
+        offer = ProductOffer.objects.get(product=product)
+        discount_percentage = offer.discount_percentage
+
+        for variant in variants:
+            original_price = variant.price
+            discounted_price = original_price - (original_price * discount_percentage / 100)
+            variant_data.append({
+                'variant': variant,
+                'original_price': original_price,
+                'discounted_price': discounted_price,
+                'discount_percentage': discount_percentage
+            })
+    else:
+        for variant in variants:
+            variant_data.append({
+                'variant': variant,
+                'original_price': variant.price,
+                'discounted_price': None,
+                'discount_percentage': None
+            })
+
+    categories = Category.objects.all()
+    
+    return render(request, 'User side/shop-details.html', {
+        'product': product,
+        'categories': categories,
+        'variant_data': variant_data
+    })
+
+
+
 
 @never_cache
 def fetch_variant_images(request):

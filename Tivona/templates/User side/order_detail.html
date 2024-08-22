@@ -128,7 +128,7 @@
             <div class="card overflow-hidden">
                 <div class="row no-gutters row-bordered row-border-light">
                     <!-- Sidebar with account settings links -->
-                    <div class="col-md-3 pt-0">
+                    <div class="col-md-2 pt-0">
                         <div class="list-group list-group-flush account-settings-links">
                             <a class="list-group-item list-group-item-action" data-toggle="list"
                                 href="{% url 'profile page' user.id %}">Profile</a>
@@ -140,6 +140,8 @@
                                 href="{% url 'address_manage' user.id %}">Address</a>
                             <a class="list-group-item list-group-item-action active btn-success" data-toggle="list"
                                 href="{% url 'order_history' %}">Order history</a>
+                            <a class="list-group-item list-group-item-action" data-toggle="list"
+                                href="{%url 'wallet_details'%}">Wallet</a>
                             <div class="p-3 pl-6 px-6 my-6">
                                 <a class="btn text-danger" href="{% url 'logout' %}">Logout</a>
                             </div>
@@ -155,15 +157,14 @@
                                     <div class="col-md-12">
                                         <p><strong>Order ID:</strong> {{ order.id }}</p>
                                         <p><strong>User:</strong> {{ order.user.username }}</p>
-                                        <p><strong>Address:</strong> {{order.order_address.name}}<br>{{ order.order_address.street}},
-                                            {{order.order_address.city }},{{ order.order_address.state }},
-                                            {{ order.order_address.pin_code }}</p>
+                                        <p><strong>Address:</strong> {{order.order_address}}</p>
                                         <p><strong>Order Date:</strong> {{ order.created_at }}</p>
                                         <p><strong>SubTotal:</strong> Rs {{sub_total}}</p>
                                         <p><strong>Tax :</strong> Rs {{ order.tax_amount }}</p>
                                         
                                         <p><strong>Discount :</strong> - Rs {{ order.discount }}</p>
                                         <p><strong>Total Amount (including tax):</strong> Rs {{order.total_amount}}</p>
+                                        <p><strong>Payment method :</strong> {{ order.payment_method }}</p>
                                         <p {%if order.status == "Pending" %} style="color: red;" {%elif order.status == "Delivered" %} style="color:green;"
                                         {%else%} style="color:orange;" {%endif%}><strong>Status:</strong> {{ order.status }}</p>
                                         <p><strong>Expected Date:</strong>
@@ -190,21 +191,36 @@
                                                 Price: Rs {{ item.price }}<br>
                                             {% endfor %}
                                         </ul>
-                                        {%if order.is_listed%}
-                                            {%if order.status != "Delivered" %}
-                                            <form method="POST" action="{% url 'order_cancel' order.id %}" style="display:inline;">
-                                            {% csrf_token %}
-                                            <button type="submit" class="btn btn-danger mb-2">Cancel Order</button>
-                                            </form>
-                                            {%else%}
-                                            <form method="POST" action="{% url 'order_cancel' order.id %}" style="display:inline;">
+                                        {%if order.is_listed %}
+                                            {% if order.status != "Delivered" %}
+                                                {% if order.status != "Refund processed" %}
+                                                    {% if order.status != "Refunded" %}
+                                                        {%if order.payment_method == "Cash on delivery" %}
+                                                            <form method="POST" action="{% url 'order_cancel' order.id %}" style="display:inline;">
+                                                            {% csrf_token %}
+                                                            <button type="submit" class="btn btn-danger mb-2">Cancel Order</button>
+                                                            </form>
+                                                        {% elif order.payment_method == "Razorpay" or order.payment_method == "Wallet" %}
+                                                            <form method="POST" action="{% url 'request_refund' order.id %}" style="display:inline;">
+                                                            {% csrf_token %}
+                                                            <button type="submit" class="btn btn-danger mb-2">Cancel Order</button>
+                                                            </form>
+                                                        {%endif%}
+                                                    {%endif%}
+                                                {%endif%}
+                                            {%elif order.status == "Delivered" %}
+                                                <form method="POST" action="{% url 'request_refund' order.id %}" style="display:inline;">
                                                 {% csrf_token %}
                                                 <button type="submit" class="btn btn-danger mb-2">Return</button>
-                                            </form>
+                                                </form>
                                             {%endif%}
-                                        {%else%}
-                                            {%if order.status == "Delivered" %}
-                                            <h3 style="color: red;">Returned</h3>
+                                        {% else %}
+                                            {% if order.status == "Delivered" or order.status == "Refunded" %} 
+                                                {%if order.status == "Refunded" %}
+                                                <h3 style="color: red;">Refunded</h3>
+                                                {% else %}
+                                                <h3 style="color: red;">Returned</h3>
+                                                {%endif%}
                                         <!-- <a href="{% url 'order_cancel' order.id %}" class="btn btn-danger">Cancel Order</a> -->
                                             {%else%}
                                             <h3 style="color: red;">order cancelled</h3>

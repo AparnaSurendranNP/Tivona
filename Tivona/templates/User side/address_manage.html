@@ -186,7 +186,7 @@
 
             <div class="card overflow-hidden ">
                 <div class="row no-gutters row-bordered row-border-light">
-                    <div class="col-md-3 pt-0">
+                    <div class="col-md-2 pt-0">
                         <div class="list-group list-group-flush account-settings-links">
                             <a class="list-group-item list-group-item-action " data-toggle="list"
                                 href="{%url 'profile page' user.id %}">Profile</a>
@@ -196,6 +196,10 @@
                                 href="{%url 'address_manage' user.id %}">Address</a>
                             <a class="list-group-item list-group-item-action" data-toggle="list"
                                 href="{%url 'order_history'%}">Order history</a>
+                            
+                            <a class="list-group-item list-group-item-action" data-toggle="list"
+                                href="{%url 'wallet_details'%}">Wallet</a>
+                            
                             <div class="p-3 pl-6 px-6 my-6">
                                 <a class="btn text-danger" href="{%url 'logout'%}">Logout</a>
                             </div>
@@ -250,13 +254,6 @@
                                         {% endif %}
                                         {% endfor %}
                                     </div>
-                                    {% if messages %}
-                                    <div class="alert text-danger" id='alert-message'>
-                                        {% for message in messages %}
-                                        {{ message }}
-                                        {% endfor %}
-                                    </div>
-                                    {% endif %}
                                 </div>
                             </div>
                         </div>
@@ -442,6 +439,17 @@
             }
         });
     </script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.all.min.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            {% if messages %}
+                {% for message in messages %}
+                    Swal.fire('{{ message }}');
+                {% endfor %}
+            {% endif %}
+        });
+    </script>
+    
 
 </body>
 

@@ -11,6 +11,7 @@ from django.contrib.auth.decorators import login_required
 from django.views.decorators.cache import never_cache
 from products.utils import colors
 from django.core.paginator import Paginator
+from user_profile.models import Wallet,WalletTransaction
 
 # Create your views here.
 @never_cache
@@ -27,12 +28,9 @@ def update_profile(request,user_id):
     user = get_object_or_404(CustomUser,id=user_id)
 
     if request.method == 'POST':
-        username = request.POST.get('username')
-        phone = request.POST.get('phone')
+        username = request.POST.get('username').strip()
+        phone = request.POST.get('phone').replace(" ", "").strip()
 
-        if " " in username or " " in phone:
-            messages.error(request, "White spaces are not allowed in username or phone.")
-            return redirect('update_profile',user_id=user_id)
         
         if not username.isalpha():
             messages.error(request,"username should contain only letters.")
@@ -89,14 +87,14 @@ def get_address_details(pin_code):
 @login_required
 def add_address(request,user_id):
     if request.method == 'POST':
-        customer_name=request.POST.get('name')
-        customer_phone=request.POST.get('phone')
-        customer_address=request.POST.get('address')
-        street=request.POST.get('street')
-        city=request.POST.get('city')
-        state=request.POST.get('state')
-        pin_code=request.POST.get('pin_code')
-        country=request.POST.get('country')
+        customer_name=request.POST.get('name').strip()
+        customer_phone=request.POST.get('phone').replace(" ", "").strip()
+        customer_address=request.POST.get('address').strip()
+        street=request.POST.get('street').strip()
+        city=request.POST.get('city').strip()
+        state=request.POST.get('state').strip()
+        pin_code=request.POST.get('pin_code').replace(" ", "").strip()
+        country=request.POST.get('country').strip()
         source_page = request.POST.get('source_page')
 
         user=get_object_or_404(CustomUser,id=user_id)
@@ -109,7 +107,7 @@ def add_address(request,user_id):
                 messages.error(request, "All fields are required.")
                 return redirect('address_manage',user_id=user_id)
 
-        if " " in customer_phone or customer_phone =='0000000000':
+        if '00000000' in customer_phone:
             if source_page == 'make_order':
                 messages.error(request, "Invalid number format. Please enter a valid phone number.")
                 return redirect ('make_order',{'address':address})   
@@ -158,7 +156,7 @@ def add_address(request,user_id):
             )
         if source_page == 'make_order':
             messages.success(request, "Address added successfully.")
-            return redirect ('make_order',{'address':address})   
+            return redirect ('make_order')   
         else:
             messages.success(request, "Address added successfully.")
             return redirect('address_manage',user_id=user_id)
@@ -175,14 +173,14 @@ def edit_address(request,address_id):
     user_id=address.user_id
 
     if request.method == 'POST':
-        customer_name=request.POST.get('name')
-        customer_phone=request.POST.get('phone')
-        customer_address=request.POST.get('address')
-        street=request.POST.get('street')
-        city=request.POST.get('city')
-        state=request.POST.get('state')
-        pin_code=request.POST.get('pin_code')
-        country=request.POST.get('country')
+        customer_name=request.POST.get('name',address.name).strip()
+        customer_phone=request.POST.get('phone',address.phone).replace(" ", "").strip()
+        customer_address=request.POST.get('address',address.address).strip()
+        street=request.POST.get('street',address.street).strip()
+        city=request.POST.get('city',address.city).strip()
+        state=request.POST.get('state',address.state).strip()
+        pin_code=request.POST.get('pin_code',address.pin_code).strip()
+        country=request.POST.get('country',address.country).strip()
         source_page = request.POST.get('source_page') 
 
 
@@ -190,7 +188,7 @@ def edit_address(request,address_id):
             messages.error(request, "All fields are required.")
             return redirect('address_manage',user_id=user_id)
 
-        if " " or '0000000000' in customer_phone:
+        if '00000000' in customer_phone:
             messages.error(request, "Incorrect phone number.")
             if source_page == 'make_order':
                 return redirect('make_order')
@@ -219,7 +217,7 @@ def edit_address(request,address_id):
         address.pin_code = pin_code
         address.country = country
         address.save()
-
+        messages.success(request,"Address edit successfully")
         if source_page == 'make_order':
             return redirect('make_order')
         else:
@@ -320,9 +318,39 @@ def order_detail(request,order_id):
 def order_cancel(request,order_id):
     order=get_object_or_404(Order,pk=order_id)
     if request.method=='POST':
-        order.is_listed=not order.is_listed
-        order.status=" order cancelled "
+        order.is_listed = not order.is_listed
+        order.status=" order cancelled " 
         order.save()
+        order_items = OrderItem.objects.filter(order=order)
+        for order_item in order_items:
+            variant = order_item.variant
+            variant.stock = variant.stock + order_item.quantity
+            variant.save()
+
         return redirect('order_history')
     return redirect('order_history')
     
+@never_cache
+@login_required
+def wallet_details(request):
+    user = request.user
+    wallet = Wallet.objects.filter(user=user).first()
+    context = {
+        'balance_amount' : wallet.balance if wallet else 0
+    }
+    return render(request,'User side/wallet.html',context)
+
+@never_cache
+@login_required
+def wallet_transactions(request):
+    user = request.user
+    wallet = Wallet.objects.filter(user=user).first()
+
+    transactions = WalletTransaction.objects.filter(wallet=wallet)
+
+    context = {
+        'transactions' : transactions,
+        'balance_amount' : wallet.balance
+    }
+    return render(request,'User side/wallet_transactions.html',context)
+

@@ -26,7 +26,12 @@ class CartItem(models.Model):
         return f'{self.quantity} x {self.product.name}'
 
     def get_total_price(self):
-        return self.product.price * self.quantity
+        if self.variant.discount_amount:
+            price = self.variant.discount_amount
+        else:
+            price = self.variant.price
+        return price * self.quantity
+    
     
 
 class Coupon(models.Model):
@@ -48,13 +53,17 @@ class Order(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
     status = models.CharField(max_length=20, default='Pending')
     razorpay_order_id = models.CharField(max_length=10,blank=True,null=True)
-    order_address = models.ForeignKey(Address,on_delete=models.CASCADE, null=True, blank=True)
+    address = models.ForeignKey(Address,on_delete=models.CASCADE, null=True, blank=True)
+    order_address = models.CharField(max_length=50, null=True, blank=True)
     payment_method = models.CharField(max_length=50, null=True, blank=True)
     coupon = models.ForeignKey(Coupon, on_delete=models.SET_NULL, null=True, blank=True)
     discount = models.DecimalField(max_digits=10, decimal_places=2, default=0.00)
     total_amount = models.DecimalField(max_digits=10, decimal_places=2, default=0)
     tax_amount=models.DecimalField(max_digits=10, decimal_places=2, default=0)
     is_listed = models.BooleanField(default=True)
+    refund_requested = models.BooleanField(default=False)
+    refund_granted = models.BooleanField(default=False)
+    refunded_to_wallet = models.BooleanField(default=False)
 
     def __str__(self):
         return f'Order-id {self.id} by {self.user.username}'

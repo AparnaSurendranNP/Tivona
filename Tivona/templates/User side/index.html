@@ -204,23 +204,32 @@
     <!-- Categories Section Begin -->
     <section class="categories">
         <div class="container">
-            <div class="row">
-                <div class="categories__slider owl-carousel">
-                    <!-- Loop through categories -->
-                    {% for category in categories%}
-                    {%if category.is_listed%}
-                    <div class="col-lg-3">
-                        <div class="categories__item set-bg" data-setbg="{{ category.image.url }}">
-                            <h5><a href="{%url 'category_detail' category.slug%}">{{ category.name }}</a></h5>
-                        </div>
+            <div class="d-flex flex-wrap">
+                <!-- Offers Section -->
+                <div class="col-lg-3">
+                    <a href="{%url 'offers'%}">
+                    <div style="background-image: url('/media/offer.png'); background-size: cover; background-position: center; height: 100%; width: 100%;">
                     </div>
-                    {%endif%}
-                    {% endfor %}
-                    <!-- End loop -->
+                </a>
+                </div>
+                <!-- Categories Carousel -->
+                <div class="col-lg-9">
+                    <div class="categories__slider owl-carousel">
+                        <!-- Loop through categories -->
+                        {% for category in categories %}
+                            {% if category.is_listed %}
+                                <div class="categories__item set-bg equal-height mx-2" data-setbg="{{ category.image.url }}">
+                                    <h5><a href="{% url 'category_detail' category.slug %}">{{ category.name }}</a></h5>
+                                </div>
+                            {% endif %}
+                        {% endfor %}
+                        <!-- End loop -->
+                    </div>
                 </div>
             </div>
         </div>
-    </section>    
+    </section>
+    
     <!-- Categories Section End -->
 
     <!-- Featured Section Begin -->

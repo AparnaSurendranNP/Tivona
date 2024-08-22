@@ -282,6 +282,8 @@
                                         <!-- <option value="0">Default</option> -->
                                         <option value="?sort=name&min_price={{ min_price }}&max_price={{ max_price }}"
                                             {% if sort_option == 'name' %} selected {% endif %}>Name</option>
+                                        <option value="?sort=-name&min_price={{ min_price }}&max_price={{ max_price }}"
+                                            {% if sort_option == '-name' %} selected {% endif %}>Name (desc)</option>
                                         <option value="?sort=price&min_price={{ min_price }}&max_price={{ max_price }}"
                                             {% if sort_option == 'price' %} selected {% endif %}>Price</option>
                                         <option value="?sort=-price&min_price={{ min_price }}&max_price={{ max_price }}"
@@ -318,8 +320,14 @@
                                     </ul>
                                 </div>
                                 <div class="product__item__text">
-                                    <h6><a href="{% url 'product_detail' product.slug %}">{{ product.name }}</a></h6>
-                                    <h5>{{ product.price }}</h5>
+                                    <p><a href="{% url 'product_detail' product.slug %}" style="color: black;">{{ product.name }}</a></p>
+                                    {% if product.offer_applied and product.offer.is_active %}
+                                            <h6><strong>Rs <span style="text-decoration: line-through;">{{ product.variants.first.price|floatformat:2 }}</span> 
+                                            {{ product.variants.first.discounted_price|floatformat:2 }} 
+                                            <span style="color: red;">{{ product.offer.discount_percentage }}% OFF</span></strong></h6>
+                                    {% else %}
+                                        <h6><strong>Rs {{ product.variants.first.price|floatformat:2 }}</strong></h6>
+                                    {% endif %}
                                 </div>
                             </div>
                         </div>

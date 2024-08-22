@@ -140,11 +140,6 @@
                 </div>
             </form>
 
-            {% for message in messages %}
-            <div class="alert alert-{{message.tags}} alert-dismissible fade show p-3" role="alert">
-                <strong>{{message}}</strong>
-            </div>
-            {% endfor %}
         </div>
     </section>
 
@@ -214,5 +209,15 @@
     </footer>
     <!-- Footer Section End -->
 </body>
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.all.min.js"></script>
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        {% if messages %}
+            {% for message in messages %}
+                Swal.fire('{{ message }}');
+            {% endfor %}
+        {% endif %}
+    });
+</script>
 
 </html>

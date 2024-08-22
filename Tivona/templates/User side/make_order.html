@@ -232,9 +232,9 @@
                                 </ul>
                             </li>
                             <!-- <li><a href="./blog.html">Blog</a></li> -->
-                            <li><a href="{%url 'shoping-cart'%}">Shop Cart</a></li>
+                            <li class="active"><a href="{%url 'shoping-cart'%}">Shop Cart</a></li>
                             <!-- <li><a href="./checkout.html">Check Out</a></li> -->
-                            <li class="active"><a href="{%url 'contact page'%}">Contact</a></li>
+                            <li ><a href="{%url 'contact page'%}">Contact</a></li>
                         </ul>
                     </nav>
                 </div>
@@ -294,17 +294,18 @@
                                     {% for coupon in coupons %}
                                     {% if coupon.active %}
                                     {% if sub_total >= coupon.min_amount and sub_total <= coupon.max_amount %} <option
-                                        value="{{ coupon.id }}" {% if coupon.id == coupon.id %}selected{% endif %}>{{
-                                        coupon.code }}({{coupon.discount}}%)</option>
-                                        {% endif %}
-                                        {% endif %}
-                                        {% endfor %}
+                                        value="{{ coupon.id }}" {% if coupon.id == coupon.id %}selected{% endif %}>
+                                        {{ coupon.code }}({{ coupon.discount }}%)</option>
+                                    {% endif %}
+                                    {% endif %}
+                                    {% endfor %}
                                 </select>
                                 <div class="input-group-append">
                                     <button class="btn btn-primary" type="submit">Apply</button>
                                 </div>
                             </div>
                         </form>
+                        <a href="{%url 'remove_coupon'%}" class="btn btn-danger">remove</a>
                     </div>
                 </div>
             </div>
@@ -360,9 +361,15 @@
                                         {{ cartItem.product.name }}
                                     </a>
                                 </h5>
+                                {%if cartItem.variant.discounted_price and cartItem.product.offer_applied %}
+                                <div class="shoping__cart__price">
+                                    Price: {{ cartItem.variant.discounted_price|floatformat:2 }}
+                                </div>
+                                {%else%}
                                 <div class="shoping__cart__price">
                                     Price: {{ cartItem.variant.price }}
                                 </div>
+                                {%endif%}
                                 <div class="shoping__cart__quantity" style="padding: 10%;">
                                     Quantity: {{ cartItem.quantity }}
                                 </div>
@@ -378,16 +385,23 @@
                                 <div class="checkout__order__products">Products <span>Total</span></div>
                                 <ul>
                                     {% for cartItem in cartItems %}
-                                    <li>{{cartItem.product.name}}<span>Rs {{cartItem.variant.price}} *
-                                            {{cartItem.quantity}}</span></li>
+                                    <li>{{cartItem.product.name}}<span>
+                                        Rs 
+                                        {% if cartItem.variant.discounted_price and cartItem.product.offer_applied %}
+                                            {{ cartItem.variant.discounted_price|floatformat:2}}
+                                        {% else %}
+                                            {{cartItem.variant.price|floatformat:2 }}
+                                        {% endif %}
+                                        *{{ cartItem.quantity}}
+                                    </span></li>
                                     {%endfor%}
                                     <!-- <li><b>Delivery Charge</b><span>$7.99</span></li> -->
                                 </ul>
-                                <div class="checkout__order__subtotal">Subtotal <span>{{sub_total}}</span></div>
+                                <div class="checkout__order__subtotal">Subtotal <span>{{ sub_total|floatformat:2 }}</span></div>
                                 <ul>
-                                    <li><b>Tax</b><span>RS {{tax}}</span></li>
+                                    <li><b>Tax</b><span>RS {{ tax|floatformat:2 }}</span></li>
                                     {%if coupon_amount %}
-                                    <li><b>Discount amount</b><span>- Rs {{coupon_amount}}</span></li>
+                                    <li><b>Discount amount</b><span>- Rs {{ coupon_amount|floatformat:2 }}</span></li>
                                     {% endif %}
                                     <li><b>Free Delivery</b>
                                 </ul>
@@ -403,9 +417,14 @@
                                         <input type="radio" id="razorpay" name="payment_method" value="razorpay">
                                         <span class="radio"></span>
                                     </label>
+                                    <label for="wallet">
+                                        Wallet
+                                        <input type="radio" id="wallet" name="payment_method" value="wallet">
+                                        <span class="radio"></span>
+                                    </label>
                                 </div>
-
-                                <button type="submit" class="site-btn">PLACE ORDER</button>
+                                <button type="submit" class="site-btn">PLACE
+                                    ORDER</button>
                             </div>
                         </div>
                     </div>
@@ -555,23 +574,69 @@
     <script src="{%static 'js/owl.carousel.min.js'%}"></script>
     <script src="{%static 'js/main.js'%}"></script>
 
-    {%if order%}
-    <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
-    <script>
-        var options = {
-            key: "{{ razorpay_merchant_key }}",
-            amount: "{{ amount }}",
-            currency: "{{ currency }}",
-            name: "Tivona",
-            order_id: "{{ razorpay_order_id }}",
-            callback_url: "{{ callback_url }}",
-        };
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
-        var rzp1 = new Razorpay(options);
-        rzp1.open();
-        // preventDefault();
-    </script>
-    {%endif%}
+{% if razorpay_order_id %}
+<script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+<script>
+    var options = {
+        "key": "{{ razorpay_merchant_key }}",
+        "amount": "{{ amount }}",
+        "currency": "{{ currency }}",
+        "name": "Tivona",
+        "description": "Order Payment",
+        "order_id": "{{ razorpay_order_id }}",
+        "prefill": {
+            "name": "{{ user|default:'Customer' }}",
+            "email": "{{ user.email|default:'' }}",
+        },
+        "theme": {
+            "color": "#3399cc"
+        },
+        "handler": function (response) {
+            // Send payment details back to your server using fetch
+            fetch("{% url 'online_payment_success' %}", {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': '{{ csrf_token }}'
+                },
+                body: JSON.stringify({
+                    'razorpay_payment_id': response.razorpay_payment_id,
+                    'razorpay_order_id': response.razorpay_order_id,
+                    'razorpay_signature': response.razorpay_signature,
+                    'amount': "{{ amount }}",
+                    'address_id': "{{ address_id }}",
+                    'discount_amount': "{{ discount_amount }}",
+                })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    window.location.href = data.redirect_url;
+                } else {
+                    alert('Payment verification . Please try again.');
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('Payment verification failed. Please try again.');
+            });
+        }
+    };
+
+    var rzp1 = new Razorpay(options);
+    rzp1.on('payment.failed', function (response) {
+        alert('Payment failed. Please try again.');
+        console.log(response.error);
+    });
+
+    rzp1.open();
+</script>
+{% endif %}
+
+    
 
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.all.min.js"></script>
     <script>
