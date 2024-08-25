@@ -388,6 +388,7 @@
                                         <th class="px-4 py-2 text-left">Total Orders</th>
                                         <th class="px-4 py-2 text-left">Total Product QTY</th>
                                         <th class="px-4 py-2 text-left">Total Order Amount</th>
+                                        <th class="px-4 py-2 text-left">Discount Amount</th>
                                         <th class="px-4 py-2 text-left">Profit</th>
                                     </tr>
                                 </thead>
@@ -398,6 +399,7 @@
                                         <td class="px-4 py-2">{{ item.total_orders }}</td>
                                         <td class="px-4 py-2">{{ item.total_qty }}</td>
                                         <td class="px-4 py-2">{{ item.total_amount|floatformat:2 }}</td>
+                                        <td class="px-4 py-2">{{ item.total_discount|floatformat:2 }}</td>
                                         <td class="px-4 py-2">{{ item.profit|floatformat:2 }}</td>
                                     </tr>
                                     {% empty %}

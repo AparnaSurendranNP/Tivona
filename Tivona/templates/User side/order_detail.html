@@ -159,11 +159,12 @@
                                         <p><strong>User:</strong> {{ order.user.username }}</p>
                                         <p><strong>Address:</strong> {{order.order_address}}</p>
                                         <p><strong>Order Date:</strong> {{ order.created_at }}</p>
-                                        <p><strong>SubTotal:</strong> Rs {{sub_total}}</p>
-                                        <p><strong>Tax :</strong> Rs {{ order.tax_amount }}</p>
+                                        <p><strong>SubTotal:</strong> ₹ {{sub_total}}</p>
+                                        <p><strong>Tax :</strong> ₹ {{ order.tax_amount }}</p>
+                                        <p><strong>Delivery Charge :</strong> ₹ 50.00</p>
                                         
-                                        <p><strong>Discount :</strong> - Rs {{ order.discount }}</p>
-                                        <p><strong>Total Amount (including tax):</strong> Rs {{order.total_amount}}</p>
+                                        <p><strong>Discount :</strong> ₹ {{ order.discount }}</p>
+                                        <p><strong>Total Amount (including tax):</strong>₹ {{order.total_amount}}</p>
                                         <p><strong>Payment method :</strong> {{ order.payment_method }}</p>
                                         <p {%if order.status == "Pending" %} style="color: red;" {%elif order.status == "Delivered" %} style="color:green;"
                                         {%else%} style="color:orange;" {%endif%}><strong>Status:</strong> {{ order.status }}</p>
@@ -188,7 +189,7 @@
                                                 {%endif%}
                                                 {% endfor %}<br>
                                                 Quantity: {{item.quantity}}<br>
-                                                Price: Rs {{ item.price }}<br>
+                                                Price: ₹ {{ item.price }}<br>
                                             {% endfor %}
                                         </ul>
                                         {%if order.is_listed %}
@@ -200,7 +201,12 @@
                                                             {% csrf_token %}
                                                             <button type="submit" class="btn btn-danger mb-2">Cancel Order</button>
                                                             </form>
-                                                        {% elif order.payment_method == "Razorpay" or order.payment_method == "Wallet" %}
+                                                        {% elif order.payment_method == "Razorpay" %}
+                                                            <form method="POST" action="{% url 'request_refund' order.id %}" style="display:inline;">
+                                                            {% csrf_token %}
+                                                            <button type="submit" class="btn btn-danger mb-2">Cancel Order</button>
+                                                            </form>
+                                                        {% elif order.payment_method == "Wallet" %}
                                                             <form method="POST" action="{% url 'request_refund' order.id %}" style="display:inline;">
                                                             {% csrf_token %}
                                                             <button type="submit" class="btn btn-danger mb-2">Cancel Order</button>
@@ -229,6 +235,7 @@
                                         <a href="{% url 'order_history' %}" class="btn btn-secondary mb-2">Back to Order
                                             History</a>
                                     </div>
+                                    <a href="{% url 'download_invoice' order.id %}" class="btn btn-primary">Download Invoice</a>
                                 </div>
                             </div>
                         </div>
@@ -296,6 +303,16 @@
         </div>
     </footer>
     <!-- Footer Section End -->
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.all.min.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            {% if messages %}
+                {% for message in messages %}
+                    Swal.fire('{{ message }}');
+                {% endfor %}
+            {% endif %}
+        });
+    </script>
 
 </body>
 

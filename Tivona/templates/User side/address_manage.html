@@ -23,6 +23,8 @@
     <link rel="stylesheet" href="{%static 'css/slicknav.min.css'%}" type="text/css">
     <link rel="stylesheet" href="{%static 'css/style.css'%}" type="text/css">
 
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/sweetalert/2.1.2/sweetalert.min.css">
+
 </head>
 
 <style>
@@ -243,9 +245,9 @@
                                                     <div class="d-flex">
                                                         <a href="{% url 'edit_address' address.id %}"
                                                             class="btn btn-primary mb-1 ">Edit</a>
-                                                        <form action="{% url 'delete_address' address.id %}" method="post">
+                                                        <form id="delete-form-{{ address.id }}" action="{% url 'delete_address' address.id %}" method="post">
                                                             {% csrf_token %}
-                                                            <button class="btn btn-danger mb-1 ml-2" type="submit">Delete</button>
+                                                            <button class="btn btn-danger mb-1 ml-2" type="button" onclick="confirmDelete('{{ address.id }}')">Delete</button>
                                                         </form>
                                                     </div>
                                                 </div>
@@ -440,6 +442,29 @@
         });
     </script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.all.min.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/sweetalert/2.1.2/sweetalert.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/sweetalert/2.1.2/sweetalert.min.js"></script>
+
+    <script>
+        function confirmDelete(addressId) {
+            // SweetAlert confirmation dialog
+            swal({
+                title: "Are you sure?",
+                text: "Once deleted, you will not be able to recover this address!",
+                icon: "warning",
+                buttons: true,
+                dangerMode: true,
+            }).then((willDelete) => {
+                if (willDelete) {
+                    // Submit the form if the user confirms
+                    document.getElementById('delete-form-' + addressId).submit();
+                } else {
+                    // Optional: Show a message if the user cancels the deletion
+                    swal("Your address is safe!");
+                }
+            });
+        }
+    </script>
     <script>
         document.addEventListener('DOMContentLoaded', function() {
             {% if messages %}

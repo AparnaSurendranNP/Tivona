@@ -18,12 +18,19 @@ from admin_dashboard.models import CategoryOffer, ProductOffer
 @never_cache
 def index(request):
     categories=Category.objects.all()
-    products=Product.objects.all().order_by('name')[:12]
+    products_list=Product.objects.all().order_by('name')
+
+    page_number = request.GET.get('page', 1)  # Default to page 1 if not specified
+    paginator = Paginator(products_list, 12)  # Show 12 products per page
+    
+    # Get the current page object
+    page_obj = paginator.get_page(page_number)
     latest_products=Product.objects.all().order_by('-id')[:4]
+
     context={
-        'categories':categories,
-        'products':products,
-        'latest_products':latest_products,
+        'categories': categories,
+        'page_obj': page_obj,
+        'latest_products': latest_products,
     }
     return render(request,'User side/index.html',context)
 
@@ -72,6 +79,18 @@ def search(request):
     products = Product.objects.filter(name__icontains=query)
     product = products.filter(name__iexact=query).first()
 
+    if not query:
+        messages.error(request, "Sorry, No search query provided")
+        return redirect('shop page')
+    
+    if len(query) == 1 or len(query) == 2:
+        messages.error(request, "Sorry, Product not found")
+        return redirect('shop page')
+
+    if not products.exists():
+        messages.error(request, "Sorry, Product not found")
+        return redirect('shop page')
+
     variant_data = []
     
     if product:
@@ -80,7 +99,7 @@ def search(request):
         # Check if the product has an offer applied
         if product.offer_applied:
             try:
-                offer = ProductOffer.objects.get(product=product)
+                offer = ProductOffer.objects.filter(product=product).first()
                 discount_percentage = offer.discount_percentage
                 
                 for variant in variants:

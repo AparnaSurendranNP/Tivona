@@ -11,7 +11,7 @@ from django.core.mail import send_mail
 from django.conf import settings
 from django.utils import timezone
 from datetime import datetime, timedelta
-from django.contrib.auth.decorators import login_required
+from django.contrib.auth.decorators import login_required,user_passes_test
 import random
 from django.http import Http404
 from django.core.paginator import Paginator
@@ -21,9 +21,12 @@ from django.core.paginator import Paginator
 
 from django.shortcuts import render, redirect, get_object_or_404
 
+def is_user_superuser(user):
+    return user.is_superuser
 
-@login_required(login_url='/admin_login/')
 @never_cache
+@login_required(login_url='/admin_login/')
+@user_passes_test(is_user_superuser)
 def block_user(request, pk):
     if request.method == 'POST':
         user = get_object_or_404(CustomUser, pk=pk)
@@ -38,6 +41,7 @@ def block_user(request, pk):
 
 @never_cache
 @login_required(login_url='/admin_login/')
+@user_passes_test(is_user_superuser)
 def admin_users(request):
     customers=CustomUser.objects.all()
     paginator = Paginator(customers,10)

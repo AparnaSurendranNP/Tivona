@@ -234,7 +234,7 @@
                             <!-- <li><a href="./blog.html">Blog</a></li> -->
                             <li class="active"><a href="{%url 'shoping-cart'%}">Shop Cart</a></li>
                             <!-- <li><a href="./checkout.html">Check Out</a></li> -->
-                            <li ><a href="{%url 'contact page'%}">Contact</a></li>
+                            <li><a href="{%url 'contact page'%}">Contact</a></li>
                         </ul>
                     </nav>
                 </div>
@@ -296,9 +296,9 @@
                                     {% if sub_total >= coupon.min_amount and sub_total <= coupon.max_amount %} <option
                                         value="{{ coupon.id }}" {% if coupon.id == coupon.id %}selected{% endif %}>
                                         {{ coupon.code }}({{ coupon.discount }}%)</option>
-                                    {% endif %}
-                                    {% endif %}
-                                    {% endfor %}
+                                        {% endif %}
+                                        {% endif %}
+                                        {% endfor %}
                                 </select>
                                 <div class="input-group-append">
                                     <button class="btn btn-primary" type="submit">Apply</button>
@@ -316,97 +316,104 @@
                     {% csrf_token %}
                     <div class="row">
                         <div class="col-lg-8 col-md-6">
-                            <a href="#addAddressModal" class="btn btn-success">change Address</a>
-                            <div class="row">
-                                <div class="col-md-12">
-                                    {% for address in addresses %}
-                                    {% if address.primary_address %}
-                                    <div class="row">
-                                        <div class="col-md-8">
-                                            <br>
-                                            <label for="address_select{{ forloop.counter }}"
-                                                class="primary-label font-weight-bold">Primary Address</label>
-                                            <a href="{% url 'edit_address' address.id %}"
-                                                class="btn btn-primary mb-1">Edit</a>
-                                            <input type="hidden" name="address_id" value="{{ address.id }}">
-                                        </div>
-                                    </div>
-                                    <br>
-                                    <p>Name: {{ address.name }}<br>Mobile: {{ address.phone}}<br>
-                                        Address: {{address.address }}<br>{{ address.street }}
-                                        {{ address.city }} {{ address.state }} {{ address.pin_code }}
-                                    </p>
-                                    {% endif %}
-                                    {% endfor %}
-                                </div>
+                            <div class="d-flex justify-content-between align-items-center mb-3">
+                                <h5>Select Address</h5>
+                                <a href="#addAddressModal" class="btn btn-success btn-sm">Add Address</a>
                             </div>
-                            <!-- <div class="checkout__input__checkbox">
-                                <label for="diff-acc">
-                                    Ship to a different address?
-                                    <input type="checkbox" id="diff-acc">
-                                    <span class="checkmark"></span>
-                                </label>
-                            </div> -->
+                            <div class="row">
+                                {% for address in addresses %}
+                                {% if address.is_listed %}
+                                <div class="col-md-4 mb-3">
+                                    <div class="address-box border rounded p-3">
+                                        <div class="form-check mb-2">
+                                            <input type="radio" class="form-check-input" name="address_id"
+                                                id="address_select{{ forloop.counter }}" value="{{ address.id }}"
+                                                {% if address.primary_address %} checked {% endif %}>
+                                            <label for="address_select{{ forloop.counter }}" class="form-check-label">
+                                                {% if address.primary_address %}
+                                                Primary Address
+                                                {% else %}
+                                                Address
+                                                {% endif %}
+                                            </label>
+                                            <a href="{% url 'edit_address' address.id %}" class="btn btn-primary btn-sm float-right">Edit</a>
+                                        </div>
+                                        <p class="mb-1">
+                                            <strong>Name:</strong> {{ address.name }}<br>
+                                            <strong>Mobile:</strong> {{ address.phone }}<br>
+                                            <strong>Address:</strong> {{ address.address }}<br>
+                                            {{ address.street }}, {{ address.city }}, {{ address.state }} - {{ address.pin_code }}
+                                        </p>
+                                    </div>
+                                </div>
+                                {% endif %}
+                                {% endfor %}
+                            </div>
                             {% for cartItem in cartItems %}
-                            <div class="shoping__cart__item" style="display: flex;align-items: center;">
-                                <div class="shoping__cart__detail">
-                                    <br>
+                            <div class="shoping__cart__item mb-3 p-3 border rounded shadow-sm d-flex align-items-center">
+                                <div class="shoping__cart__detail mr-3">
                                     <div style="width: 100px; height: 100px;">
                                         <img src="{{ cartItem.variant.images.first.image.url }}" alt="">
                                     </div>
                                     <br>
                                 </div>
-                                <h5 style="padding:10%;">
-                                    <a href="{% url 'product_detail' cartItem.product.slug %}" style="color: black;">
-                                        {{ cartItem.product.name }}
-                                    </a>
-                                </h5>
-                                {%if cartItem.variant.discounted_price and cartItem.product.offer_applied %}
-                                <div class="shoping__cart__price">
-                                    Price: {{ cartItem.variant.discounted_price|floatformat:2 }}
+                                <div class="flex-grow-1">
+                                    <h5>
+                                        <a href="{% url 'product_detail' cartItem.product.slug %}" style="color: black;">
+                                            {{ cartItem.product.name }}
+                                        </a>
+                                    </h5>
+                                    <div class="shoping__cart__price">
+                                        {% if cartItem.variant.discounted_price and cartItem.product.offer_applied %}
+                                        Price: ₹ {{ cartItem.discounted_price|floatformat:2 }}
+                                        {% else %}
+                                        Price: ₹ {{ cartItem.variant.price }}
+                                        {% endif %}
+                                    </div>
                                 </div>
-                                {%else%}
-                                <div class="shoping__cart__price">
-                                    Price: {{ cartItem.variant.price }}
-                                </div>
-                                {%endif%}
                                 <div class="shoping__cart__quantity" style="padding: 10%;">
                                     Quantity: {{ cartItem.quantity }}
                                 </div>
                                 <div class="shoping__cart__total">
-                                    {{ cartItem.total_item_price }}
+                                    ₹ {{ cartItem.total_item_price }}
                                 </div>
                             </div>
                             {% endfor %}
                         </div>
                         <div class="col-lg-4 col-md-6">
-                            <div class="checkout__order">
+                            <div class="checkout__order p-3 border rounded shadow-sm">
                                 <h4>Your Order</h4>
-                                <div class="checkout__order__products">Products <span>Total</span></div>
-                                <ul>
+                                <div class="checkout__order__products mb-2">Products <span class="float-right">Total</span></div>
+                                <ul class="list-unstyled">
                                     {% for cartItem in cartItems %}
-                                    <li>{{cartItem.product.name}}<span>
-                                        Rs 
-                                        {% if cartItem.variant.discounted_price and cartItem.product.offer_applied %}
-                                            {{ cartItem.variant.discounted_price|floatformat:2}}
-                                        {% else %}
-                                            {{cartItem.variant.price|floatformat:2 }}
-                                        {% endif %}
-                                        *{{ cartItem.quantity}}
-                                    </span></li>
+                                    <li class="d-flex justify-content-between">
+                                        {{cartItem.product.name}}
+                                        <span>
+                                            ₹
+                                            {% if cartItem.variant.discounted_price and cartItem.product.offer_applied %}
+                                            {{ cartItem.discounted_price|floatformat:2 }}
+                                            {% else %}
+                                            {{ cartItem.variant.price }}
+                                            {% endif %}
+                                            *{{ cartItem.quantity}}
+                                        </span>
+                                    </li>
                                     {%endfor%}
                                     <!-- <li><b>Delivery Charge</b><span>$7.99</span></li> -->
                                 </ul>
-                                <div class="checkout__order__subtotal">Subtotal <span>{{ sub_total|floatformat:2 }}</span></div>
-                                <ul>
-                                    <li><b>Tax</b><span>RS {{ tax|floatformat:2 }}</span></li>
+                                <div class="checkout__order__subtotal d-flex justify-content-between">
+                                    Subtotal 
+                                    <span>₹ {{ sub_total|floatformat:2 }}</span></div>
+                                <ul class="list-unstyled">
+                                    <li class="d-flex justify-content-between"><strong>Tax</strong><span>₹ {{ tax|floatformat:2 }}</span></li>
                                     {%if coupon_amount %}
-                                    <li><b>Discount amount</b><span>- Rs {{ coupon_amount|floatformat:2 }}</span></li>
+                                    <li class="d-flex justify-content-between"><strong>Discount amount</strong><span>- ₹ {{ coupon_amount|floatformat:2 }}</span></li>
                                     {% endif %}
-                                    <li><b>Free Delivery</b>
+                                    <li class="d-flex justify-content-between"><strong>Delivery Charge</strong><span>₹ {{ del_charge|floatformat:2 }}</span></li>
                                 </ul>
-                                <div class="checkout__order__total">Total <span>{{total_amount}}</span></div>
-                                <div class="radio_btn">
+                                <div class="checkout__order__total d-flex justify-content-between">Total <span>₹ {{total_amount}}</span></div>
+                                
+                                <div class="radio_btn mt-3">
                                     <label for="payment">
                                         Cash On Delivery
                                         <input type="radio" id="payment" name="payment_method" value="cash_on_delivery">
@@ -423,8 +430,7 @@
                                         <span class="radio"></span>
                                     </label>
                                 </div>
-                                <button type="submit" class="site-btn">PLACE
-                                    ORDER</button>
+                                <button type="submit" class="site-btn">PLACE ORDER</button>
                             </div>
                         </div>
                     </div>
@@ -577,66 +583,66 @@
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
-{% if razorpay_order_id %}
-<script src="https://checkout.razorpay.com/v1/checkout.js"></script>
-<script>
-    var options = {
-        "key": "{{ razorpay_merchant_key }}",
-        "amount": "{{ amount }}",
-        "currency": "{{ currency }}",
-        "name": "Tivona",
-        "description": "Order Payment",
-        "order_id": "{{ razorpay_order_id }}",
-        "prefill": {
-            "name": "{{ user|default:'Customer' }}",
-            "email": "{{ user.email|default:'' }}",
-        },
-        "theme": {
-            "color": "#3399cc"
-        },
-        "handler": function (response) {
-            // Send payment details back to your server using fetch
-            fetch("{% url 'online_payment_success' %}", {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'X-CSRFToken': '{{ csrf_token }}'
-                },
-                body: JSON.stringify({
-                    'razorpay_payment_id': response.razorpay_payment_id,
-                    'razorpay_order_id': response.razorpay_order_id,
-                    'razorpay_signature': response.razorpay_signature,
-                    'amount': "{{ amount }}",
-                    'address_id': "{{ address_id }}",
-                    'discount_amount': "{{ discount_amount }}",
+    {% if razorpay_order_id %}
+    <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+    <script>
+        var options = {
+            "key": "{{ razorpay_merchant_key }}",
+            "amount": "{{ amount }}",
+            "currency": "{{ currency }}",
+            "name": "Tivona",
+            "description": "Order Payment",
+            "order_id": "{{ razorpay_order_id }}",
+            "prefill": {
+                "name": "{{ user|default:'Customer' }}",
+                "email": "{{ user.email|default:'' }}",
+            },
+            "theme": {
+                "color": "#3399cc"
+            },
+            "handler": function (response) {
+                // Send payment details back to your server using fetch
+                fetch("{% url 'online_payment_success' %}", {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRFToken': '{{ csrf_token }}'
+                    },
+                    body: JSON.stringify({
+                        'razorpay_payment_id': response.razorpay_payment_id,
+                        'razorpay_order_id': response.razorpay_order_id,
+                        'razorpay_signature': response.razorpay_signature,
+                        'amount': "{{ amount }}",
+                        'address_id': "{{ address_id }}",
+                        'discount_amount': "{{ discount_amount }}",
+                    })
                 })
-            })
-            .then(response => response.json())
-            .then(data => {
-                if (data.success) {
-                    window.location.href = data.redirect_url;
-                } else {
-                    alert('Payment verification . Please try again.');
-                }
-            })
-            .catch(error => {
-                console.error('Error:', error);
-                alert('Payment verification failed. Please try again.');
-            });
-        }
-    };
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.success) {
+                            window.location.href = data.redirect_url;
+                        } else {
+                            alert('Payment verification . Please try again.');
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Error:', error);
+                        alert('Payment verification failed. Please try again.');
+                    });
+            }
+        };
 
-    var rzp1 = new Razorpay(options);
-    rzp1.on('payment.failed', function (response) {
-        alert('Payment failed. Please try again.');
-        console.log(response.error);
-    });
+        var rzp1 = new Razorpay(options);
+        rzp1.on('payment.failed', function (response) {
+            alert('Payment failed. Please try again.');
+            console.log(response.error);
+        });
 
-    rzp1.open();
-</script>
-{% endif %}
+        rzp1.open();
+    </script>
+    {% endif %}
 
-    
+
 
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.all.min.js"></script>
     <script>

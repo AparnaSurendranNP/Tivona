@@ -5,7 +5,7 @@ from .models import Product,ProductImage
 from categories.models import Category
 from django.shortcuts import get_object_or_404
 from django.views.decorators.cache import never_cache
-from django.contrib.auth.decorators import login_required
+from django.contrib.auth.decorators import login_required,user_passes_test
 from .models import Product, ProductImage,Variant
 import base64
 from django.core.files.base import ContentFile
@@ -18,21 +18,29 @@ from django.http import JsonResponse
 from django.core.paginator import Paginator
 
 
+def is_user_superuser(user):
+    return user.is_superuser
+
 @never_cache
+@login_required
 def product_detail(request, product_slug):
     product = get_object_or_404(Product, slug=product_slug)
     variants = product.variants.filter(product=product)
     
     variant_data = []
+    offer = None
+
+    if product.offer_applied :
+        offer = ProductOffer.objects.filter(product=product).first()
     
-    if product.offer_applied:
-        offer = ProductOffer.objects.get(product=product)
+    if offer and offer.is_active :
         discount_percentage = offer.discount_percentage
 
         for variant in variants:
             original_price = variant.price
-            discounted_price = original_price - (original_price * discount_percentage / 100)
+            discounted_price = variant.discounted_price
             variant_data.append({
+                'offer':offer,
                 'variant': variant,
                 'original_price': original_price,
                 'discounted_price': discounted_price,
@@ -66,8 +74,10 @@ def fetch_variant_images(request):
     image_urls = [image.image.url for image in images]
     return JsonResponse({'images': image_urls})
 
+
 @never_cache
 @login_required(login_url='/admin_login/')
+@user_passes_test(is_user_superuser)
 def unlist_product(request, product_id):
     product = get_object_or_404(Product, pk=product_id)
     
@@ -82,6 +92,7 @@ def unlist_product(request, product_id):
 
 @never_cache
 @login_required(login_url='/admin_login/')
+@user_passes_test(is_user_superuser)
 def admin_products(request):
     admin_user = request.session.get('admin_user', None)
     products=Product.objects.all().order_by('-id')
@@ -99,6 +110,7 @@ def admin_products(request):
 
 @never_cache
 @login_required(login_url='/admin_login/')
+@user_passes_test(is_user_superuser)
 def add_products(request):
     if request.method == 'POST':
         name = request.POST.get('product_name')
@@ -158,6 +170,7 @@ def add_products(request):
 
 @never_cache
 @login_required(login_url='/admin_login/')
+@user_passes_test(is_user_superuser)
 def edit_product(request, product_id):
     admin_user = request.session.get('admin_user', None)
     product = get_object_or_404(Product, id=product_id)
@@ -216,6 +229,7 @@ def edit_product(request, product_id):
 
 @never_cache
 @login_required(login_url='/admin_login/')
+@user_passes_test(is_user_superuser)
 def add_variant(request,product_id):
     product = get_object_or_404(Product,id=product_id)
     category = product.category
@@ -251,6 +265,7 @@ def add_variant(request,product_id):
 
 @never_cache
 @login_required(login_url='/admin_login/')
+@user_passes_test(is_user_superuser)
 def unlist_variant(request,variant_id):
     variant=get_object_or_404(Variant,id=variant_id)
     if request.method == 'POST':

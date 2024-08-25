@@ -209,6 +209,7 @@
                             <li class="list-group-item"><strong>Payment Method:</strong> {{ order.payment_method }}</li>
                             <li class="list-group-item"><strong>Status:</strong> {{ order.status }}</li>
                         </ul>
+                        <a href="{% url 'download_invoice' order.id %}" class="btn btn-primary">Download Invoice</a>
                         <a href="{% url 'order_history' %}" class="btn btn-primary">View Order History</a>
                     </div>
                 </div>

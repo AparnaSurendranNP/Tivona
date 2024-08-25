@@ -13,6 +13,7 @@ urlpatterns = [
     path('online_payment_success/',views.online_payment_success,name='online_payment_success'),
     path('place_order/',views.place_order,name='place_order'),
     path('order_success/<int:order_id>/', views.order_success, name='order_success'),
+    path('download_invoice/<int:order_id>/',views.download_invoice_pdf, name='download_invoice'),
     path('request-refund/<int:order_id>/', views.request_refund, name='request_refund'),
 ]
 

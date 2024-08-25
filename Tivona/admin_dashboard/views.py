@@ -25,12 +25,12 @@ from io import BytesIO
 import pdfkit
 from django.db.models.functions import TruncDate, TruncWeek, TruncMonth
 
-def is_superuser(user):
+def is_user_superuser(user):
     return user.is_superuser
 
 @never_cache
 @login_required(login_url='/admin_login/')
-@user_passes_test(is_superuser)
+@user_passes_test(is_user_superuser)
 def admin_dashboard(request):
     admin_user = request.session.get('admin_user',None)
     customers = CustomUser.objects.all()
@@ -55,16 +55,16 @@ def admin_dashboard(request):
     
     return render(request, 'Admin side/admin_dashboard.html', context)
 
-@user_passes_test(is_superuser)
-@login_required(login_url='/admin_login/')
 @never_cache
+@login_required(login_url='/admin_login/')
+@user_passes_test(is_user_superuser)
 def admin_profile(request):
     return render(request,'Admin side/admin_profile.html')
 
 
-@user_passes_test(is_superuser)
-@login_required(login_url='/admin_login/')
 @never_cache
+@login_required(login_url='/admin_login/')
+@user_passes_test(is_user_superuser)
 def admin_orders(request):
     admin_user = request.session.get('admin_user', None)
     orders=Order.objects.all().order_by('-created_at')
@@ -77,14 +77,15 @@ def admin_orders(request):
     }
     return render(request,'Admin side/admin_orders.html',context)
 
-@user_passes_test(is_superuser)
-@login_required(login_url='/admin_login/')
 @never_cache
+@login_required(login_url='/admin_login/')
+@user_passes_test(is_user_superuser)
 def admin_order_details(request,order_id):
     admin_user = request.session.get('admin_user', None)
     order = get_object_or_404(Order, id=order_id)
     orderItems = OrderItem.objects.filter(order=order)
-    sub_total=(order.total_amount - order.tax_amount) + order.discount
+    Del_charge = Decimal(50)
+    sub_total=(order.total_amount + order.discount ) - order.tax_amount - Del_charge
     context = {
         'admin':admin_user,
         'order':order,
@@ -94,7 +95,9 @@ def admin_order_details(request,order_id):
     }
     return render(request, 'Admin side/admin_order_details.html',context)
 
+@never_cache
 @login_required(login_url='/admin_login/')
+@user_passes_test(is_user_superuser)
 def change_order_status(request,order_id):
     order=get_object_or_404(Order,id=order_id)
     if request.method == 'POST':
@@ -138,9 +141,9 @@ def change_order_status(request,order_id):
             return redirect('admin_order_details',order_id=order_id)
     return redirect('admin_order_details',order_id=order_id)
 
-@user_passes_test(is_superuser)
-@login_required(login_url='/admin_login/')
 @never_cache
+@login_required(login_url='/admin_login/')
+@user_passes_test(is_user_superuser)
 def admin_coupons(request):
     coupons = Coupon.objects.all()
     for coupon in coupons:
@@ -161,6 +164,7 @@ def admin_coupons(request):
 
 @never_cache
 @login_required(login_url='/admin_login/')
+@user_passes_test(is_user_superuser)
 def add_coupon(request):
     if request.method == 'POST':
         code = request.POST.get('coupon_code')
@@ -221,6 +225,7 @@ def add_coupon(request):
 
 @never_cache
 @login_required(login_url='/admin_login/')
+@user_passes_test(is_user_superuser)
 def edit_coupon(request, coupon_id):
     coupon = get_object_or_404(Coupon, id=coupon_id)
     if request.method == 'POST':
@@ -292,6 +297,7 @@ def edit_coupon(request, coupon_id):
 
 @never_cache
 @login_required(login_url='/admin_login/')
+@user_passes_test(is_user_superuser)
 def coupon_status(request, coupon_id):
     coupon = get_object_or_404(Coupon, id=coupon_id)
     if coupon.valid_to >= timezone.now() :
@@ -305,14 +311,15 @@ def coupon_status(request, coupon_id):
         messages.error(request, f'Cannot activate coupon "{coupon.code}" it has expired.')
     return redirect('admin_coupons')
 
-@user_passes_test(is_superuser)
-@login_required(login_url='/admin_login/')
 @never_cache
+@login_required(login_url='/admin_login/')
+@user_passes_test(is_user_superuser)
 def banners(request):
     return render(request,'Admin side/banneres.html')
 
-@login_required
 @never_cache
+@login_required(login_url='/admin_login/')
+@user_passes_test(is_user_superuser)
 def approve_refund(request, order_id):
 
     order = get_object_or_404(Order, id=order_id)
@@ -349,9 +356,9 @@ def approve_refund(request, order_id):
         messages.error(request, "Refund cannot be processed.")
         return redirect('admin_order_details',order_id=order_id)
 
-@user_passes_test(is_superuser)
-@login_required(login_url='/admin_login/')
 @never_cache
+@login_required(login_url='/admin_login/')
+@user_passes_test(is_user_superuser)
 def admin_offers(request):
     category_offers = CategoryOffer.objects.all()
     product_offers = ProductOffer.objects.all()
@@ -380,9 +387,9 @@ def admin_offers(request):
     }
     return render(request, 'Admin side/admin_offers.html', context)
 
-
-@login_required(login_url='/admin_login/')
 @never_cache
+@login_required(login_url='/admin_login/')
+@user_passes_test(is_user_superuser)
 def add_category_offer(request):
     if request.method == 'POST':
         category_id = request.POST.get('category')
@@ -451,8 +458,9 @@ def add_category_offer(request):
 
 
 
-@login_required(login_url='/admin_login/')
 @never_cache
+@login_required(login_url='/admin_login/')
+@user_passes_test(is_user_superuser)
 def add_product_offer(request):
     if request.method == 'POST':
         product_id = request.POST.get('product')
@@ -539,6 +547,9 @@ def get_variants(request, product_id):
     return JsonResponse({'variants': list(variants_names)})
 
 
+@never_cache
+@login_required(login_url='/admin_login/')
+@user_passes_test(is_user_superuser)
 def  change_category_offer_status(request,offer_id):
     offer = get_object_or_404(CategoryOffer, id=offer_id)
     offered_products = ProductOffer.objects.filter(offer=offer)
@@ -567,6 +578,10 @@ def  change_category_offer_status(request,offer_id):
 
     return redirect('admin_offers')
 
+
+@never_cache
+@login_required(login_url='/admin_login/')
+@user_passes_test(is_user_superuser)
 def  change_product_offer_status(request,offer_id):
     offer = get_object_or_404(ProductOffer, id=offer_id)
     if offer.valid_to < timezone.now():
@@ -589,16 +604,22 @@ def  change_product_offer_status(request,offer_id):
     return redirect('admin_offers')
 
 
+@never_cache
+@login_required(login_url='/admin_login/')
+@user_passes_test(is_user_superuser)
 def edit_category_offer(request,offer_id):
     return redirect('edit_category_offer')
 
+
 @never_cache
+@login_required(login_url='/admin_login/')
+@user_passes_test(is_user_superuser)
 def edit_product_offer(request,offer_id):
     offer = get_object_or_404(ProductOffer, id=offer_id)
     
     if request.method == 'POST':
-        product_id = request.POST.get('product',offer.product)
-        variant_id = request.POST.get('variant',offer.variant)
+        product_id = request.POST.get('product',offer.product.id)
+        variant_id = request.POST.get('variant',offer.variant.id)
         percentage = request.POST.get('discount_percentage',offer.discount_percentage)
         valid_from = request.POST.get('valid_from',offer.valid_from)
         valid_to = request.POST.get('valid_to',offer.valid_to)
@@ -611,7 +632,7 @@ def edit_product_offer(request,offer_id):
             valid_from = timezone.make_aware(valid_from, timezone.get_current_timezone())
             valid_to = timezone.make_aware(valid_to, timezone.get_current_timezone())
 
-            if not product_id.strip():
+            if not product_id:
                 messages.error(request, 'Invalid product ID.')
                 return redirect('admin_offers')
 
@@ -669,6 +690,8 @@ def edit_product_offer(request,offer_id):
     return render(request, 'Admin side/edit_product_offer.html', context)
 
 @never_cache
+@login_required(login_url='/admin_login/')
+@user_passes_test(is_user_superuser)
 def report(request):
     report_type = request.GET.get('report_type', 'day')
 

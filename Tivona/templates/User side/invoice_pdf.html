@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Invoice - {{ order.id }}</title>
+    <style>
+        /* Add your custom styles here */
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+        }
+        .container {
+            padding: 20px;
+        }
+        .header, .footer {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        .content {
+            border-top: 1px solid #000;
+            border-bottom: 1px solid #000;
+            margin-top: 20px;
+            padding: 10px 0;
+        }
+        .content table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        .content table, .content th, .content td {
+            border: 1px solid #000;
+        }
+        .content th, .content td {
+            padding: 10px;
+            text-align: left;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>Invoice</h1>
+            <p>Order ID: {{ order.id }}</p>
+        </div>
+        <div class="content">
+            <h2>Order Details</h2>
+            <table>
+                <tr>
+                    <th>Order Date</th>
+                    <td>{{ order.created_at }}</td>
+                </tr>
+                <tr>
+                    <th>Discount</th>
+                    <td>{{ order.discount }}</td>
+                </tr>
+                <tr>
+                    <th>Total Amount</th>
+                    <td>Rs {{ order.total_amount }}</td>
+                </tr>
+                <tr>
+                    <th>Payment Method</th>
+                    <td>{{ order.payment_method }}</td>
+                </tr>
+                <tr>
+                    <th>Status</th>
+                    <td>{{ order.status }}</td>
+                </tr>
+            </table>
+        </div>
+        <div class="footer">
+            <p>Thank you for your order!</p>
+        </div>
+    </div>
+</body>
+</html>

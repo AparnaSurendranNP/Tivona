@@ -4,15 +4,18 @@ from .models import Category
 from django.utils.text import slugify
 from products.models import Product,Variant
 from django.views.decorators.cache import never_cache
-from django.contrib.auth.decorators import login_required
+from django.contrib.auth.decorators import login_required,user_passes_test
 from django.conf import settings
 from django.db.models import Min
 from django.contrib import messages
 from django.core.paginator import Paginator
 from decimal import Decimal, InvalidOperation
 
+def is_user_superuser(user):
+    return user.is_superuser
 
 @never_cache
+@login_required
 def category_detail(request, category_slug):
     category = get_object_or_404(Category, slug=category_slug)
     sort_option=request.GET.get('sort','name')
@@ -65,6 +68,7 @@ def category_detail(request, category_slug):
 
 @never_cache
 @login_required(login_url='/admin_login/')
+@user_passes_test(is_user_superuser)
 def admin_categories(request):
     admin_user = request.session.get('admin_user', None)
     categories=Category.objects.all()
@@ -80,6 +84,7 @@ def admin_categories(request):
 
 @never_cache
 @login_required(login_url='/admin_login/')
+@user_passes_test(is_user_superuser)
 def add_category(request):
     if request.method == 'POST':
         cat_name = request.POST.get('category_name')
@@ -120,6 +125,7 @@ def add_category(request):
 
 @never_cache
 @login_required(login_url='/admin_login/')
+@user_passes_test(is_user_superuser)
 def unlist_category(request, category_id):
     category = get_object_or_404(Category, pk=category_id)
     
@@ -136,6 +142,7 @@ def unlist_category(request, category_id):
 
 @never_cache
 @login_required(login_url='/admin_login/')
+@user_passes_test(is_user_superuser)
 def edit_category(request, category_id):
     admin_user = request.session.get('admin_user', None)
     category = get_object_or_404(Category,id=category_id)

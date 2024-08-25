@@ -10,6 +10,7 @@ from django.contrib.auth import update_session_auth_hash
 from django.contrib.auth.decorators import login_required
 from django.views.decorators.cache import never_cache
 from products.utils import colors
+from decimal import Decimal
 from django.core.paginator import Paginator
 from user_profile.models import Wallet,WalletTransaction
 
@@ -237,7 +238,7 @@ def delete_address(request, address_id):
         address.is_listed = not address.is_listed  # Toggle the is_listed flag
         address.primary_address=False
         address.save() 
-        addresses = Address.objects.filter(user_id=user_id)
+        addresses = Address.objects.filter(user_id=user_id, is_listed=True)
         if not addresses.filter(primary_address=True).exists() and addresses.exists():
             last_address = addresses.last()
             last_address.primary_address = True
@@ -290,7 +291,7 @@ def change_password(request,user_id):
 def order_history(request):
     user = request.user
     orders = Order.objects.filter(user=user).order_by('-created_at')
-    paginator = Paginator(orders,5)
+    paginator = Paginator(orders,3)
     page_number=request.GET.get('page')
     page_obj=paginator.get_page(page_number)
     context={
@@ -302,8 +303,9 @@ def order_history(request):
 @never_cache
 def order_detail(request,order_id):
     order = get_object_or_404(Order, id=order_id)
-    order_items = OrderItem.objects.filter(order=order) 
-    sub_total = (order.total_amount + order.discount) - order.tax_amount 
+    order_items = OrderItem.objects.filter(order=order)
+    Del_charge = Decimal(50) 
+    sub_total = (order.total_amount + order.discount) - order.tax_amount - Del_charge
     expected_date = order.created_at + timedelta(days=5)
     context = {
         'order': order,
@@ -346,11 +348,15 @@ def wallet_transactions(request):
     user = request.user
     wallet = Wallet.objects.filter(user=user).first()
 
-    transactions = WalletTransaction.objects.filter(wallet=wallet)
+    transactions = WalletTransaction.objects.filter(wallet=wallet).order_by('-id')
+
+    paginator = Paginator(transactions, 4)
+    page_number = request.GET.get('page')
+    page_obj = paginator.get_page(page_number)
 
     context = {
-        'transactions' : transactions,
-        'balance_amount' : wallet.balance
+        'page_obj': page_obj,
+        'balance_amount': wallet.balance
     }
     return render(request,'User side/wallet_transactions.html',context)
 

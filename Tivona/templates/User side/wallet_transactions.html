@@ -36,6 +36,18 @@
         font-size: 36px;
         color: #28a745;
     }
+    .transaction__pagination a {
+      margin: 0 5px;
+      padding: 0px 5px;
+      text-decoration: none;
+      border: 1px solid #ddd;
+      color: rgb(22, 165, 65);
+  }
+  .transaction__pagination a.active {
+      background-color: rgb(22, 165, 65);
+      color: #fff;
+  }
+
 </style>
 
 <body>
@@ -186,7 +198,7 @@
                                         </tr>
                                     </thead>
 
-                                    {%for transaction in transactions %}
+                                    {%for transaction in page_obj %}
                                     <tbody>
                                         <tr>
                                             <td>{{ transaction.id }}</td>
@@ -199,6 +211,33 @@
                                 </table>
                                 {%endif%}
                             </div>
+                            <div
+                                    class="grid px-4 py-3 text-xs font-semibold tracking-wide text-gray-500 uppercase border-t dark:border-gray-700 bg-gray-50 sm:grid-cols-9 dark:text-gray-400 dark:bg-gray-800">
+                                    <!-- <span class="flex items-center col-span-3">
+                                    Showing 21-30 of 100
+                                    </span> -->
+                                    <span class="col-span-4"></span>
+                                    <!-- Pagination -->
+                                    <div class="transaction__pagination">
+                                        {% if page_obj.has_previous %}
+                                        <a href="?page={{ page_obj.previous_page_number }}"><i
+                                                class="fa fa-long-arrow-left"></i></a>
+                                        {% endif %}
+
+                                        {% for num in page_obj.paginator.page_range %}
+                                        {% if page_obj.number == num %}
+                                        <a href="#" class="active">{{ num }}</a>
+                                        {% else %}
+                                        <a href="?page={{num }}">{{ num }}</a>
+                                        {% endif %}
+                                        {% endfor %}
+
+                                        {% if page_obj.has_next %}
+                                        <a href="?page={{ page_obj.next_page_number }}"><i
+                                                class="fa fa-long-arrow-right"></i></a>
+                                        {% endif %}
+                                    </div>
+                                </div>
                         </div>
                     </div>
                 </div>

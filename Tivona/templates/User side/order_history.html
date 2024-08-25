@@ -169,7 +169,7 @@
                         </div>
                     </div>
                     {% comment %} Order Area {% endcomment %}
-                    <div class="col-md-9">
+                    <div class="col-md-10">
                         <div class="card-body pb-2">
                             <div class="tab-content" id="myTabContent">
                                 <div class="tab-pane fade fade show active" id="account-orders">
@@ -178,7 +178,6 @@
                                             <thead class="thead-light">
                                                 <tr>
                                                     <th>Order ID</th>
-                                                    <th>Name</th>
                                                     <th>Address</th>
                                                     <th>Order Date</th>
                                                     <th>Price</th>
@@ -190,10 +189,9 @@
                                             <tbody>
                                                 <tr>
                                                     <td >{{order.id}}</td>
-                                                    <td>{{order.user.username}}</td>
                                                     <td>{{order.order_address}}</td>
                                                     <td>{{order.created_at}}</td>
-                                                    <td>Rs {{order.total_amount}}</td>
+                                                    <td>₹ {{order.total_amount}}</td>
                                                     {%if order.is_listed%}
                                                     <td {%if order.status == "Pending" %} style="color: red;" {%elif order.status == "Delivered" %} style="color:green;"
                                                     {%else%} style="color:orange;" {%endif%}>{{order.status}} </td>
@@ -299,6 +297,17 @@
         </div>
     </footer>
     <!-- Footer Section End -->
+
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.all.min.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            {% if messages %}
+                {% for message in messages %}
+                    Swal.fire('{{ message }}');
+                {% endfor %}
+            {% endif %}
+        });
+    </script>
 
 </body>
 

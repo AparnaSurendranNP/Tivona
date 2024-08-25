@@ -437,18 +437,19 @@
                                         {% endfor %}
                                         <br>
                                         Quantity: {{item.quantity}}<br>
-                                        Price: Rs {{ item.price }}
+                                        Price: ₹ {{ item.price }}
                                     </li>
                                     {% endfor %}
                                 </ul>
                                 <br> 
-                                <p><strong>SubTotal:</strong> Rs {{sub_total}}</p>
+                                <p><strong>SubTotal:</strong> ₹ {{sub_total}}</p>
                                 <p><strong>Tax:</strong> {{ order.tax_amount }}</p>
                                 {%if order.coupon%}
                                 <!-- <p><strong>Coupon code:</strong> {{ order.coupon }}</p> -->
-                                <p><strong>Discount :</strong> - Rs {{ order.discount }} (coupon: {{ order.coupon }})</p>
+                                <p><strong>Discount :</strong> - ₹ {{ order.discount }} (coupon: {{ order.coupon }})</p>
                                 {%endif%}
-                                <p><strong>Total Amount (including tax):</strong> Rs {{ order.total_amount }}</p>
+                                <p><strong>Delivery Charge:</strong> ₹ 50.00</p>
+                                <p><strong>Total Amount (including tax):</strong> ₹ {{ order.total_amount }}</p>
                                 <a href="{% url 'admin_orders' %}"><button class="btn btn-danger">Back</button></a>
                                 {%if order.is_listed and order.status != "Delivered" %}
                                 {%if order.status != "Return processed" %}

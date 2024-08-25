@@ -8,7 +8,7 @@ from django.contrib.auth import logout as auth_logout
 from django.contrib.auth.decorators import login_required,user_passes_test
 from django.conf import settings
 
-def is_superuser(user):
+def is_user_superuser(user):
     return user.is_superuser
 
 @never_cache
@@ -40,7 +40,7 @@ def admin_forgot_password(request):
 
 @never_cache
 @login_required(login_url='/admin_login/')
-@user_passes_test(is_superuser)
+@user_passes_test(is_user_superuser)
 def admin_logout(request):
     auth_logout(request)
     return render(request,'Admin side/admin_login.html')

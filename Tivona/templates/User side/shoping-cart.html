@@ -239,13 +239,13 @@
                                                     style="color: black;">{{ cartItem.product.name }}</a></h5>
                                             </div>
                                         </td>
-                                        {%if cartItem.variant.discounted_price and cartItem.product.offer_applied %}
+                                        {%if cartItem.discounted_price%}
                                         <td class="shoping__cart__price">
-                                            {{ cartItem.variant.discounted_price }}
+                                            ₹ {{ cartItem.discounted_price }}
                                         </td>
                                         {%else%}
                                         <td class="shoping__cart__price">
-                                            {{ cartItem.variant.price }}
+                                            ₹ {{ cartItem.variant.price }}
                                         </td>
                                         {%endif%}
                                         <td class="shoping__cart__quantity">
@@ -290,7 +290,7 @@
                         <div class="shoping__checkout">
                             <h5>Cart Total</h5>
                             <ul>
-                                <li>Total <span>Rs {{ total }}</span></li>
+                                <li>Total <span>₹ {{ total }}</span></li>
                             </ul>
                             <button type="submit" class="primary-btn">PROCEED TO CHECKOUT</button>
                         </div>

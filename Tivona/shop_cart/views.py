@@ -22,8 +22,12 @@ from django.urls import reverse
 from django.middleware.csrf import get_token
 from django.http import JsonResponse
 import json
+from django.http import HttpResponse
+import pdfkit
+from django.template.loader import render_to_string
 
 @never_cache
+@login_required
 def shoping_cart(request):
     user= request.user
 
@@ -43,12 +47,14 @@ def shoping_cart(request):
         product= item.product
         variant = item.variant
 
-        if variant.discounted_price and product.offer_applied:
-            item.discounted_price = item.variant.discounted_price
-        else:
-            item.discounted_price = item.variant.price
+        item.discounted_price = variant.price
 
-        item.total_item_price= item.discounted_price * item.quantity
+        if product.offer_applied:
+            offer = ProductOffer.objects.filter(product=product).first()
+            if offer and offer.is_active and offer.variant == variant:
+                item.discounted_price = variant.discounted_price or variant.price
+
+        item.total_item_price = item.discounted_price * item.quantity
         total += item.total_item_price
     
     context = {
@@ -61,6 +67,7 @@ def shoping_cart(request):
 
 @never_cache
 @transaction.atomic
+@login_required
 def add_cart(request,variant_id):
     if request.method == 'GET':
         from_wishlist=request.GET.get('from_wishlist',False)
@@ -103,6 +110,7 @@ def add_cart(request,variant_id):
 
 
 @never_cache
+@login_required
 def remove_cart(request,cartItem_id):
     user=request.user
     cart = Cart.objects.filter(user=user).first()
@@ -112,6 +120,7 @@ def remove_cart(request,cartItem_id):
     return redirect('shoping-cart')
 
 @never_cache
+@login_required
 def apply_coupon(request):
     if request.method == 'POST':
         coupon_id = request.POST.get('coupon_code')
@@ -129,6 +138,7 @@ def apply_coupon(request):
 
 
 @never_cache
+@login_required
 def remove_coupon(request):
     try:
         if 'coupon_id'in request.session:
@@ -172,23 +182,26 @@ def make_order(request):
 
     cartItems = CartItem.objects.filter(cart=cart)
     Tax_Rate = Decimal(0.05)
-    total=0
+    Del_Charge = Decimal(50)
+    total = Decimal(0)
     discount_amount = Decimal(0)
 
     for item in cartItems:
         product= item.product
         variant = item.variant
 
-        if variant.discounted_price and product.offer_applied:
-            item.discounted_price = item.variant.discounted_price
-        else:
-            item.discounted_price = item.variant.price
+        item.discounted_price = variant.price
 
-        item.total_item_price= item.discounted_price * item.quantity
+        if product.offer_applied:
+            offer = ProductOffer.objects.filter(product=product).first()
+            if offer and offer.is_active and offer.variant == variant:
+                item.discounted_price = variant.discounted_price or variant.price
+
+        item.total_item_price = item.discounted_price * item.quantity
         total += item.total_item_price
 
     tax_amount = total * Tax_Rate
-    total_amount = total + tax_amount
+    total_amount = total + tax_amount + Del_Charge
 
     if coupon_id:
         try:
@@ -209,15 +222,15 @@ def make_order(request):
         'sub_total': total,
         'total_amount': total_amount,
         'tax': tax_amount,
+        'del_charge':Del_Charge,
         'coupons': coupons,
         'coupon_amount': discount_amount if coupon_id else None,
     }
 
     return render(request, 'User side/make_order.html', context)
 
-
-@login_required
 @never_cache
+@login_required
 def place_order(request):
     if request.method == 'POST':
         user = request.user
@@ -239,22 +252,25 @@ def place_order(request):
         
         Tax_Rate = Decimal(0.05)
         total = Decimal(0)
+        Del_Charge = Decimal(50)
         discount_amount = Decimal(0)
 
         for item in cartItems:
             product= item.product
             variant = item.variant
 
-            if variant.discounted_price and product.offer_applied:
-                item.discounted_price = item.variant.discounted_price
-            else:
-                item.discounted_price = item.variant.price
+            item.discounted_price = variant.price
 
-            item.total_item_price= item.discounted_price * item.quantity
+            if product.offer_applied:
+                offer = ProductOffer.objects.filter(product=product).first()
+                if offer and offer.is_active and offer.variant == variant:
+                    item.discounted_price = variant.discounted_price or variant.price
+
+            item.total_item_price = item.discounted_price * item.quantity
             total += item.total_item_price
             
         tax_amount = total * Tax_Rate
-        total_amount = total + tax_amount
+        total_amount = total + tax_amount + Del_Charge
 
         tax_amount = round(tax_amount, 2)
         total_amount = round(total_amount, 2)
@@ -272,6 +288,10 @@ def place_order(request):
                 return redirect('make_order')
 
         if payment_method == 'cash_on_delivery' or payment_method == 'wallet':
+
+            if total_amount > 1000 and payment_method == 'cash_on_delivery' :
+                messages.error(request,"Order above ₹1000 cannot be placed using Cash On Delivery.")
+                return redirect('make_order')
 
             if payment_method == 'wallet':
 
@@ -317,7 +337,7 @@ def place_order(request):
                     product=cartItem.product,
                     variant=cartItem.variant,
                     quantity=cartItem.quantity,
-                    price=cartItem.variant.price,
+                    price=cartItem.discounted_price,
                 )
                 cartItem.variant.stock -= cartItem.quantity
                 cartItem.variant.save()
@@ -406,12 +426,22 @@ def online_payment_success(request):
 
             # Create order items and update stock
             for cartItem in cartItems:
+                product = cartItem.product
+                variant = cartItem.variant
+
+                cartItem.discounted_price = variant.price
+
+                if product.offer_applied:
+                    offer = ProductOffer.objects.filter(product=product).first()
+                    if offer and offer.is_active and offer.variant == variant:
+                        cartItem.discounted_price = variant.discounted_price or variant.price
+
                 OrderItem.objects.create(
                     order=order,
                     product=cartItem.product,
                     variant=cartItem.variant,
                     quantity=cartItem.quantity,
-                    price=cartItem.variant.price,
+                    price=cartItem.discounted_price,
                 )
                 cartItem.variant.stock -= cartItem.quantity
                 cartItem.variant.save()
@@ -422,7 +452,7 @@ def online_payment_success(request):
             # Clear the coupon session if used
             if 'coupon_id' in request.session:
                 coupon_id = request.session['coupon_id']
-                coupon = Coupon.objects.get(id=coupon_id, active=True)
+                coupon = Coupon.objects.filter(id=coupon_id, active=True).first()
                 order.coupon = coupon
                 coupon.used = True
                 coupon.save()
@@ -445,6 +475,7 @@ def online_payment_success(request):
 
 
 @never_cache
+@login_required
 def order_success(request, order_id):
     order = get_object_or_404(Order, id=order_id)
     context={
@@ -452,11 +483,34 @@ def order_success(request, order_id):
     }
     return render(request, 'User side/order_success.html',context)
 
+@login_required
+@never_cache
+def download_invoice_pdf(request, order_id):
+
+    order = get_object_or_404(Order, id=order_id)
+
+    context = {
+        'order': order,
+    }
+
+    # Render HTML content from template with context data
+    html = render_to_string('User side/invoice_pdf.html', context)
+    config = pdfkit.configuration(wkhtmltopdf=r'C:\Program Files\wkhtmltopdf\bin\wkhtmltopdf.exe')
+
+    # Generate PDF from HTML using pdfkit
+    pdf = pdfkit.from_string(html, False, configuration=config)
+
+    # Create HTTP response with the PDF
+    response = HttpResponse(pdf, content_type='application/pdf')
+    response['Content-Disposition'] = 'attachment; filename="invoice.pdf"'
+
+    return response
 
 @login_required
+@never_cache
 def request_refund(request, order_id):
     order = get_object_or_404(Order, id=order_id, user=request.user)
-    if order.status == 'Delivered' or order.payment_method == 'razorpay':
+    if order.status == 'Delivered' or order.payment_method == 'Razorpay' or order.payment_method == 'Wallet':
         order.refund_requested = True
         order.status = 'Refund processed'
         order.save()

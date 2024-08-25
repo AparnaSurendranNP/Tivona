@@ -3008,12 +3008,12 @@ ol {
 	font-size: 18px;
 }
 
-.wishlist__btns {
+.wishlist__btns.add_cart__btns {
 	text-align: right;
 	margin-top: 20px;
 }
 
-.wishlist__btns .wishlist-btn {
+.wishlist__btns .wishlist-btn  {
 	display: inline-block;
 	padding: 10px 20px;
 	background-color: red;
