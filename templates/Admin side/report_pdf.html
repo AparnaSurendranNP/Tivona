@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Report</title>
+</head>
+<body>
+    <h1 class="text-2xl font-bold mb-6">Report - {{ report_type }}</h1>
+    <div class="mb-8 rounded-lg shadow-xs dark:bg-gray-800 p-6">
+        <div class="overflow-x-auto">
+            <table class="w-full whitespace-nowrap">
+                <thead>
+                    <tr>
+                        <th class="px-4 py-2 text-left">Date</th>
+                        <th class="px-4 py-2 text-left">Total Orders</th>
+                        <th class="px-4 py-2 text-left">Total Product QTY</th>
+                        <th class="px-4 py-2 text-left">Total Order Amount</th>
+                        <th class="px-4 py-2 text-left">Total Discount</th>
+                        <th class="px-4 py-2 text-left">Profit</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for item in page_obj %}
+                    <tr>
+                        <td class="px-4 py-2">{{ item.date }}</td>
+                        <td class="px-4 py-2">{{ item.total_orders }}</td>
+                        <td class="px-4 py-2">{{ item.total_qty }}</td>
+                        <td class="px-4 py-2">{{ item.total_amount|floatformat:2 }}</td>
+                        <td class="px-4 py-2">{{ item.total_discount|floatformat:2 }}</td>
+                        <td class="px-4 py-2">{{ item.profit|floatformat:2 }}</td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="6" class="px-4 py-2 text-center">No data found</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        <!-- Pagination Controls -->
+        <div class="mt-4">
+            <span class="text-gray-600 dark:text-gray-400">
+                Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}</span>
+            <div class="mt-2">
+                <span class="mr-2">
+                    {% if page_obj.has_previous %}
+                    <a href="?page={{ page_obj.previous_page_number }}&report_type={{ report_type }}"
+                        class="text-blue-500">Previous</a>
+                    {% endif %}
+                </span>
+                <span class="mr-2">
+                    {% if page_obj.has_next %}
+                    <a href="?page={{ page_obj.next_page_number }}&report_type={{ report_type }}"
+                        class="text-blue-500">Next</a>
+                    {% endif %}
+                </span>
+            </div>
+        </div>
+    </div>
+</body>
+
+</html>

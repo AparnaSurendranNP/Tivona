@@ -1,0 +1,660 @@
+{%load static%}
+<!DOCTYPE html>
+<html lang="zxx">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="description" content="Ogani Template">
+    <meta name="keywords" content="Ogani, unica, creative, html">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Tinova</title>
+
+    <!-- Google Font -->
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@200;300;400;600;900&display=swap" rel="stylesheet">
+
+    <!-- Css Styles -->
+    <link rel="stylesheet" href="{%static 'css/bootstrap.min.css'%}" type="text/css">
+    <link rel="stylesheet" href="{%static 'css/font-awesome.min.css'%}" type="text/css">
+    <link rel="stylesheet" href="{%static 'css/elegant-icons.css'%}" type="text/css">
+    <link rel="stylesheet" href="{%static 'css/nice-select.css'%}" type="text/css">
+    <link rel="stylesheet" href="{%static 'css/jquery-ui.min.css'%}" type="text/css">
+    <link rel="stylesheet" href="{%static 'css/owl.carousel.min.css'%}" type="text/css">
+    <link rel="stylesheet" href="{%static 'css/slicknav.min.css'%}" type="text/css">
+    <link rel="stylesheet" href="{%static 'css/style.css'%}" type="text/css">
+
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js"></script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
+
+</head>
+
+<style>
+    .btn-success {
+        background-color: #28a745;
+        border-color: #28a745;
+        color: #fff;
+    }
+
+    /* Style for danger button */
+    .btn-danger {
+        background-color: #dc3545;
+        border-color: #dc3545;
+        color: #fff;
+    }
+
+    /* Style for badge buttons */
+    .badge {
+        padding: 5px 10px;
+        border-radius: 15px;
+    }
+
+    .modal-bg {
+        display: none;
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0, 0, 0, 0.5);
+        justify-content: center;
+        align-items: center;
+        inset: 0;
+        z-index: 50;
+        overflow-y: auto;
+    }
+
+    .modal-content {
+        background: white;
+        padding: 20px;
+        border-radius: 8px;
+        width: 100%;
+        max-width: 60%;
+        max-height: 80%;
+        overflow-y: auto;
+        box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
+    }
+
+    .jcrop-holder img {
+        max-width: 100%;
+    }
+
+    /* Style for showing modal */
+    .modal-bg:target {
+        display: flex;
+    }
+
+    /* Style for close button */
+    .close-btn {
+        display: inline-block;
+        margin-top: 10px;
+        padding: 5px 10px;
+        background-color: red;
+        color: white;
+        text-align: center;
+        border-radius: 5px;
+        text-decoration: none;
+        cursor: pointer;
+    }
+</style>
+
+<body>
+
+    <!-- Page Preloder -->
+    <div id="preloder">
+        <div class="loader"></div>
+    </div>
+
+    <!-- Humberger Begin -->
+    <div class="humberger__menu__overlay"></div>
+    <div class="humberger__menu__wrapper">
+        <div class="humberger__menu__logo">
+            <a href="#"><img src="img/logo.png" alt=""></a>
+        </div>
+        <div class="humberger__menu__cart">
+            <ul>
+                <li><a href="{%url 'wishlist'%}"><i class="fa fa-heart"></i> <span>1</span></a></li>
+                <li><a href="{%url 'shoping-cart'%}"><i class="fa fa-shopping-bag"></i> <span>3</span></a></li>
+            </ul>
+            <div class="header__cart__price">item: <span>$150.00</span></div>
+        </div>
+        <div class="humberger__menu__widget">
+            <div class="header__top__right__language">
+                <img src="img/language.png" alt="">
+                <div>English</div>
+                <span class="arrow_carrot-down"></span>
+                <ul>
+                    <li><a href="#">Spanis</a></li>
+                    <li><a href="#">English</a></li>
+                </ul>
+            </div>
+            <div class="header__top__right__auth">
+                {% if user.is_authenticated %}
+                <a href="{% url 'profile page' user.id %}"><i class="fa fa-user"></i>{{ user.username }}</a>
+                {% else %}
+                <a href="{% url 'login page' %}"><i class="fa fa-user"></i> Login/Signup</a>
+                {% endif %}
+            </div>
+        </div>
+        <nav class="humberger__menu__nav mobile-menu">
+            <ul>
+                <li class="active"><a href="{%url 'home page'%}">Home</a></li>
+                <li><a href="{%url 'shop page'%}">Store</a></li>
+                <li><a href="#">Pages</a>
+                    <ul class="header__menu__dropdown">
+                        <li><a href="./shop-details.html">Shop Details</a></li>
+                        <li><a href="./shoping-cart.html">Shop Cart</a></li>
+                        <li><a href="./checkout.html">Check Out</a></li>
+                        <li><a href="./blog-details.html">Blog Details</a></li>
+                    </ul>
+                </li>
+                <li><a href="./blog.html">Blog</a></li>
+                <li><a href="./contact.html">Contact</a></li>
+            </ul>
+        </nav>
+        <div id="mobile-menu-wrap"></div>
+        <div class="header__top__right__social">
+            <a href="#"><i class="fa fa-facebook"></i></a>
+            <a href="#"><i class="fa fa-twitter"></i></a>
+            <a href="#"><i class="fa fa-linkedin"></i></a>
+            <a href="#"><i class="fa fa-pinterest-p"></i></a>
+        </div>
+        <div class="humberger__menu__contact">
+            <ul>
+                <li><i class="fa fa-envelope"></i> hello@colorlib.com</li>
+                <li>Free Shipping for all Order of $99</li>
+            </ul>
+        </div>
+    </div>
+    <!-- Humberger End -->
+
+    <!-- Header Section Begin -->
+    <header class="header">
+        <div class="header__top">
+            <div class="container">
+                <div class="row">
+                    <div class="col-lg-6">
+                        <div class="header__top__left">
+                            <ul>
+                                <!-- <li><i class="fa fa-envelope"></i> {{user.email}}</li>
+                                <li>Free Shipping for all Order of $99</li> -->
+                            </ul>
+                        </div>
+                    </div>
+                    <div class="col-lg-6">
+                        <div class="header__top__right">
+                            <div class="header__top__right__social">
+                                <a href="#"><i class="fa fa-facebook"></i></a>
+                                <a href="#"><i class="fa fa-twitter"></i></a>
+                                <a href="#"><i class="fa fa-linkedin"></i></a>
+                                <a href="#"><i class="fa fa-pinterest-p"></i></a>
+                            </div>
+                            <div class="header__top__right__language">
+                                <img src="{%static 'img/language.png'%}" alt="">
+                                <div>English</div>
+                                <span class="arrow_carrot-down"></span>
+                                <ul>
+                                    <li><a href="#">Spanis</a></li>
+                                    <li><a href="#">English</a></li>
+                                </ul>
+                            </div>
+                            <div class="header__top__right__auth">
+                                {% if user.is_authenticated %}
+                                <a href="{% url 'profile page' user.id %}"><i
+                                        class="fa fa-user"></i>{{user.username}}</a>
+                                {% else %}
+                                <a href="{% url 'login page' %}"><i class="fa fa-user"></i> Login/Signup</a>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="container">
+            <div class="row">
+                <div class="col-lg-3">
+                    <div class="header__logo">
+                        <a href="{%url 'home page'%}"><img src="{%static 'img/logo.png'%}" alt=""></a>
+                    </div>
+                </div>
+                <div class="col-lg-6" style="padding: 20px;">
+                    <nav class="header__menu">
+                        <ul>
+                            <li><a href="{%url 'home page'%}">Home</a></li>
+                            <li><a href="{%url 'shop page'%}">Store</a>
+                                <ul class="header__menu__dropdown">
+                                    {% for category in categories %}
+                                    {% if category.is_listed %}
+                                    <li><a href="{% url 'category_detail' category.slug %}">{{ category.name }}</a></li>
+                                    {% endif %}
+                                    {% endfor %}
+                                </ul>
+                            </li>
+                            <!-- <li><a href="./blog.html">Blog</a></li> -->
+                            <li class="active"><a href="{%url 'shoping-cart'%}">Shop Cart</a></li>
+                            <!-- <li><a href="./checkout.html">Check Out</a></li> -->
+                            <li><a href="{%url 'contact page'%}">Contact</a></li>
+                        </ul>
+                    </nav>
+                </div>
+                <div class="col-lg-3" style="padding: 20px;">
+                    <div class="header__cart">
+                        <ul>
+                            <li><a href="{%url 'wishlist'%}"><i class="fa fa-heart"></i></a></li>
+                            <li><a href="{%url 'shoping-cart'%}"><i class="fa fa-shopping-bag"></i></a>
+                            </li>
+                        </ul>
+                        <!-- <div class="header__cart__price">item: <span>$150.00</span></div> -->
+                    </div>
+                </div>
+            </div>
+            <div class="humberger__open">
+                <i class="fa fa-bars"></i>
+            </div>
+        </div>
+    </header>
+    <!-- Header Section End -->
+
+    <!-- Breadcrumb Section Begin -->
+    <section class="breadcrumb-section set-bg" data-setbg="{%static 'img/breadcrumb.jpg'%}">
+        <div class="container">
+            <div class="row">
+                <div class="col-lg-12 text-center">
+                    <div class="breadcrumb__text">
+                        <h2>Checkout</h2>
+                        <div class="breadcrumb__option">
+                            <a href="{%url 'home page'%}">Home</a>
+                            <span>Checkout</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+    <!-- Breadcrumb Section End -->
+
+    <!-- Checkout Section Begin -->
+    <section class="checkout spad">
+        <div class="container">
+            <div class="row">
+                <div class="col-lg-12">
+                    <h6>
+                        <span class="icon_tag_alt"></span> Have a coupon?
+                        <a href="#" data-toggle="collapse" data-target="#couponForm" aria-expanded="false"
+                            aria-controls="couponForm">Click here</a> to enter your code
+                    </h6>
+                    <div id="couponForm" class="collapse">
+                        <form action="{% url 'apply_coupon' %}" method="post">
+                            {% csrf_token %}
+                            <div class="input-group mb-3">
+                                <!-- <span for="coupon_code" class="block text-gray-700">Apply Coupon code</span> -->
+                                <select id="coupon_code" name="coupon_code" class="form-control border-2" required>
+                                    <option value="" disabled selected>Apply Coupon code</option>
+                                    {% for coupon in coupons %}
+                                    {% if coupon.active %}
+                                    {% if sub_total >= coupon.min_amount and sub_total <= coupon.max_amount %} <option
+                                        value="{{ coupon.id }}" {% if coupon.id == coupon.id %}selected{% endif %}>
+                                        {{ coupon.code }}({{ coupon.discount }}%)</option>
+                                        {% endif %}
+                                        {% endif %}
+                                        {% endfor %}
+                                </select>
+                                <div class="input-group-append">
+                                    <button class="btn btn-primary" type="submit">Apply</button>
+                                </div>
+                            </div>
+                        </form>
+                        <a href="{%url 'remove_coupon'%}" class="btn btn-danger">remove</a>
+                    </div>
+                </div>
+            </div>
+            <div class="checkout__form">
+                <br>
+                <h4>Billing Details</h4>
+                <form action="{% url 'place_order' %}" method="post">
+                    {% csrf_token %}
+                    <div class="row">
+                        <div class="col-lg-8 col-md-6">
+                            <div class="d-flex justify-content-between align-items-center mb-3">
+                                <h5>Select Address</h5>
+                                <a href="#addAddressModal" class="btn btn-success btn-sm">Add Address</a>
+                            </div>
+                            <div class="row">
+                                {% for address in addresses %}
+                                {% if address.is_listed %}
+                                <div class="col-md-4 mb-3">
+                                    <div class="address-box border rounded p-3">
+                                        <div class="form-check mb-2">
+                                            <input type="radio" class="form-check-input" name="address_id"
+                                                id="address_select{{ forloop.counter }}" value="{{ address.id }}"
+                                                {% if address.primary_address %} checked {% endif %}>
+                                            <label for="address_select{{ forloop.counter }}" class="form-check-label">
+                                                {% if address.primary_address %}
+                                                Primary Address
+                                                {% else %}
+                                                Address
+                                                {% endif %}
+                                            </label>
+                                            <a href="{% url 'edit_address' address.id %}" class="btn btn-primary btn-sm float-right">Edit</a>
+                                        </div>
+                                        <p class="mb-1">
+                                            <strong>Name:</strong> {{ address.name }}<br>
+                                            <strong>Mobile:</strong> {{ address.phone }}<br>
+                                            <strong>Address:</strong> {{ address.address }}<br>
+                                            {{ address.street }}, {{ address.city }}, {{ address.state }} - {{ address.pin_code }}
+                                        </p>
+                                    </div>
+                                </div>
+                                {% endif %}
+                                {% endfor %}
+                            </div>
+                            {% for cartItem in cartItems %}
+                            <div class="shoping__cart__item mb-3 p-3 border rounded shadow-sm d-flex align-items-center">
+                                <div class="shoping__cart__detail mr-3">
+                                    <div style="width: 100px; height: 100px;">
+                                        <img src="{{ cartItem.variant.images.first.image.url }}" alt="">
+                                    </div>
+                                    <br>
+                                </div>
+                                <div class="flex-grow-1">
+                                    <h5>
+                                        <a href="{% url 'product_detail' cartItem.product.slug %}" style="color: black;">
+                                            {{ cartItem.product.name }}
+                                        </a>
+                                    </h5>
+                                    <div class="shoping__cart__price">
+                                        {% if cartItem.variant.discounted_price and cartItem.product.offer_applied %}
+                                        Price: ₹ {{ cartItem.discounted_price|floatformat:2 }}
+                                        {% else %}
+                                        Price: ₹ {{ cartItem.variant.price }}
+                                        {% endif %}
+                                    </div>
+                                </div>
+                                <div class="shoping__cart__quantity" style="padding: 10%;">
+                                    Quantity: {{ cartItem.quantity }}
+                                </div>
+                                <div class="shoping__cart__total">
+                                    ₹ {{ cartItem.total_item_price }}
+                                </div>
+                            </div>
+                            {% endfor %}
+                        </div>
+                        <div class="col-lg-4 col-md-6">
+                            <div class="checkout__order p-3 border rounded shadow-sm">
+                                <h4>Your Order</h4>
+                                <div class="checkout__order__products mb-2">Products <span class="float-right">Total</span></div>
+                                <ul class="list-unstyled">
+                                    {% for cartItem in cartItems %}
+                                    <li class="d-flex justify-content-between">
+                                        {{cartItem.product.name}}
+                                        <span>
+                                            ₹
+                                            {% if cartItem.variant.discounted_price and cartItem.product.offer_applied %}
+                                            {{ cartItem.discounted_price|floatformat:2 }}
+                                            {% else %}
+                                            {{ cartItem.variant.price }}
+                                            {% endif %}
+                                            *{{ cartItem.quantity}}
+                                        </span>
+                                    </li>
+                                    {%endfor%}
+                                    <!-- <li><b>Delivery Charge</b><span>$7.99</span></li> -->
+                                </ul>
+                                <div class="checkout__order__subtotal d-flex justify-content-between">
+                                    Subtotal 
+                                    <span>₹ {{ sub_total|floatformat:2 }}</span></div>
+                                <ul class="list-unstyled">
+                                    <li class="d-flex justify-content-between"><strong>Tax</strong><span>₹ {{ tax|floatformat:2 }}</span></li>
+                                    {%if coupon_amount %}
+                                    <li class="d-flex justify-content-between"><strong>Discount amount</strong><span>- ₹ {{ coupon_amount|floatformat:2 }}</span></li>
+                                    {% endif %}
+                                    <li class="d-flex justify-content-between"><strong>Delivery Charge</strong><span>₹ {{ del_charge|floatformat:2 }}</span></li>
+                                </ul>
+                                <div class="checkout__order__total d-flex justify-content-between">Total <span>₹ {{total_amount}}</span></div>
+                                
+                                <div class="radio_btn mt-3">
+                                    <label for="payment">
+                                        Cash On Delivery
+                                        <input type="radio" id="payment" name="payment_method" value="cash_on_delivery">
+                                        <span class="radio"></span>
+                                    </label>
+                                    <label for="razorpay">
+                                        Online payment
+                                        <input type="radio" id="razorpay" name="payment_method" value="razorpay">
+                                        <span class="radio"></span>
+                                    </label>
+                                    <label for="wallet">
+                                        Wallet
+                                        <input type="radio" id="wallet" name="payment_method" value="wallet">
+                                        <span class="radio"></span>
+                                    </label>
+                                </div>
+                                <button type="submit" class="site-btn">PLACE ORDER</button>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </section>
+
+    <!-- Checkout Section End -->
+
+    <!-- Add Address Modal HTML -->
+    <div id="addAddressModal" class="modal-bg">
+        <div class="modal-content">
+            <form action="{% url 'add_address' user.id %}" method="post" enctype="multipart/form-data">
+                {% csrf_token %}
+                <input type="hidden" name="source_page" value="make_order">
+                <div class="modal-header flex justify-between items-center mb-4">
+                    <h4 class="text-xl font-semibold">Add Address</h4>
+                    <a href="#" class="close-btn">&times;</a>
+                </div>
+                <div class="modal-body">
+                    <div class="form-group mb-4">
+                        <label for="name" class="block text-gray-700">Name</label>
+                        <input type="text" id="name" name="name"
+                            class="form-control w-full px-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-purple-600"
+                            required>
+                    </div>
+                    <div class="form-group mb-4">
+                        <label for="phone" class="block text-gray-700">Phone number</label>
+                        <input type="text" id="phone" name="phone"
+                            class="form-control w-full px-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-purple-600"
+                            required>
+                    </div>
+                    <div class="form-group mb-4">
+                        <label for="address" class="block text-gray-700">Address</label>
+                        <textarea id="address" name="address"
+                            class="form-control w-full px-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-purple-600"
+                            rows="4" required></textarea>
+                    </div>
+                    <div class="form-group mb-4">
+                        <label for="pin_code" class="block text-gray-700">Pin Code</label>
+                        <input type="text" id="pin_code" name="pin_code"
+                            class="form-control w-full px-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-purple-600"
+                            required onblur="fetchAddressDetails()">
+                    </div>
+                    <div class="form-group mb-4">
+                        <label for="street" class="block text-gray-700">Street</label>
+                        <input type="text" id="street" name="street"
+                            class="form-control w-full px-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-purple-600"
+                            required>
+                    </div>
+                    <div class="form-group mb-4">
+                        <label for="city" class="block text-gray-700">City</label>
+                        <input type="text" id="city" name="city"
+                            class="form-control w-full px-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-purple-600"
+                            required>
+                    </div>
+                    <div class="form-group mb-4">
+                        <label for="state" class="block text-gray-700">State</label>
+                        <input type="text" id="state" name="state"
+                            class="form-control w-full px-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-purple-600"
+                            required>
+                    </div>
+                    <div class="form-group mb-4">
+                        <label for="country" class="block text-gray-700">Country</label>
+                        <input type="text" id="country" name="country"
+                            class="form-control w-full px-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-purple-600"
+                            required>
+                    </div>
+                </div>
+                <div class="modal-footer flex justify-end">
+                    <a href="#"
+                        class="btn btn-default px-4 py-2 bg-gray-200 text-gray-800 rounded-md focus:outline-none focus:ring-2 focus:ring-gray-600 cursor-pointer">Cancel</a>
+                    <button type="submit"
+                        class="btn btn-success ml-2 px-4 py-2 bg-purple-600 text-white rounded-md focus:outline-none focus:ring-2 focus:ring-purple-600">Add</button>
+                </div>
+
+            </form>
+        </div>
+    </div>
+
+    <!-- Footer Section Begin -->
+    <footer class="footer spad">
+        <div class="container">
+            <div class="row">
+                <div class="col-lg-3 col-md-6 col-sm-6">
+                    <div class="footer__about">
+                        <div class="footer__about__logo">
+                            <a href="{%url 'home page'%}"><img src="{%static 'img/logo.png'%}" alt=""></a>
+                        </div>
+                        <ul>
+                            <li>Address: 60-49 Road 11378 New York</li>
+                            <li>Phone: +65 11.188.888</li>
+                            <li>Email: hello@colorlib.com</li>
+                        </ul>
+                    </div>
+                </div>
+                <div class="col-lg-4 col-md-6 col-sm-6 offset-lg-1">
+                    <div class="footer__widget">
+                        <h6>Useful Links</h6>
+                        <ul>
+                            <li><a href="#">About Us</a></li>
+                            <li><a href="#">About Our Shop</a></li>
+                            <li><a href="#">Secure Shopping</a></li>
+                            <li><a href="#">Delivery infomation</a></li>
+                            <li><a href="#">Privacy Policy</a></li>
+                            <li><a href="#">Our Sitemap</a></li>
+                        </ul>
+                        <ul>
+                            <li><a href="#">Who We Are</a></li>
+                            <li><a href="#">Our Services</a></li>
+                            <li><a href="#">Projects</a></li>
+                            <li><a href="#">Contact</a></li>
+                            <li><a href="#">Innovation</a></li>
+                            <li><a href="#">Testimonials</a></li>
+                        </ul>
+                    </div>
+                </div>
+                <div class="col-lg-4 col-md-12">
+                    <div class="footer__widget">
+                        <h6>Join Our Newsletter Now</h6>
+                        <p>Get E-mail updates about our latest shop and special offers.</p>
+                        <form action="#">
+                            <input type="text" placeholder="Enter your mail">
+                            <button type="submit" class="site-btn">Subscribe</button>
+                        </form>
+                        <div class="footer__widget__social">
+                            <a href="#"><i class="fa fa-facebook"></i></a>
+                            <a href="#"><i class="fa fa-instagram"></i></a>
+                            <a href="#"><i class="fa fa-twitter"></i></a>
+                            <a href="#"><i class="fa fa-pinterest"></i></a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </footer>
+    <!-- Footer Section End -->
+
+    <!-- Js Plugins -->
+    <script src="{%static 'js/jquery-3.3.1.min.js'%}"></script>
+    <script src="{%static 'js/bootstrap.min.js'%}"></script>
+    <script src="{%static 'js/jquery.nice-select.min.js'%}"></script>
+    <script src="{%static 'js/jquery-ui.min.js'%}"></script>
+    <script src="{%static 'js/jquery.slicknav.js'%}"></script>
+    <script src="{%static 'js/mixitup.min.js'%}"></script>
+    <script src="{%static 'js/owl.carousel.min.js'%}"></script>
+    <script src="{%static 'js/main.js'%}"></script>
+
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+    {% if razorpay_order_id %}
+    <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+    <script>
+        var options = {
+            "key": "{{ razorpay_merchant_key }}",
+            "amount": "{{ amount }}",
+            "currency": "{{ currency }}",
+            "name": "Tivona",
+            "description": "Order Payment",
+            "order_id": "{{ razorpay_order_id }}",
+            "prefill": {
+                "name": "{{ user|default:'Customer' }}",
+                "email": "{{ user.email|default:'' }}",
+            },
+            "theme": {
+                "color": "#3399cc"
+            },
+            "handler": function (response) {
+                // Send payment details back to your server using fetch
+                fetch("{% url 'online_payment_success' %}", {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRFToken': '{{ csrf_token }}'
+                    },
+                    body: JSON.stringify({
+                        'razorpay_payment_id': response.razorpay_payment_id,
+                        'razorpay_order_id': response.razorpay_order_id,
+                        'razorpay_signature': response.razorpay_signature,
+                        'amount': "{{ amount }}",
+                        'address_id': "{{ address_id }}",
+                        'discount_amount': "{{ discount_amount }}",
+                    })
+                })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.success) {
+                            window.location.href = data.redirect_url;
+                        } else {
+                            alert('Payment verification . Please try again.');
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Error:', error);
+                        alert('Payment verification failed. Please try again.');
+                    });
+            }
+        };
+
+        var rzp1 = new Razorpay(options);
+        rzp1.on('payment.failed', function (response) {
+            alert('Payment failed. Please try again.');
+            console.log(response.error);
+        });
+
+        rzp1.open();
+    </script>
+    {% endif %}
+
+
+
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.all.min.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            {% if messages %}
+            {% for message in messages %}
+            Swal.fire('{{ message }}');
+            {% endfor %}
+            {% endif %}
+        });
+    </script>
+
+</body>
+
+</html>

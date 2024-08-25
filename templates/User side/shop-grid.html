@@ -1,0 +1,551 @@
+{%load static %}
+<!DOCTYPE html>
+<html lang="zxx">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="description" content="Ogani Template">
+    <meta name="keywords" content="Ogani, unica, creative, html">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Tivona</title>
+
+    <!-- Google Font -->
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@200;300;400;600;900&display=swap" rel="stylesheet">
+
+    <!-- Css Styles -->
+    <link rel="stylesheet" href="{%static 'css/bootstrap.min.css'%}" type="text/css">
+    <link rel="stylesheet" href="{%static 'css/font-awesome.min.css'%}" type="text/css">
+    <link rel="stylesheet" href="{%static 'css/elegant-icons.css'%}" type="text/css">
+    <link rel="stylesheet" href="{%static 'css/nice-select.css'%}" type="text/css">
+    <link rel="stylesheet" href="{%static 'css/jquery-ui.min.css'%}" type="text/css">
+    <link rel="stylesheet" href="{%static 'css/owl.carousel.min.css'%}" type="text/css">
+    <link rel="stylesheet" href="{%static 'css/slicknav.min.css'%}" type="text/css">
+    <link rel="stylesheet" href="{%static 'css/style.css'%}" type="text/css">
+</head>
+
+<style>
+    .product__pagination a {
+        margin: 0 5px;
+        padding: 0px 5px;
+        text-decoration: none;
+        border: 1px solid #ddd;
+        color: #02920e;
+    }
+
+    .product__pagination a.active {
+        background-color: #02920e;
+        color: #fff;
+    }
+
+    #suggestions {
+    list-style-type: none;
+    padding: 0;
+    margin: 0;
+    width: 100%;
+    }
+
+    #suggestions li {
+    display: block;
+    padding: 8px;
+    cursor: pointer;
+    border-bottom: 1px solid #ddd;
+    width: 100%;
+    box-sizing: border-box;
+    }
+
+    #suggestions li:hover {
+    background-color: #f0f0f0;
+    }
+
+</style>
+
+<body>
+    <!-- Page Preloder -->
+    <div id="preloder">
+        <div class="loader"></div>
+    </div>
+
+    <!-- Humberger Begin -->
+    <div class="humberger__menu__overlay"></div>
+    <div class="humberger__menu__wrapper">
+        <div class="humberger__menu__logo">
+            <a href="#"><img src="{%static 'img/logo.png'%}" alt=""></a>
+        </div>
+        <div class="humberger__menu__cart">
+            <ul>
+                <li><a href="{%url 'wishlist'%}"><i class="fa fa-heart"></i> <span>1</span></a></li>
+                <li><a href="{%url 'shoping-cart'%}"><i class="fa fa-shopping-bag"></i> <span>3</span></a></li>
+            </ul>
+            <div class="header__cart__price">item: <span>$150.00</span></div>
+        </div>
+        <div class="humberger__menu__widget">
+            <div class="header__top__right__language">
+                <img src="{%static 'img/language.png'%}" alt="">
+                <div>English</div>
+                <span class="arrow_carrot-down"></span>
+                <ul>
+                    <li><a href="#">Spanis</a></li>
+                    <li><a href="#">English</a></li>
+                </ul>
+            </div>
+            <div class="header__top__right__auth">
+                {% if user.is_authenticated %}
+                <a href="{% url 'profile page' user.id %}"><i class="fa fa-user"></i>{{ user.username }}</a>
+                {% else %}
+                <a href="{% url 'login page' %}"><i class="fa fa-user"></i> Login/Signup</a>
+                {% endif %}
+            </div>
+        </div>
+        <nav class="humberger__menu__nav mobile-menu">
+            <ul>
+                <li class="active"><a href="./index.html">Home</a></li>
+                <li><a href="./shop-grid.html">Shop</a></li>
+                <li><a href="./shoping-cart.html">Shoping Cart</a></li>
+                <!-- <li><a href="#">Pages</a>
+                    <ul class="header__menu__dropdown">
+                        <li><a href="./shop-details.html">Shop Details</a></li>
+                        <li><a href="./shoping-cart.html">Shoping Cart</a></li>
+                        <li><a href="./checkout.html">Check Out</a></li>
+                        <li><a href="./blog-details.html">Blog Details</a></li>
+                    </ul>
+                </li>
+                <li><a href="./blog.html">Blog</a></li> -->
+                <li><a href="./contact.html">Contact</a></li>
+            </ul>
+        </nav>
+        <div id="mobile-menu-wrap"></div>
+        <div class="header__top__right__social">
+            <a href="#"><i class="fa fa-facebook"></i></a>
+            <a href="#"><i class="fa fa-twitter"></i></a>
+            <a href="#"><i class="fa fa-linkedin"></i></a>
+            <a href="#"><i class="fa fa-pinterest-p"></i></a>
+        </div>
+    </div>
+    <!-- Humberger End -->
+
+    <!-- Header Section Begin -->
+    <header class="header">
+        <div class="header__top">
+            <div class="container">
+                <div class="row">
+                    <div class="col-lg-12 col-md-6">
+                        <div class="header__top__right">
+                            <div class="header__top__right__social">
+                                <a href="#"><i class="fa fa-facebook"></i></a>
+                                <a href="#"><i class="fa fa-twitter"></i></a>
+                                <a href="#"><i class="fa fa-linkedin"></i></a>
+                                <a href="#"><i class="fa fa-pinterest-p"></i></a>
+                            </div>
+                            <div class="header__top__right__language">
+                                <img src="{%static 'img/language.png'%}" alt="">
+                                <div>English</div>
+                                <span class="arrow_carrot-down"></span>
+                                <ul>
+                                    <li><a href="#">Spanis</a></li>
+                                    <li><a href="#">English</a></li>
+                                </ul>
+                            </div>
+                            <div class="header__top__right__auth">
+                                {% if user.is_authenticated %}
+                                <a href="{% url 'profile page' user.id %}"><i class="fa fa-user"></i>
+                                    {{user.username}}</a>
+                                {% else %}
+                                <a href="{% url 'login page' %}"><i class="fa fa-user"></i> Login/Signup</a>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="container">
+            <div class="row">
+                <div class="col-lg-3">
+                    <div class="header__logo">
+                        <a href="{%url 'home page'%}"><img src="{%static './img/logo.png'%}" alt=""></a>
+                    </div>
+                </div>
+                <div class="col-lg-6" style="padding: 20px;">
+                    <nav class="header__menu">
+                        <ul>
+                            <li><a href="{%url 'home page'%}">Home</a></li>
+                            <li class="active"><a href="{%url 'shop page'%}">Store</a>
+                                <ul class="header__menu__dropdown">
+                                    {% for category in categories %}
+                                    {%if category.is_listed%}
+                                    <li><a href="{% url 'category_detail' category.slug %}">{{ category.name }}</a></li>
+                                    {%endif%}
+                                    {% endfor %}
+                                </ul>
+                            </li>
+                            <!-- <li><a href="./blog.html">Blog</a></li> -->
+                            <li><a href="{%url 'shoping-cart'%}">Shop Cart</a></li>
+                            <!-- <li><a href="./checkout.html">Check Out</a></li> -->
+                            <li><a href="{%url 'contact page'%}">Contact</a></li>
+                        </ul>
+                    </nav>
+                </div>
+                <div class="header__cart" style="display: flex;margin-top: 25px;">
+                    <div class="header__search">
+                        <form id="search-form" action="{% url 'search' %}" method="get">
+                            <input type="text" id="search-input" name="search" placeholder="Search for products..."
+                                autocomplete="off">
+                            <button type="submit"><i class="fa fa-search"></i></button>
+                        </form>
+                        <ul id="suggestions"></ul>
+                    </div>
+                    <ul style="margin-left: 10px;">
+                        <li><a href="{% url 'wishlist' %}"><i class="fa fa-heart"></i></a></li>
+                        <li><a href="{% url 'shoping-cart' %}"><i class="fa fa-shopping-bag"></i></a></li>
+                    </ul>
+                </div>
+            </div>
+            <div class="humberger__open">
+                <i class="fa fa-bars"></i>
+            </div>
+        </div>
+    </header>
+    <!-- Header Section End -->
+
+    <!-- Breadcrumb Section Begin -->
+    <section class="breadcrumb-section set-bg" data-setbg="{%static 'img/breadcrumb.jpg'%}">
+        <div class="container">
+            <div class="row">
+                <div class="col-lg-12 text-center">
+                    <div class="breadcrumb__text">
+                        <h2>Tinova Store</h2>
+                        <div class="breadcrumb__option">
+                            <a href="{%url 'home page'%}">Home</a>
+                            <span>Shop</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+    <!-- Breadcrumb Section End -->
+
+    <!-- Product Section Begin -->
+    <section class="product spad">
+        <div class="container">
+            <div class="row">
+                <div class="col-lg-3 col-md-5">
+                    <div class="sidebar">
+                        <div class="sidebar__item">
+                            <h4>Department</h4>
+                            <ul>
+                                {% for category in categories %}
+                                {%if category.is_listed%}
+                                <li><a href="{% url 'category_detail' category.slug %}">{{ category.name }}</a></li>
+                                {%endif%}
+                                {% endfor %}
+                            </ul>
+                        </div>
+                        <div class="sidebar__item">
+                            <h4>Price</h4>
+                            <form id="price-filter-form" method="get">
+                                <input type="hidden" name="sort" value="{{ sort_option }}">
+                                <div class="price-range-wrap">
+                                    <div class="price-range ui-slider ui-corner-all ui-slider-horizontal ui-widget ui-widget-content"
+                                        data-min="99" data-max="1000">
+                                        <div class="ui-slider-range ui-corner-all ui-widget-header"></div>
+                                        <span tabindex="0"
+                                            class="ui-slider-handle ui-corner-all ui-state-default"></span>
+                                        <span tabindex="0"
+                                            class="ui-slider-handle ui-corner-all ui-state-default"></span>
+                                    </div>
+                                    <div class="range-slider">
+                                        <div class="price-input">
+                                            <input type="text" id="minamount" name="min_price"
+                                                value="{{request.GET.min_price|default:99 }}">
+                                            <input type="text" id="maxamount" name="max_price"
+                                                value="{{request.GET.max_price|default:1000 }}">
+                                        </div>
+                                    </div>
+                                </div>
+                                <button type="submit" style="display: none;"></button>
+                            </form>
+                        </div>
+
+                        <div class="sidebar__item">
+                            <div class="latest-product__text">
+                                <h4>Latest Products</h4>
+                                <div class="latest-product__slider owl-carousel">
+                                    {%for latest_product in latest_products%}
+                                    {%if latest_product.is_listed%}
+                                    <div class="latest-prdouct__slider__item">
+                                        <a href="{%url 'product_detail' latest_product.slug %}"
+                                            class="latest-product__item">
+                                            <div class="latest-product__item__pic">
+                                                <img src="{{ latest_product.image.url }}" alt="">
+                                            </div>
+                                            <div class="latest-product__item__text">
+                                                <h6>{{ latest_product.name }}</h6>
+                                                <span>{{ latest_product.variants.price }}</span>
+                                            </div>
+                                        </a>
+                                    </div>
+                                    {%endif%}
+                                    {%endfor%}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-lg-9 col-md-7">
+                    <div class="filter__item">
+                        <div class="row">
+                            <div class="col-lg-4 col-md-5">
+                                <div class="filter__sort">
+                                    <span>Sort By</span>
+                                    <select id="sort-select" onchange="location = this.value;">
+                                        <!-- <option value="0">Default</option> -->
+                                        <option value="?sort=name&min_price={{ min_price }}&max_price={{ max_price }}"
+                                            {% if sort_option == 'name' %} selected {% endif %}>Name</option>
+                                        <option value="?sort=-name&min_price={{ min_price }}&max_price={{ max_price }}"
+                                            {% if sort_option == '-name' %} selected {% endif %}>Name (desc)</option>
+                                        <option value="?sort=price&min_price={{ min_price }}&max_price={{ max_price }}"
+                                            {% if sort_option == 'price' %} selected {% endif %}>Price</option>
+                                        <option value="?sort=-price&min_price={{ min_price }}&max_price={{ max_price }}"
+                                            {% if sort_option == '-price' %} selected {% endif %}>Price (desc)</option>
+                                        <option
+                                            value="?sort=created_at&min_price={{ min_price }}&max_price={{ max_price }}"
+                                            {% if sort_option == 'created_at' %} selected {% endif %}>Newest</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="col-lg-4 col-md-4">
+                                <div class="filter__found">
+                                    <h6><span>{{ page_obj.paginator.count }}</span> Products found</h6>
+                                </div>
+                            </div>
+                            <div class="col-lg-4 col-md-3">
+                                <div class="filter__option">
+                                    <span class="icon_grid-2x2"></span>
+                                    <span class="icon_ul"></span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        {% for product in page_obj.object_list %}
+                        {% if product.is_listed %}
+                        <div class="col-lg-4 col-md-6 col-sm-6">
+                            <div class="product__item">
+                                <div class="product__item__pic set-bg" data-setbg="{{ product.image.url }}">
+                                    <!-- <ul class="product__item__pic__hover">
+                                        <li><a href="{% url 'wishlist' %}"><i class="fa fa-heart"></i></a></li>
+                                        <li><a href="{% url 'shoping-cart' %}"><i class="fa fa-shopping-cart"></i></a>
+                                        </li>
+                                    </ul> -->
+                                </div>
+                                <div class="product__item__text">
+                                    <p><a href="{% url 'product_detail' product.slug %}" style="color: black;">{{ product.name }}</a></p>
+                                    {% if product.offer_applied and product.offer.is_active %}
+                                            <h6><strong>₹ <span style="text-decoration: line-through;">{{ product.variants.first.price|floatformat:2 }}</span> 
+                                            {{ product.variants.first.discounted_price|floatformat:2 }} 
+                                            <span style="color: red;"><br>{{ product.offer.discount_percentage }}% OFF</span></strong></h6>
+                                    {% else %}
+                                        <h6><strong>₹ {{ product.variants.first.price|floatformat:2 }}</strong></h6>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+                        {% endif %}
+                        {% endfor %}
+                    </div>
+                    <div class="product__pagination">
+                        {% if page_obj.has_previous %}
+                        <a
+                            href="?page={{ page_obj.previous_page_number }}&sort={{ sort_option }}&min_price={{ min_price }}&max_price={{ max_price }}"><i
+                                class="fa fa-long-arrow-left"></i></a>
+                        {% endif %}
+
+                        {% for num in page_obj.paginator.page_range %}
+                        {% if page_obj.number == num %}
+                        <a href="#" class="active">{{ num }}</a>
+                        {% else %}
+                        <a
+                            href="?page={{ num }}&sort={{ sort_option }}&min_price={{ min_price }}&max_price={{ max_price }}">{{num }}</a>
+                        {% endif %}
+                        {% endfor %}
+
+                        {% if page_obj.has_next %}
+                        <a
+                            href="?page={{ page_obj.next_page_number }}&sort={{ sort_option }}&min_price={{ min_price }}&max_price={{ max_price }}"><i
+                                class="fa fa-long-arrow-right"></i></a>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+    <!-- Product Section End -->
+
+    <!-- Footer Section Begin -->
+    <footer class="footer spad">
+        <div class="container">
+            <div class="row">
+                <div class="col-lg-3 col-md-6 col-sm-6">
+                    <div class="footer__about">
+                        <div class="footer__about__logo">
+                            <a href="./index.html"><img src="{%static 'img/logo.png'%}" alt=""></a>
+                        </div>
+                        <ul>
+                            <li>Address: 60-49 Road 11378 New York</li>
+                            <li>Phone: +65 11.188.888</li>
+                            <li>Email: hello@colorlib.com</li>
+                        </ul>
+                    </div>
+                </div>
+                <div class="col-lg-4 col-md-6 col-sm-6 offset-lg-1">
+                    <div class="footer__widget">
+                        <h6>Useful Links</h6>
+                        <ul>
+                            <li><a href="#">About Us</a></li>
+                            <li><a href="#">About Our Shop</a></li>
+                            <li><a href="#">Secure Shopping</a></li>
+                            <li><a href="#">Delivery infomation</a></li>
+                            <li><a href="#">Privacy Policy</a></li>
+                            <li><a href="#">Our Sitemap</a></li>
+                        </ul>
+                        <ul>
+                            <li><a href="#">Who We Are</a></li>
+                            <li><a href="#">Our Services</a></li>
+                            <li><a href="#">Projects</a></li>
+                            <li><a href="#">Contact</a></li>
+                            <li><a href="#">Innovation</a></li>
+                            <li><a href="#">Testimonials</a></li>
+                        </ul>
+                    </div>
+                </div>
+                <div class="col-lg-4 col-md-12">
+                    <div class="footer__widget">
+                        <h6>Join Our Newsletter Now</h6>
+                        <p>Get E-mail updates about our latest shop and special offers.</p>
+                        <form action="#">
+                            <input type="text" placeholder="Enter your mail">
+                            <button type="submit" class="site-btn">Subscribe</button>
+                        </form>
+                        <div class="footer__widget__social">
+                            <a href="#"><i class="fa fa-facebook"></i></a>
+                            <a href="#"><i class="fa fa-instagram"></i></a>
+                            <a href="#"><i class="fa fa-twitter"></i></a>
+                            <a href="#"><i class="fa fa-pinterest"></i></a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!-- <div class="row">
+                <div class="col-lg-12">
+                    <div class="footer__copyright">
+                        <div class="footer__copyright__text"><p>
+                        <div class="footer__copyright__payment"><img src="img/payment-item.png" alt=""></div>
+                    </div>
+                </div>
+            </div> -->
+        </div>
+    </footer>
+    <!-- Footer Section End -->
+
+    <!-- Js Plugins -->
+    <script src="{%static 'js/jquery-3.3.1.min.js' %}"></script>
+    <script src="{%static 'js/bootstrap.min.js' %}"></script>
+    <script src="{%static 'js/jquery.nice-select.min.js' %}"></script>
+    <script src="{%static 'js/jquery-ui.min.js' %}"></script>
+    <script src="{%static 'js/jquery.slicknav.js' %}"></script>
+    <script src="{%static 'js/mixitup.min.js' %}"></script>
+    <script src="{%static 'js/owl.carousel.min.js' %}"></script>
+    <script src="{%static 'js/main.js' %}"></script>
+
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.min.js"></script>
+    <link rel="stylesheet" href="https://code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
+
+    <script>
+        $(function () {
+            // Parse the values from the template and ensure they are numbers
+            var minPrice = parseInt("{{ request.GET.min_price|default:99 }}") || 99;
+            var maxPrice = parseInt("{{ request.GET.max_price|default:1000 }}") || 1000;
+
+            console.log("Initial minPrice:", minPrice);
+            console.log("Initial maxPrice:", maxPrice);
+
+            // Initialize the jQuery UI slider
+            $(".price-range").slider({
+                range: true,
+                min: 99,
+                max: 1000,
+                values: [minPrice, maxPrice],
+                slide: function (event, ui) {
+                    $("#minamount").val(ui.values[0]);
+                    $("#maxamount").val(ui.values[1]);
+                },
+                change: function (event, ui) {
+                    console.log("Slider changed: ", ui.values);
+                    $("#price-filter-form").submit();
+                }
+            });
+
+            // Set the initial values of the input fields
+            $("#minamount").val($(".price-range").slider("values", 0));
+            $("#maxamount").val($(".price-range").slider("values", 1));
+
+            // Handle input field changes and update the slider values
+            $("#minamount, #maxamount").on("change", function () {
+                var minVal = parseInt($("#minamount").val()) || 99;
+                var maxVal = parseInt($("#maxamount").val()) || 1000;
+                $(".price-range").slider("values", [minVal, maxVal]);
+            });
+        });
+    </script>
+
+
+    <script>
+        $(document).ready(function () {
+            $('#search-input').on('input', function () {
+                var query = $(this).val();
+                if (query.length > 2) {
+                    $.ajax({
+                        url: '{% url "suggest_products" %}',
+                        data: {
+                            'search': query
+                        },
+                        success: function (data) {
+                            $('#suggestions').empty();
+                            if (data.length > 0) {
+                                data.forEach(function (item) {
+                                    $('#suggestions').append('<li>' + item.name + '</li>');
+                                });
+                            } else {
+                                $('#suggestions').append('<li>No suggestions found</li>');
+                            }
+                        }
+                    });
+                } else {
+                    $('#suggestions').empty();
+                }
+            });
+
+            $(document).on('click', '#suggestions li', function () {
+                var text = $(this).text();
+                $('#search-input').val(text);
+                $('#search-form').submit();
+            });
+        });
+    </script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.all.min.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            {% if messages %}
+                {% for message in messages %}
+                    Swal.fire('{{ message }}');
+                {% endfor %}
+            {% endif %}
+        });
+    </script>
+
+</body>
+
+</html>

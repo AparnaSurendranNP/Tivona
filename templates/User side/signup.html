@@ -1,0 +1,223 @@
+{%load static%}
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+    <meta name="description" content="Ogani Template">
+    <meta name="keywords" content="Ogani, unica, creative, html">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Tivona</title>
+
+    <!-- Google Font -->
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@200;300;400;600;900&display=swap"
+        rel="stylesheet">
+
+    <!-- Css Styles -->
+    <link rel="stylesheet" href="{%static 'css/bootstrap.min.css'%}" type="text/css">
+    <link rel="stylesheet" href="{%static 'css/font-awesome.min.css'%}" type="text/css">
+    <link rel="stylesheet" href="{%static 'css/elegant-icons.css'%}" type="text/css">
+    <link rel="stylesheet" href="{%static 'css/nice-select.css'%}" type="text/css">
+    <link rel="stylesheet" href="{%static 'css/jquery-ui.min.css'%}" type="text/css">
+    <link rel="stylesheet" href="{%static 'css/owl.carousel.min.css'%}" type="text/css">
+    <link rel="stylesheet" href="{%static 'css/slicknav.min.css'%}" type="text/css">
+    <link rel="stylesheet" href="{%static 'css/style.css'%}" type="text/css">
+</head>
+
+<body>
+    <header class="header">
+        <div class="header__top">
+            <div class="container">
+                <div class="row">
+                    <!-- <div class="col-lg-6">
+                        <div class="header__top__left">
+                            <ul>
+                                 <li><i class="fa fa-envelope"></i> hello@.com</li>
+                                <li>Free Shipping for all Order of $99</li>
+                            </ul>
+                        </div>
+                    </div> -->
+                    <div class="col-lg-12 col-md-6">
+                        <div class="header__top__right">
+                            <div class="header__top__right__social">
+                                <a href="#"><i class="fa fa-facebook"></i></a>
+                                <a href="#"><i class="fa fa-twitter"></i></a>
+                                <a href="#"><i class="fa fa-linkedin"></i></a>
+                                <a href="#"><i class="fa fa-pinterest-p"></i></a>
+                            </div>
+                            <div class="header__top__right__language">
+                                <img src="{%static 'img/language.png'%}" alt="">
+                                <div>English</div>
+                                <span class="arrow_carrot-down"></span>
+                                <ul>
+                                    <li><a href="#">Spanis</a></li>
+                                    <li><a href="#">English</a></li>
+                                </ul>
+                            </div>
+                            <div class="header__top__right__auth">
+                                <a href="{%url 'signup page'%}"><i class="fa fa-user"></i> Login\Sign Up</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="container">
+            <div class="row">
+                <div class="col-lg-3">
+                    <div class="header__logo">
+                        <img src="{%static './img/logo.png'%}" alt="">
+                    </div>
+                </div>
+                <div class="col-lg-6 col-lg-3" style="padding: 20px;">
+                    <nav class="header__menu">
+                        <ul>
+                            <li><a href="{%url 'home page'%}">Home</a></li>
+                            <li><a href="{%url 'shop page'%}">Store</a>
+                                <ul class="header__menu__dropdown">
+                                    {% for category in categories %}
+                                    {% if category.is_listed %}
+                                    <li><a href="{% url 'category_detail' category.slug %}">{{ category.name }}</a></li>
+                                    {% endif %}
+                                    {% endfor %}          
+                                </ul>
+                            </li>
+                            <li><a href="{%url 'shoping-cart'%}">Shop Cart</a></li>
+                            <!-- <li><a href="./checkout.html">Check Out</a></li> -->
+                            <li><a href="{%url 'contact page'%}">Contact</a></li>
+                        </ul>
+                    </nav>
+                </div>
+                <div class="col-lg-3" style="padding: 20px;">
+                    <div class="header__cart">
+                        <ul>
+                            <li><a href="{%url 'wishlist'%}"><i class="fa fa-heart"></i></a></li>
+                            <li><a href="{%url 'contact page'%}"><i class="fa fa-shopping-bag"></i></a></li>
+                        </ul>
+                        <!-- <div class="header__cart__price">item: <span>$150.00</span></div> -->
+                    </div>
+                </div>
+            </div>
+            <div class="humberger__open">
+                <i class="fa fa-bars"></i>
+            </div>
+        </div>
+    </header>
+
+    <section class="d-flex justify-content-center" style="background:url('../static/img/hero/banner.jpg');">
+        <div class="container p-5">
+            <form action="" method="post" class="p-5"
+                style="background-color:rgba(93, 112, 98, 0.267);">
+                {% csrf_token %}
+                <p class="text-center h1 fw-bold text-white">SIGN UP</p>
+                <div class="mb-3 mt-4">
+                    <input type="text" class="form-control" placeholder="Enter your username" name="username" required>
+                </div>
+
+                <div class="mb-3">
+                    <input type="email" class="form-control" placeholder="Enter your email" name="email" required>
+                </div>
+
+                <div class="mb-3">
+                    <input type="text" class="form-control" placeholder="Enter your phone number" name="phone" required>
+                </div>
+
+                <div class="mb-3">
+                    <input type="password" class="form-control" placeholder="Enter password" name="password1" required>
+                </div>
+
+                <div class="mb-3">
+                    <input type="password" class="form-control" placeholder="Confirm password" name="password2"
+                        required>
+                </div>
+
+                <div class="text-center mb-3">
+                    <button type="submit" class="btn btn-success btn-lg">Register</button>
+                    <p style="color: black;">Already have an account? Click <a class="text-success"
+                            href="{% url 'login page' %}">here</a> to login.</p>
+                </div>
+            </form>
+
+        </div>
+    </section>
+
+    <!-- Footer Section Begin -->
+    <footer class="footer spad">
+        <div class="container">
+            <div class="row">
+                <div class="col-lg-3 col-md-6 col-sm-6">
+                    <div class="footer__about">
+                        <div class="footer__about__logo">
+                            <a href="{%url 'home page'%}"><img src="{%static 'img/logo.png'%}" alt=""></a>
+                        </div>
+                        <ul>
+                            <li>Address: 60-49 Road 11378 New York</li>
+                            <li>Phone: +65 11.188.888</li>
+                            <li>Email: hello@colorlib.com</li>
+                        </ul>
+                    </div>
+                </div>
+                <div class="col-lg-4 col-md-6 col-sm-6 offset-lg-1">
+                    <div class="footer__widget">
+                        <h6>Useful Links</h6>
+                        <ul>
+                            <li><a href="#">About Us</a></li>
+                            <li><a href="#">About Our Shop</a></li>
+                            <li><a href="#">Secure Shopping</a></li>
+                            <li><a href="#">Delivery infomation</a></li>
+                            <li><a href="#">Privacy Policy</a></li>
+                            <li><a href="#">Our Sitemap</a></li>
+                        </ul>
+                        <ul>
+                            <li><a href="#">Who We Are</a></li>
+                            <li><a href="#">Our Services</a></li>
+                            <li><a href="#">Projects</a></li>
+                            <li><a href="#">Contact</a></li>
+                            <li><a href="#">Innovation</a></li>
+                            <li><a href="#">Testimonials</a></li>
+                        </ul>
+                    </div>
+                </div>
+                <div class="col-lg-4 col-md-12">
+                    <div class="footer__widget">
+                        <h6>Join Our Newsletter Now</h6>
+                        <p>Get E-mail updates about our latest shop and special offers.</p>
+                        <form action="#">
+                            <input type="text" placeholder="Enter your mail">
+                            <button type="submit" class="site-btn">Subscribe</button>
+                        </form>
+                        <div class="footer__widget__social">
+                            <a href="#"><i class="fa fa-facebook"></i></a>
+                            <a href="#"><i class="fa fa-instagram"></i></a>
+                            <a href="#"><i class="fa fa-twitter"></i></a>
+                            <a href="#"><i class="fa fa-pinterest"></i></a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!-- <div class="row">
+            <div class="col-lg-12">
+                <div class="footer__copyright">
+                    <div class="footer__copyright__text"><p>
+                    <div class="footer__copyright__payment"><img src="img/payment-item.png" alt=""></div>
+                </div>
+            </div>
+            </div> -->
+        </div>
+    </footer>
+    <!-- Footer Section End -->
+</body>
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.all.min.js"></script>
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        {% if messages %}
+            {% for message in messages %}
+                Swal.fire('{{ message }}');
+            {% endfor %}
+        {% endif %}
+    });
+</script>
+
+</html>

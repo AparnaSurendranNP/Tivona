@@ -1,0 +1,481 @@
+{%load static%}
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="description" content="Ogani Template">
+    <meta name="keywords" content="Ogani, unica, creative, html">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Tivona</title>
+
+    <!-- Google Font -->
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@200;300;400;600;900&display=swap" rel="stylesheet">
+
+    <!-- Css Styles -->
+    <link rel="stylesheet" href="{%static 'css/bootstrap.min.css'%}" type="text/css">
+    <link rel="stylesheet" href="{%static 'css/font-awesome.min.css'%}" type="text/css">
+    <link rel="stylesheet" href="{%static 'css/elegant-icons.css'%}" type="text/css">
+    <link rel="stylesheet" href="{%static 'css/nice-select.css'%}" type="text/css">
+    <link rel="stylesheet" href="{%static 'css/jquery-ui.min.css'%}" type="text/css">
+    <link rel="stylesheet" href="{%static 'css/owl.carousel.min.css'%}" type="text/css">
+    <link rel="stylesheet" href="{%static 'css/slicknav.min.css'%}" type="text/css">
+    <link rel="stylesheet" href="{%static 'css/style.css'%}" type="text/css">
+
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/sweetalert/2.1.2/sweetalert.min.css">
+
+</head>
+
+<style>
+    .btn-success {
+        background-color: #28a745;
+        border-color: #28a745;
+        color: #fff;
+    }
+
+    /* Style for danger button */
+    .btn-danger {
+        background-color: #dc3545;
+        border-color: #dc3545;
+        color: #fff;
+    }
+
+    /* Style for badge buttons */
+    .badge {
+        padding: 5px 10px;
+        border-radius: 15px;
+    }
+
+    .modal-bg {
+        display: none;
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0, 0, 0, 0.5);
+        justify-content: center;
+        align-items: center;
+        inset: 0;
+        z-index: 50;
+        overflow-y: auto;
+    }
+
+    .modal-content {
+        background: white;
+        padding: 20px;
+        border-radius: 8px;
+        width: 100%;
+        max-width: 60%;
+        max-height: 80%;
+        overflow-y: auto;
+        box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
+    }
+
+    .jcrop-holder img {
+        max-width: 100%;
+    }
+
+    /* Style for showing modal */
+    .modal-bg:target {
+        display: flex;
+    }
+
+    /* Style for close button */
+    .close-btn {
+        display: inline-block;
+        margin-top: 10px;
+        padding: 5px 10px;
+        background-color: red;
+        color: white;
+        text-align: center;
+        border-radius: 5px;
+        text-decoration: none;
+        cursor: pointer;
+    }
+</style>
+
+<body>
+    <header class="header">
+        <div class="header__top">
+            <div class="container">
+                <div class="row">
+                    <!-- <div class="col-lg-6">
+                    <div class="header__top__left">
+                        <ul>
+                             <li><i class="fa fa-envelope"></i> hello@.com</li>
+                            <li>Free Shipping for all Order of $99</li>
+                        </ul>
+                    </div>
+                </div> -->
+                    <div class="col-lg-12 col-md-6">
+                        <div class="header__top__right">
+                            <div class="header__top__right__social">
+                                <a href="#"><i class="fa fa-facebook"></i></a>
+                                <a href="#"><i class="fa fa-twitter"></i></a>
+                                <a href="#"><i class="fa fa-linkedin"></i></a>
+                                <a href="#"><i class="fa fa-pinterest-p"></i></a>
+                            </div>
+                            <div class="header__top__right__language">
+                                <img src="{%static 'img/language.png'%}" alt="">
+                                <div>English</div>
+                                <span class="arrow_carrot-down"></span>
+                                <ul>
+                                    <li><a href="#">Spanis</a></li>
+                                    <li><a href="#">English</a></li>
+                                </ul>
+                            </div>
+                            <div class="header__top__right__auth">
+                                {% if user.is_authenticated %}
+                                <a href="{% url 'profile page' user.id %}"><i class="fa fa-user"></i>{{ user.username }}</a>
+                                {% else %}
+                                <a href="{% url 'login page' %}"><i class="fa fa-user"></i> Login/Signup</a>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="container">
+            <div class="row">
+                <div class="col-lg-3">
+                    <div class="header__logo">
+                        <a href="{%url 'home page'%}"><img src="{%static './img/logo.png'%}" alt=""></a>
+                    </div>
+                </div>
+                <div class="col-lg-6 col-lg-3" style="padding: 20px;">
+                    <nav class="header__menu">
+                        <ul>
+                            <li><a href="{%url 'home page'%}">Home</a></li>
+                            <li ><a href="{%url 'shop page'%}">Store</a>
+                                <ul class="header__menu__dropdown">
+                                    {% for category in categories %}
+                                    {% if category.is_listed %}
+                                    <li><a href="{% url 'category_detail' category.slug %}">{{ category.name }}</a></li>
+                                    {% endif %}
+                                    {% endfor %}
+                                </ul>
+                            </li>
+                            <li><a href="{%url 'shoping-cart'%}">Shop Cart</a></li>
+                            <!-- <li><a href="./checkout.html">Check Out</a></li> -->
+                            <li><a href="{%url 'contact page'%}">Contact</a></li>
+                        </ul>
+                    </nav>
+                </div>
+                <div class="col-lg-3" style="padding: 20px;">
+                    <div class="header__cart">
+                        <ul>
+                            <li><a href="{%url 'contact page'%}"><i class="fa fa-heart"></i></a></li>
+                            <li><a href="{%url 'shoping-cart'%}"><i class="fa fa-shopping-bag"></i></a>
+                            </li>
+                        </ul>
+                        <!-- <div class="header__cart__price">item: <span>$150.00</span></div> -->
+                    </div>
+                </div>
+            </div>
+            <div class="humberger__open">
+                <i class="fa fa-bars"></i>
+            </div>
+        </div>
+    </header>
+    <div class=" justify-content-center" style="background:url('../static/img/hero/banner.jpg'); ">
+        <div class=" flex-grow-1 p-5 ">
+            {% comment %} <h4 class="font-weight-bold py-3 mb-4">
+                Account settings
+            </h4> {% endcomment %}
+
+            <div class="card overflow-hidden ">
+                <div class="row no-gutters row-bordered row-border-light">
+                    <div class="col-md-2 pt-0">
+                        <div class="list-group list-group-flush account-settings-links">
+                            <a class="list-group-item list-group-item-action " data-toggle="list"
+                                href="{%url 'profile page' user.id %}">Profile</a>
+                            <a class="list-group-item list-group-item-action" data-toggle="list"
+                                href="{%url 'change_password' user.id %}">Change password</a>
+                            <a class="list-group-item list-group-item-action active btn-success" data-toggle="list"
+                                href="{%url 'address_manage' user.id %}">Address</a>
+                            <a class="list-group-item list-group-item-action" data-toggle="list"
+                                href="{%url 'order_history'%}">Order history</a>
+                            
+                            <a class="list-group-item list-group-item-action" data-toggle="list"
+                                href="{%url 'wallet_details'%}">Wallet</a>
+                            
+                            <div class="p-3 pl-6 px-6 my-6">
+                                <a class="btn text-danger" href="{%url 'logout'%}">Logout</a>
+                            </div>
+                            <!-- {% comment %} <a class="list-group-item list-group-item-action" data-toggle="list" href="#account-social-links">Social links</a>
+                <a class="list-group-item list-group-item-action" data-toggle="list" href="#account-connections">Connections</a>
+                <a class="list-group-item list-group-item-action" data-toggle="list" href="#account-notifications">Notifications</a> {% endcomment %} -->
+                        </div>
+                    </div>
+
+                    <div class="col-md-9">
+                        <div class="tab-content">
+                            <div class="tab-pane fade active show" id="account-general">
+                                <hr class="border-light m-0">
+                                <div class="card-body">
+                                    <div class="form-group">
+                                        {% comment %} Address Area {% endcomment %}
+                                        <p>The following address's are used for checkout by default</p>
+                                        <a href="#addAddressModal" class="btn btn-success">Add Address</a>
+                                    </div>
+                                    <div class="form-group">
+                                        {% for address in addresses %}
+                                        {% if address.is_listed %}
+                                        <div
+                                            class="address-box border-0 {% if address.primary_address %} primary-address {% endif %}">
+                                            <input type="radio" id="address_select{{ forloop.counter }}"
+                                                name="address_select" value="{{ address.id }}" 
+                                                {% if address.primary_address %}checked{% endif %}>
+                                            <div class="row">
+                                                <div class="col-md-8">
+                                                    {% if address.primary_address %}
+                                                    <label for="address_select{{ forloop.counter }}"
+                                                        class="primary-label font-weight-bold ">Primary Address</label>
+                                                    {%endif%}
+                                                    <br>
+                                                    <p>Name: {{ address.name }}<br>Mobile: {{ address.phone}}
+                                                        <br>Address: {{ address.address }}<br>{{ address.street }}
+                                                        {{address.city }} {{ address.state }} {{ address.pin_code }}
+                                                    </p>
+                                                </div>
+                                                <div class="col-md-8">
+                                                    <div class="d-flex">
+                                                        <a href="{% url 'edit_address' address.id %}"
+                                                            class="btn btn-primary mb-1 ">Edit</a>
+                                                        <form id="delete-form-{{ address.id }}" action="{% url 'delete_address' address.id %}" method="post">
+                                                            {% csrf_token %}
+                                                            <button class="btn btn-danger mb-1 ml-2" type="button" onclick="confirmDelete('{{ address.id }}')">Delete</button>
+                                                        </form>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        {% endif %}
+                                        {% endfor %}
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Add Address Modal HTML -->
+    <div id="addAddressModal" class="modal-bg">
+        <div class="modal-content">
+            <form action="{% url 'add_address' user.id %}" method="post" enctype="multipart/form-data">
+                {% csrf_token %}
+                <input type="hidden" name="source_page" value="address_manage">
+                <div class="modal-header flex justify-between items-center mb-4">
+                    <h4 class="text-xl font-semibold">Add Address</h4>
+                    <a href="#" class="close-btn">&times;</a>
+                </div>
+                <div class="modal-body">
+                    <div class="form-group mb-4">
+                        <label for="name" class="block text-gray-700">Name</label>
+                        <input type="text" id="name" name="name"
+                            class="form-control w-full px-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-purple-600"
+                            required>
+                    </div>
+                    <div class="form-group mb-4">
+                        <label for="phone" class="block text-gray-700">Phone number</label>
+                        <input type="text" id="phone" name="phone"
+                            class="form-control w-full px-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-purple-600"
+                            required>
+                    </div>
+                    <div class="form-group mb-4">
+                        <label for="address" class="block text-gray-700">Address</label>
+                        <textarea id="address" name="address"
+                            class="form-control w-full px-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-purple-600"
+                            rows="4" required></textarea>
+                    </div>
+                    <div class="form-group mb-4">
+                        <label for="pin_code" class="block text-gray-700">Pin Code</label>
+                        <input type="text" id="pin_code" name="pin_code"
+                            class="form-control w-full px-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-purple-600"
+                            required onblur="fetchAddressDetails()">
+                    </div>
+                    <div class="form-group mb-4">
+                        <label for="street" class="block text-gray-700">Street</label>
+                        <input type="text" id="street" name="street"
+                            class="form-control w-full px-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-purple-600"
+                            required>
+                    </div>
+                    <div class="form-group mb-4">
+                        <label for="city" class="block text-gray-700">City</label>
+                        <input type="text" id="city" name="city"
+                            class="form-control w-full px-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-purple-600"
+                            required>
+                    </div>
+                    <div class="form-group mb-4">
+                        <label for="state" class="block text-gray-700">State</label>
+                        <input type="text" id="state" name="state"
+                            class="form-control w-full px-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-purple-600"
+                            required>
+                    </div>
+                    <div class="form-group mb-4">
+                        <label for="country" class="block text-gray-700">Country</label>
+                        <input type="text" id="country" name="country"
+                            class="form-control w-full px-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-purple-600"
+                            required>
+                    </div>
+                </div>
+                <div class="modal-footer flex justify-end">
+                    <a href="#"
+                        class="btn btn-default px-4 py-2 bg-gray-200 text-gray-800 rounded-md focus:outline-none focus:ring-2 focus:ring-gray-600 cursor-pointer">Cancel</a>
+                    <button type="submit"
+                        class="btn btn-success ml-2 px-4 py-2 bg-purple-600 text-white rounded-md focus:outline-none focus:ring-2 focus:ring-purple-600">Add</button>
+                </div>   
+            </form>
+        </div>
+    </div>
+
+    <!-- Footer Section Begin -->
+    <footer class="footer spad">
+        <div class="container">
+            <div class="row">
+                <div class="col-lg-3 col-md-6 col-sm-6">
+                    <div class="footer__about">
+                        <div class="footer__about__logo">
+                            <a href="./index.html"><img src="{%static 'img/logo.png'%}" alt=""></a>
+                        </div>
+                        <ul>
+                            <li>Address: 60-49 Road 11378 New York</li>
+                            <li>Phone: +65 11.188.888</li>
+                            <li>Email: hello@colorlib.com</li>
+                        </ul>
+                    </div>
+                </div>
+                <div class="col-lg-4 col-md-6 col-sm-6 offset-lg-1">
+                    <div class="footer__widget">
+                        <h6>Useful Links</h6>
+                        <ul>
+                            <li><a href="#">About Us</a></li>
+                            <li><a href="#">About Our Shop</a></li>
+                            <li><a href="#">Secure Shopping</a></li>
+                            <li><a href="#">Delivery infomation</a></li>
+                            <li><a href="#">Privacy Policy</a></li>
+                            <li><a href="#">Our Sitemap</a></li>
+                        </ul>
+                        <ul>
+                            <li><a href="#">Who We Are</a></li>
+                            <li><a href="#">Our Services</a></li>
+                            <li><a href="#">Projects</a></li>
+                            <li><a href="#">Contact</a></li>
+                            <li><a href="#">Innovation</a></li>
+                            <li><a href="#">Testimonials</a></li>
+                        </ul>
+                    </div>
+                </div>
+                <div class="col-lg-4 col-md-12">
+                    <div class="footer__widget">
+                        <h6>Join Our Newsletter Now</h6>
+                        <p>Get E-mail updates about our latest shop and special offers.</p>
+                        <form action="#">
+                            <input type="text" placeholder="Enter your mail">
+                            <button type="submit" class="site-btn">Subscribe</button>
+                        </form>
+                        <div class="footer__widget__social">
+                            <a href="#"><i class="fa fa-facebook"></i></a>
+                            <a href="#"><i class="fa fa-instagram"></i></a>
+                            <a href="#"><i class="fa fa-twitter"></i></a>
+                            <a href="#"><i class="fa fa-pinterest"></i></a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </footer>
+    <!-- Footer Section End -->
+
+    <script>
+        function fetchAddressDetails() {
+            const pinCode = document.getElementById('pin_code').value;
+            if (pinCode.length === 6) {
+                fetch(`/get_address_details/${pinCode}/`)
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.status === 'success') {
+                            document.getElementById('city').value = data.city;
+                            document.getElementById('state').value = data.state;
+                            document.getElementById('country').value = data.country;
+                        } else {
+                            alert('Unable to fetch address details. Please enter manually.');
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Error fetching address details:', error);
+                        alert('Error fetching address details. Please enter manually.');
+                    });
+            }
+        }
+
+        // csrf handling
+        function getCookie(name) {
+            var cookieValue = null;
+            if (document.cookie && document.cookie !== '') {
+                var cookies = document.cookie.split(';');
+                for (var i = 0; i < cookies.length; i++) {
+                    var cookie = cookies[i].trim();
+                    if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                        cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                        break;
+                    }
+                }
+            }
+            return cookieValue;
+        }
+        var csrftoken = getCookie('csrftoken');
+
+        $.ajaxSetup({
+            beforeSend: function (xhr, settings) {
+                if (!(/^http:.*/.test(settings.url) || /^https:.*/.test(settings.url))) {
+                    // Only send the token to relative URLs i.e. locally.
+                    xhr.setRequestHeader("X-CSRFToken", csrftoken);
+                }
+            }
+        });
+    </script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.all.min.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/sweetalert/2.1.2/sweetalert.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/sweetalert/2.1.2/sweetalert.min.js"></script>
+
+    <script>
+        function confirmDelete(addressId) {
+            // SweetAlert confirmation dialog
+            swal({
+                title: "Are you sure?",
+                text: "Once deleted, you will not be able to recover this address!",
+                icon: "warning",
+                buttons: true,
+                dangerMode: true,
+            }).then((willDelete) => {
+                if (willDelete) {
+                    // Submit the form if the user confirms
+                    document.getElementById('delete-form-' + addressId).submit();
+                } else {
+                    // Optional: Show a message if the user cancels the deletion
+                    swal("Your address is safe!");
+                }
+            });
+        }
+    </script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            {% if messages %}
+                {% for message in messages %}
+                    Swal.fire('{{ message }}');
+                {% endfor %}
+            {% endif %}
+        });
+    </script>
+    
+
+</body>
+
+</html>
