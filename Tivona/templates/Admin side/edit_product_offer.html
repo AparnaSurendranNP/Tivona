@@ -128,25 +128,14 @@
                     </li>
                     <li class="relative px-6 py-3">
                         <a class="inline-flex items-center w-full text-sm font-semibold transition-colors duration-150 hover:text-gray-800 dark:hover:text-gray-200"
-                            href="{url 'banners'}">
+                            href="{%url 'report'%}">
                             <svg class="w-5 h-5" aria-hidden="true" fill="none" stroke-linecap="round"
                                 stroke-linejoin="round" stroke-width="2" viewBox="0 0 24 24" stroke="currentColor">
-
-                                <path d="M4 6h16M4 10h16M4 14h16M4 18h16"></path>
+                                <path
+                                    d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01">
+                                </path>
                             </svg>
-                            <span class="ml-4">Banners</span>
-                        </a>
-                    </li>
-                    <li class="relative px-6 py-3">
-                        <a class="inline-flex items-center w-full text-sm font-semibold transition-colors duration-150 hover:text-gray-800 dark:hover:text-gray-200"
-                          href="{%url 'report'%}">
-                          <svg class="w-5 h-5" aria-hidden="true" fill="none" stroke-linecap="round" stroke-linejoin="round"
-                            stroke-width="2" viewBox="0 0 24 24" stroke="currentColor">
-                            <path
-                              d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01">
-                            </path>
-                          </svg>
-                          <span class="ml-4">Report</span>
+                            <span class="ml-4">Report</span>
                         </a>
                     </li>
                 </ul>
@@ -327,7 +316,8 @@
                                         <br>
                                         <div class="form-group mb-2">
                                             <label for="product">Select Product:</label>
-                                            <select id="product" name="product" class="form-control border-2 mb-2" disabled>
+                                            <select id="product" name="product" class="form-control border-2 mb-2"
+                                                disabled>
                                                 {% for product in products %}
                                                 <option value="{{ product.id }}" {% if product.id == offer.product.id %}selected{% endif %}>
                                                     {{ product.name }}
@@ -337,58 +327,63 @@
                                         </div>
                                         <div class="form-group mb-2">
                                             <label for="variant">Select Variant :</label>
-                                            <select id="variant" name="variant" class="form-control border-2 mb-2" disabled>
+                                            <select id="variant" name="variant" class="form-control border-2 mb-2"
+                                                disabled>
                                                 <option value="">-- Select Variant --</option>
-                                                {% if offer.product %}
                                                 {% for variant in offer.product.variants.all %}
-                                                <option value="{{ variant.id }}" {% if variant.id == offer.variant.id %}selected{% endif %}>
-                                                    {{ variant.name }}
-                                                </option>
+                                                <option value="{{ variant.id }}" {%if variant.id == offer.variant.id %} selected {% endif %}>
+                                                    {% for color_name, color_code in colors %}
+                                                        {%if variant.color == color_code%}
+                                                            {{color_name}}
+                                                        {%endif%}
+                                                    {% endfor %}     
                                                 {% endfor %}
-                                                {% endif %}
                                             </select>
                                         </div>
                                         <div class="form-group mb-2">
                                             <label for="discount_percentage">Discount Percentage:</label>
                                             <input type="number" id="discount_percentage" name="discount_percentage"
-                                                class="form-control border-2 mb-2" value="{{ offer.discount_percentage }}" disabled>
+                                                class="form-control border-2 mb-2"
+                                                value="{{ offer.discount_percentage }}" disabled>
                                         </div>
                                         <div class="form-group mb-2">
                                             <label for="valid_from">Valid From:</label>
                                             <input type="date" id="valid_from" name="valid_from"
-                                                class="form-control border-2 mb-2" value="{{ offer.valid_from|date:'Y-m-d' }}" required>
+                                                class="form-control border-2 mb-2"
+                                                value="{{ offer.valid_from|date:'Y-m-d' }}" required>
                                         </div>
                                         <div class="form-group mb-2">
                                             <label for="valid_to">Valid To:</label>
                                             <input type="date" id="valid_to" name="valid_to"
-                                                class="form-control border-2 mb-2" value="{{ offer.valid_to|date:'Y-m-d' }}" required>
+                                                class="form-control border-2 mb-2"
+                                                value="{{ offer.valid_to|date:'Y-m-d' }}" required>
                                         </div>
                                         <br>
                                         <button type="submit" class="btn btn-primary btn-success">Save Changes</button>
                                         <a href="{% url 'admin_offers' %}" class="btn btn-danger border-2">Cancel</a>
-                                    </form>                                    
+                                    </form>
                                 </div>
                             </div>
                         </div>
                     </div>
                 </section>
-            </main>            
+            </main>
         </div>
     </div>
     <script>
-        document.getElementById('product').addEventListener('change', function() {
+        document.getElementById('product').addEventListener('change', function () {
             var productId = this.value;
             var variantSelect = document.getElementById('variant');
-    
+
             // Clear previous variants
             variantSelect.innerHTML = '<option value="">-- Select Variant --</option>';
-    
+
             if (productId) {
                 // Fetch variants for the selected product
                 fetch(`/get-variants/${productId}/`)
                     .then(response => response.json())
                     .then(data => {
-                        data.variants.forEach(function(variant) {
+                        data.variants.forEach(function (variant) {
                             var option = document.createElement('option');
                             option.value = variant.id;
                             option.text = variant.color;
@@ -400,4 +395,5 @@
         });
     </script>
 </body>
+
 </html>

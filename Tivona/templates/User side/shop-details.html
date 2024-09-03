@@ -32,8 +32,9 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js"></script>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
 
+    
 
-    <style>
+    <style> 
         .product__details__pic__item--large {
             width: 100%;
             height: auto;
@@ -64,6 +65,27 @@
             border: none;
             border-radius: 5px;
         }
+
+        .color-variant-container {
+    display: flex;
+    align-items: center;
+    margin-bottom: 10px;
+}
+
+.color-variant {
+    display: inline-block;
+    margin-right: 10px;
+}
+
+.discount-info, .price-info {
+    display: inline-block;
+}
+
+.discount-info h4, .price-info h4 {
+    margin: 0;
+    font-size: 14px;
+}
+
     </style>
 
 </head>
@@ -75,70 +97,6 @@
         <div class="loader"></div>
     </div>
 
-    <!-- Humberger Begin -->
-    <div class="humberger__menu__overlay"></div>
-    <div class="humberger__menu__wrapper">
-        <div class="humberger__menu__logo">
-            <a href="#"><img src="img/logo.png" alt=""></a>
-        </div>
-        <div class="humberger__menu__cart">
-            <ul>
-                <li><a href="{%url 'wishlist'%}"><i class="fa fa-heart"></i> <span>1</span></a></li>
-                <li><a href="{%url 'shoping-cart'%}"><i class="fa fa-shopping-bag"></i> <span>3</span></a></li>
-            </ul>
-            <div class="header__cart__price">item: <span>$150.00</span></div>
-        </div>
-        <div class="humberger__menu__widget">
-            <div class="header__top__right__language">
-                <img src="img/language.png" alt="">
-                <div>English</div>
-                <span class="arrow_carrot-down"></span>
-                <ul>
-                    <li><a href="#">Spanis</a></li>
-                    <li><a href="#">English</a></li>
-                </ul>
-            </div>
-            <div class="header__top__right__auth">
-                {% if user.is_authenticated %}
-                <a href="{% url 'profile page' user.id %}"><i class="fa fa-user"></i>{{ user.username }}</a>
-                {% else %}
-                <a href="{% url 'login page' %}"><i class="fa fa-user"></i> Login/Signup</a>
-                {% endif %}
-            </div>
-        </div>
-        <nav class="humberger__menu__nav mobile-menu">
-            <ul>
-                <li class="active"><a href="{%url 'home page'%}">Home</a></li>
-                <li><a href="{%url 'shop page'%}">Shop</a></li>
-                <li><a href="#">Pages</a>
-                    <ul class="header__menu__dropdown">
-                        {% for category in categories %}
-                        {% if category.is_listed %}
-                        <li><a href="{% url 'category_detail' category.slug %}">{{ category.name }}</a></li>
-                        {% endif %}
-                        {% endfor %}
-                    </ul>
-                </li>
-                <li><a href="./blog.html">Blog</a></li>
-                <li><a href="./contact.html">Contact</a></li>
-            </ul>
-        </nav>
-        <div id="mobile-menu-wrap"></div>
-        <div class="header__top__right__social">
-            <a href="#"><i class="fa fa-facebook"></i></a>
-            <a href="#"><i class="fa fa-twitter"></i></a>
-            <a href="#"><i class="fa fa-linkedin"></i></a>
-            <a href="#"><i class="fa fa-pinterest-p"></i></a>
-        </div>
-        <div class="humberger__menu__contact">
-            <ul>
-                <li><i class="fa fa-envelope"></i> hello@colorlib.com</li>
-                <li>Free Shipping for all Order of $99</li>
-            </ul>
-        </div>
-    </div>
-    <!-- Humberger End -->
-
     <!-- Header Section Begin -->
     <header class="header">
         <div class="header__top">
@@ -146,10 +104,6 @@
                 <div class="row">
                     <div class="col-lg-6">
                         <div class="header__top__left">
-                            <!-- <ul>
-                                <li><i class="fa fa-envelope"></i> hello@colorlib.com</li>
-                                <li>Free Shipping for all Order of $99</li>
-                            </ul> -->
                         </div>
                     </div>
                     <div class="col-lg-6">
@@ -161,13 +115,8 @@
                                 <a href="#"><i class="fa fa-pinterest-p"></i></a>
                             </div>
                             <div class="header__top__right__language">
-                                <img src="{%static 'img/language.png'%}" alt="">
+                                <img src="/media/language.png" alt="">
                                 <div>English</div>
-                                <span class="arrow_carrot-down"></span>
-                                <ul>
-                                    <li><a href="#">Spanis</a></li>
-                                    <li><a href="#">English</a></li>
-                                </ul>
                             </div>
                             <div class="header__top__right__auth">
                                 {% if user.is_authenticated %}
@@ -202,9 +151,7 @@
                                     {% endfor %}
                                 </ul>
                             </li>
-                            <!-- <li><a href="./blog.html">Blog</a></li> -->
                             <li><a href="{%url 'shoping-cart'%}">Shoping Cart</a></li>
-                            <!-- <li><a href="./checkout.html">Check Out</a></li> -->
                             <li><a href="{%url 'contact page'%}">Contact</a></li>
                         </ul>
                     </nav>
@@ -216,7 +163,6 @@
                             <li><a href="{%url 'shoping-cart'%}"><i class="fa fa-shopping-bag"></i></a>
                             </li>
                         </ul>
-                        <!-- <div class="header__cart__price">item: <span>$150.00</span></div> -->
                     </div>
                 </div>
             </div>
@@ -280,10 +226,14 @@
                             {% with item=variant_data.0 %}
                             <div class="price-item">
                                 {% if item.discounted_price and item.offer.is_active %}
-                                <h4><strong>₹ <span style="text-decoration: line-through;">
-                                    {{item.original_price|floatformat:2 }}
-                                    </span> {{ item.discounted_price|floatformat:2 }}
-                                    <span style="color: red;">{{ item.discount_percentage }}% OFF</span></strong>
+                                <h4>
+                                    <strong>
+                                        ₹ <span style="text-decoration: line-through;">
+                                            {{ item.original_price|floatformat:2 }}
+                                        </span>
+                                        {{ item.discounted_price|floatformat:2 }}
+                                        <span style="color: red;">{{ item.discount_percentage }}% OFF</span>
+                                    </strong>
                                 </h4>
                                 {% else %}
                                 <h4><strong>₹ {{ item.original_price|floatformat:2 }}</strong></h4>
@@ -301,17 +251,37 @@
                             <span>Available Colors:</span>
                             <div class="color-variants">
                                 {% if variant_data %}
-                                {% for item in variant_data %}
-                                <a href="#" class="color-variant" data-variant-id="{{ item.variant.id }}"
-                                    data-variant-price="{% if item.discounted_price %}{{ item.discounted_price }}{% else %}{{ item.original_price }}{% endif %}"
-                                    data-variant-image="{{ item.variant.images.first.image.url }}">
-                                    <svg width="24" height="24">
-                                        <circle cx="12" cy="12" r="10" fill="{{ item.variant.color }}"></circle>
-                                    </svg>
-                                </a>
-                                {% endfor %}
+                                    {% for item in variant_data %}
+                                        <div class="color-variant-container">
+                                            <a href="#" class="color-variant" 
+                                               data-variant-id="{{ item.variant.id }}"
+                                               data-variant-price="{% if item.discounted_price %}{{ item.discounted_price }}{% else %}{{ item.original_price }}{% endif %}"
+                                               data-variant-image="{{ item.variant.images.first.image.url }}">
+                                                <svg width="24" height="24">
+                                                    <circle cx="12" cy="12" r="10" fill="{{ item.variant.color }}"></circle>
+                                                </svg>
+                                            </a>
+                                            {% if item.discounted_price and item.offer.is_active %}
+                                                <div class="discount-info">
+                                                    <h4>
+                                                        <strong>
+                                                            ₹ <span style="text-decoration: line-through;">
+                                                                {{ item.original_price|floatformat:2 }}
+                                                            </span>
+                                                            {{ item.discounted_price|floatformat:2 }}
+                                                            <span style="color: red;">{{ item.discount_percentage }}% OFF</span>
+                                                        </strong>
+                                                    </h4>
+                                                </div>
+                                            {% else %}
+                                                <div class="price-info">
+                                                    <h4><strong>₹ {{ item.original_price|floatformat:2 }}</strong></h4>
+                                                </div>
+                                            {% endif %}
+                                        </div>
+                                    {% endfor %}
                                 {% else %}
-                                <p>No color variants available.</p>
+                                    <p>No color variants available.</p>
                                 {% endif %}
                             </div>
                         </div>
@@ -325,13 +295,12 @@
                         </div>
                         <a href="#" class="add_cart primary-btn" id="add-cart-btn">ADD TO CART</a>
                         <a href="#" class="wish warning-btn" id="wishlist">ADD TO WISHLIST</a>
-                        <!-- <a href="#" class="heart-icon" id="heart-icon"><span class="icon_heart_alt"></span></a> -->
                         <ul>
                             <li class="flex"><b>Availability</b> <span id="variant-stock">
-                                {% if variant_data.variant.stock == 0 %}
+                                    {% if variant_data.variant.stock == 0 %}
                                     <b style="color: red;">Out of Stock</b>
-                                {% else %} <b style="color: green;"> In Stock </b> 
-                                {% endif %}</span></li>
+                                    {% else %} <b style="color: green;"> In Stock </b>
+                                    {% endif %}</span></li>
                             <li><b>Shipping</b><span>01 day shipping.<samp> Free pickup today</samp></span></li>
                             <li><b>Weight</b><span>0.5 kg</span></li>
                             <li><b>Share on</b>
@@ -473,7 +442,7 @@
                         <ul>
                             <li>Address: 60-49 Road 11378 New York</li>
                             <li>Phone: +65 11.188.888</li>
-                            <li>Email: hello@colorlib.com</li>
+                            <li>Email: iamaparnasurendran@gmail.com</li>
                         </ul>
                     </div>
                 </div>
@@ -498,22 +467,7 @@
                         </ul>
                     </div>
                 </div>
-                <div class="col-lg-4 col-md-12">
-                    <div class="footer__widget">
-                        <h6>Join Our Newsletter Now</h6>
-                        <p>Get E-mail updates about our latest shop and special offers.</p>
-                        <form action="#">
-                            <input type="text" placeholder="Enter your mail">
-                            <button type="submit" class="site-btn">Subscribe</button>
-                        </form>
-                        <div class="footer__widget__social">
-                            <a href="#"><i class="fa fa-facebook"></i></a>
-                            <a href="#"><i class="fa fa-instagram"></i></a>
-                            <a href="#"><i class="fa fa-twitter"></i></a>
-                            <a href="#"><i class="fa fa-pinterest"></i></a>
-                        </div>
-                    </div>
-                </div>
+                
             </div>
         </div>
     </footer>

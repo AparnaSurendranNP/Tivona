@@ -13,7 +13,7 @@ from products.models import Variant
 from wishlist.models import Wishlist,WishlistItem
 from user_profile.models import Wallet,WalletTransaction
 from admin_dashboard.models import ProductOffer
-from products.models import Product
+from products.utils import colors
 from decimal import Decimal
 import razorpay
 from django.conf import settings
@@ -25,88 +25,102 @@ import json
 from django.http import HttpResponse
 import pdfkit
 from django.template.loader import render_to_string
+from django.http import Http404
+
 
 @never_cache
 @login_required
 def shoping_cart(request):
-    user= request.user
+    try:
+        user= request.user
 
-    if user.is_anonymous:
-        return redirect('login page') 
-    
-    cart = Cart.objects.filter(user=user).first()
+        if user.is_anonymous:
+            return redirect('login page') 
+        
+        cart = Cart.objects.filter(user=user).first()
 
-    if not cart:
-        return redirect('shop')
-    
-    cartItems = CartItem.objects.filter(cart=cart)
-    categories = Category.objects.all()
-    total=0
+        if not cart:
+            return redirect('shop')
+        
+        cartItems = CartItem.objects.filter(cart=cart)
+        categories = Category.objects.all()
+        total=0
 
-    for item in cartItems:
-        product= item.product
-        variant = item.variant
+        for item in cartItems:
+            product= item.product
+            variant = item.variant
 
-        item.discounted_price = variant.price
+            item.discounted_price = variant.price
 
-        if product.offer_applied:
-            offer = ProductOffer.objects.filter(product=product).first()
-            if offer and offer.is_active and offer.variant == variant:
-                item.discounted_price = variant.discounted_price or variant.price
+            if product.offer_applied:
+                offer = ProductOffer.objects.filter(product=product).first()
+                if offer and offer.is_active and offer.variant == variant:
+                    item.discounted_price = variant.discounted_price or variant.price
 
-        item.total_item_price = item.discounted_price * item.quantity
-        total += item.total_item_price
-    
-    context = {
-        'cartItems':cartItems,
-        'total':total,
-        'categories':categories
-    }
-    return render(request,'User side/shoping-cart.html',context)
+            item.total_item_price = item.discounted_price * item.quantity
+            total += item.total_item_price
+        
+        context = {
+            'cartItems':cartItems,
+            'total':total,
+            'categories':categories
+        }
+        return render(request,'User side/shoping-cart.html',context)
+    except Exception as e:
+        messages.error(request, "An unexpected error occurred: " + str(e))
+        return redirect('home page')
 
 
 @never_cache
 @transaction.atomic
 @login_required
 def add_cart(request,variant_id):
-    if request.method == 'GET':
-        from_wishlist=request.GET.get('from_wishlist',False)
-        variant = get_object_or_404(Variant,id=variant_id)
-        product=variant.product
-        quantity= int(request.GET.get('quantity',1))
+    try:
+        if request.method == 'GET':
+            from_wishlist=request.GET.get('from_wishlist',False)
+            variant = get_object_or_404(Variant,id=variant_id)
+            product=variant.product
+            quantity= int(request.GET.get('quantity',1))
 
 
-        if quantity>variant.stock:
-            messages.error(request,"Quantity is exceeds available stock")
+            if quantity>variant.stock:
+                messages.error(request,"Quantity is exceeds available stock")
+                return redirect('product_detail',product_slug=product.slug)
+
+            cart ,created= Cart.objects.get_or_create(user=request.user)
+
+
+            cartItem=CartItem.objects.filter(cart=cart,variant=variant).first()
+
+            if cartItem:
+                cartItem.quantity += quantity
+                cartItem.save()
+
+            else:
+                cart_item,created = CartItem.objects.get_or_create(
+                    cart=cart,
+                    product=product,
+                    variant =variant,
+                    quantity=quantity,
+                )
+                cart_item.save()
+            
+            if from_wishlist:
+                user=request.user
+                wishlist=Wishlist.objects.filter(user=user).first()
+                wishlist_item=WishlistItem.objects.filter(wishlist=wishlist,variant=variant)
+                if wishlist_item:
+                    wishlist_item.delete()
+
+            messages.success(request,"Item added to cart successfully!")
             return redirect('product_detail',product_slug=product.slug)
-
-        cart ,created= Cart.objects.get_or_create(user=request.user)
-
-
-        cartItem=CartItem.objects.filter(cart=cart,variant=variant).first()
-
-        if cartItem:
-            cartItem.quantity += quantity
-            cartItem.save()
-
-        else:
-            cart_item,created = CartItem.objects.get_or_create(
-                cart=cart,
-                product=product,
-                variant =variant,
-                quantity=quantity,
-            )
-            cart_item.save()
-        
-        if from_wishlist:
-            user=request.user
-            wishlist=Wishlist.objects.filter(user=user).first()
-            wishlist_item=WishlistItem.objects.filter(wishlist=wishlist,variant=variant)
-            if wishlist_item:
-                wishlist_item.delete()
-
-        messages.success(request,"Item added to cart successfully!")
-        return redirect('product_detail',product_slug=product.slug)
+    except Http404:
+        messages.error(request,"Variant not Found")
+        return redirect('home page')
+    except Exception as e:
+        messages.error(request, "An unexpected error occurred: " + str(e))
+        return redirect('home page')
+    
 
 
 @never_cache
@@ -135,8 +149,6 @@ def apply_coupon(request):
             return redirect('make_order')
     return redirect('make_order')
 
-
-
 @never_cache
 @login_required
 def remove_coupon(request):
@@ -156,78 +168,82 @@ def remove_coupon(request):
 @login_required
 @never_cache
 def make_order(request):
-    user = request.user
-    addresses = Address.objects.filter(user=user)
-    cart = Cart.objects.filter(user=user).first()
-    coupons = Coupon.objects.all()
-    coupon_id = request.session.get('coupon_id')    
+    try:
+        user = request.user
+        addresses = Address.objects.filter(user=user)
+        cart = Cart.objects.filter(user=user).first()
+        coupons = Coupon.objects.all()
+        coupon_id = request.session.get('coupon_id')    
 
-    if request.method == 'POST':
-        cartItems = CartItem.objects.filter(cart=cart)
+        if request.method == 'POST':
+            cartItems = CartItem.objects.filter(cart=cart)
 
-        if not cartItems.exists():
-            messages.error(request, "Your cart is empty. Please add items before placing an order.")
-            return redirect('shoping-cart')
-
-        for item in cartItems:
-
-            quantity = int(request.POST.get(f'quantity_{item.id}', item.quantity))
-
-            if quantity>item.variant.stock:
-                messages.error(request,f"{item} Quantity exceeds available stock")
+            if not cartItems.exists():
+                messages.error(request, "Your cart is empty. Please add items before placing an order.")
                 return redirect('shoping-cart')
 
-            item.quantity = quantity
-            item.save()
+            for item in cartItems:
 
-    cartItems = CartItem.objects.filter(cart=cart)
-    Tax_Rate = Decimal(0.05)
-    Del_Charge = Decimal(50)
-    total = Decimal(0)
-    discount_amount = Decimal(0)
+                quantity = int(request.POST.get(f'quantity_{item.id}', item.quantity))
 
-    for item in cartItems:
-        product= item.product
-        variant = item.variant
+                if quantity>item.variant.stock:
+                    messages.error(request,f"{item} Quantity exceeds available stock")
+                    return redirect('shoping-cart')
 
-        item.discounted_price = variant.price
+                item.quantity = quantity
+                item.save()
 
-        if product.offer_applied:
-            offer = ProductOffer.objects.filter(product=product).first()
-            if offer and offer.is_active and offer.variant == variant:
-                item.discounted_price = variant.discounted_price or variant.price
+        cartItems = CartItem.objects.filter(cart=cart)
+        Tax_Rate = Decimal(0.05)
+        Del_Charge = Decimal(50)
+        total = Decimal(0)
+        discount_amount = Decimal(0)
 
-        item.total_item_price = item.discounted_price * item.quantity
-        total += item.total_item_price
+        for item in cartItems:
+            product= item.product
+            variant = item.variant
 
-    tax_amount = total * Tax_Rate
-    total_amount = total + tax_amount + Del_Charge
+            item.discounted_price = variant.price
 
-    if coupon_id:
-        try:
-            coupon = Coupon.objects.get(id=coupon_id, active=True)
-            discount_amount = total_amount * (coupon.discount / 100)
-            total_amount = total_amount - discount_amount
-        except Coupon.DoesNotExist:
-            messages.error(request, "Invalid address. Please select a valid address.")
-            return redirect('make_order')
-        
-    tax_amount = round(tax_amount, 2)
-    total_amount = round(total_amount, 2)
-    discount_amount = round(discount_amount, 2)
+            if product.offer_applied:
+                offer = ProductOffer.objects.filter(product=product).first()
+                if offer and offer.is_active and offer.variant == variant:
+                    item.discounted_price = variant.discounted_price or variant.price
 
-    context = {
-        'addresses': addresses,
-        'cartItems': cartItems,
-        'sub_total': total,
-        'total_amount': total_amount,
-        'tax': tax_amount,
-        'del_charge':Del_Charge,
-        'coupons': coupons,
-        'coupon_amount': discount_amount if coupon_id else None,
-    }
+            item.total_item_price = item.discounted_price * item.quantity
+            total += item.total_item_price
 
-    return render(request, 'User side/make_order.html', context)
+        tax_amount = total * Tax_Rate
+        total_amount = total + tax_amount + Del_Charge
+
+        if coupon_id:
+            try:
+                coupon = Coupon.objects.get(id=coupon_id, active=True)
+                discount_amount = round(total_amount * (coupon.discount / 100), 2)
+                total_amount = total_amount - discount_amount
+            except Coupon.DoesNotExist:
+                messages.error(request, "Invalid address. Please select a valid address.")
+                return redirect('make_order')
+            
+        tax_amount = round(tax_amount, 2)
+        total_amount = round(total_amount, 2)
+        discount_amount = round(discount_amount, 2)
+
+        context = {
+            'addresses': addresses,
+            'cartItems': cartItems,
+            'sub_total': total,
+            'total_amount': total_amount,
+            'tax': tax_amount,
+            'del_charge':Del_Charge,
+            'coupons': coupons,
+            'coupon_amount': discount_amount if coupon_id else None,
+        }
+
+        return render(request, 'User side/make_order.html', context)
+    except Exception as e:
+        messages.error(request, "An unexpected error occurred: " + str(e))
+        return redirect('shoping-cart')
 
 @never_cache
 @login_required
@@ -352,66 +368,9 @@ def place_order(request):
             razorpay_client = razorpay.Client(auth=(settings.RAZORPAY_KEY_ID,settings.RAZORPAY_SECRET_KEY))
             amount = int(total_amount * 100)
             currency = 'INR'
-            razorpay_order = razorpay_client.order.create({'amount': amount, 'currency': currency, 'payment_capture': '0'})
+            razorpay_order = razorpay_client.order.create({'amount': amount, 'currency': currency, 'payment_capture': 1})
             razorpay_order_id = razorpay_order['id']
 
-            context = {
-                'address_id':address_id,
-                'razorpay_order_id': razorpay_order_id,
-                'razorpay_merchant_key': settings.RAZORPAY_KEY_ID,
-                'amount': amount,
-                'currency': currency,
-                'csrf_token': get_token(request),
-                'discount_amount': discount_amount,
-            }
-            return render(request, 'User side/make_order.html', context=context)
-
-    return redirect('make_order')
-
-
-@login_required
-@never_cache
-@csrf_exempt
-def online_payment_success(request):
-    if request.method == 'POST':
-        try:
-            # Parse the incoming JSON data
-            data = json.loads(request.body)
-
-            razorpay_payment_id = data.get('razorpay_payment_id', '')
-            razorpay_order_id = data.get('razorpay_order_id', '')
-            razorpay_signature = data.get('razorpay_signature', '')
-            amount = data.get('amount')
-            address_id = data.get('address_id')
-            discount_amount = data.get('discount_amount', '0')
-
-            # Ensure user is authenticated
-            if not request.user.is_authenticated:
-                return JsonResponse({'success': False, 'message': 'User not authenticated'})
-
-            user = request.user
-
-            # Razorpay client setup
-            razorpay_client = razorpay.Client(auth=(settings.RAZORPAY_KEY_ID, settings.RAZORPAY_SECRET_KEY))
-
-            # Prepare the signature verification parameters
-            params_dict = {
-                'razorpay_order_id': razorpay_order_id,
-                'razorpay_payment_id': razorpay_payment_id,
-                'razorpay_signature': razorpay_signature,
-            }
-
-            # Verify the payment signature
-            razorpay_client.utility.verify_payment_signature(params_dict)
-            # Payment verified successfully, proceed to create the order
-            new_address = get_object_or_404(Address, id=address_id, user=user)
-            cart = get_object_or_404(Cart, user=user)
-            cartItems = CartItem.objects.filter(cart=cart)
-
-            total_amount = Decimal(amount) / 100  # Convert back from paise to INR
-            tax_amount = round(total_amount * Decimal(0.05) / Decimal(1.05), 2)  # Reverse calculate tax from total
-            
-            # Create the order
             order = Order.objects.create(
                 user=user,
                 order_address=str(new_address),
@@ -419,12 +378,10 @@ def online_payment_success(request):
                 total_amount=total_amount,
                 tax_amount=tax_amount,
                 discount=Decimal(discount_amount),
-                status='Processing',
                 razorpay_order_id=razorpay_order_id,
             )
-            
+            print("Order created:", order)
 
-            # Create order items and update stock
             for cartItem in cartItems:
                 product = cartItem.product
                 variant = cartItem.variant
@@ -446,76 +403,238 @@ def online_payment_success(request):
                 cartItem.variant.stock -= cartItem.quantity
                 cartItem.variant.save()
 
-            # Delete cart items after order is placed
             cartItems.delete()
 
-            # Clear the coupon session if used
             if 'coupon_id' in request.session:
                 coupon_id = request.session['coupon_id']
                 coupon = Coupon.objects.filter(id=coupon_id, active=True).first()
-                order.coupon = coupon
-                coupon.used = True
-                coupon.save()
-                del request.session['coupon_id']
+                if coupon:
+                    order.coupon = coupon
+                    coupon.used = True
+                    coupon.save()
+                    del request.session['coupon_id']
+
             order.save()
 
-            # Respond with success and redirect URL
-            return JsonResponse({
-                'success': True,
-                'redirect_url': reverse('order_success', kwargs={'order_id': order.id}),
-            })
+            context = {
+                'address_id':address_id,
+                'razorpay_order_id': razorpay_order_id,
+                'razorpay_merchant_key': settings.RAZORPAY_KEY_ID,
+                'order':order,
+                'amount': amount,
+                'currency': currency,
+                'csrf_token': get_token(request),
+                'discount_amount': discount_amount,
+            }
+            return render(request, 'User side/make_order.html', context=context)
 
-        except razorpay.errors.SignatureVerificationError as e:
-            return JsonResponse({'success': False, 'message': f"Payment verification failed: {str(e)}"})
+    return redirect('make_order')
+
+
+@login_required
+@never_cache
+@csrf_exempt
+def online_payment_success(request):
+    if request.method == 'POST':
+        try:
+            data = json.loads(request.body)
+            print("Incoming data:", data)
+
+            razorpay_payment_id = data.get('razorpay_payment_id', '')
+            razorpay_order_id = data.get('razorpay_order_id', '')
+            razorpay_signature = data.get('razorpay_signature', '')
+
+            order_id = data.get('order')
+            order = Order.objects.filter(id=order_id).first()
+
+            if not request.user.is_authenticated:
+                print("User not authenticated")
+                return JsonResponse({'success': False, 'message': 'User not authenticated'})
+
+            razorpay_client = razorpay.Client(auth=(settings.RAZORPAY_KEY_ID, settings.RAZORPAY_SECRET_KEY))
+            params_dict = {
+                'razorpay_order_id': razorpay_order_id,
+                'razorpay_payment_id': razorpay_payment_id,
+                'razorpay_signature': razorpay_signature,
+            }
+
+            # Verify the payment signature
+            try:
+                razorpay_client.utility.verify_payment_signature(params_dict)
+                order.status = 'Processing'
+                order.save()
+                return JsonResponse({
+                    'success': True,
+                    'redirect_url': reverse('order_success', kwargs={'order_id': order.id}),
+                })
+            except razorpay.errors.SignatureVerificationError:
+                order.status = 'Payment Failed'
+                order.save()
+                return JsonResponse({
+                    'success': False,
+                    'message': 'Payment verification failed.',
+                    'redirect_url': reverse('payment_failure', kwargs={'order_id': order.id}),
+                })
+
+        except json.JSONDecodeError:
+            print("Invalid JSON format received")
+            return JsonResponse({
+                'success': False,
+                'message': 'Invalid data received.',
+                'redirect_url': reverse('payment_failure', kwargs={'order_id': order_id}),
+            })
         except Exception as e:
-            return JsonResponse({'success': False, 'message': f"An error occurred: {str(e)}"})
+            print("Error occurred:", e)
+            return JsonResponse({
+                'success': False,
+                'message': f"An error occurred: {str(e)}",
+                'redirect_url': reverse('payment_failure', kwargs={'order_id': order_id}),
+            })
 
     return JsonResponse({'success': False, 'message': 'Invalid request method'})
 
+@never_cache
+@login_required
+def payment_failure(request, order_id):
+    try:
+        order = Order.objects.filter(id=order_id).first()
+        if order:
+            order.status = "Payment Failed"
+            order.save()
+            messages.error(request, "Payment Failed")
+        else:
+            messages.error(request, "Order not found. Payment Failure.")
+
+    except Order.DoesNotExist:
+        messages.error(request, "Order not found.")
+        return redirect('order_history')
+    
+    except Exception as e:
+        print("Error occurred while processing payment failure:", e)
+        messages.error(request, "An error occurred while processing your request.")
+
+    context = {
+        'order': order,
+        'error': request.GET.get('error', 'An unknown error occurred.')
+    }
+    return render(request, 'User side/payment_failure.html', context)
+
+
+def retry_payment(request,order_id):
+    try:
+        order = Order.objects.filter(id=order_id).first()
+        razorpay_order_id = order.razorpay_order_id
+        total_amount = order.total_amount
+        discount_amount = order.discount
+        amount = int(total_amount * 100)
+        currency = 'INR'
+        
+
+        context = {
+                'razorpay_order_id': razorpay_order_id,
+                'razorpay_merchant_key': settings.RAZORPAY_KEY_ID,
+                'order':order,
+                'amount': amount,
+                'currency': currency,
+                'csrf_token': get_token(request),
+                'discount_amount': discount_amount,
+            }
+        return render(request, 'User side/make_order.html', context=context)
+    
+    except Order.DoesNotExist:
+        messages.error(request, "Order not found.")
+        return redirect('order_detail', order_id=order_id)
+
+    except ValueError as e:
+        messages.error(request, str(e))
+        return redirect('order_detail', order_id=order_id)
+    
+    except Exception as e:
+        messages.error(request, "An unexpected error occurred: " + str(e))
+        return redirect('order_detail', order_id=order_id)
 
 
 @never_cache
 @login_required
 def order_success(request, order_id):
-    order = get_object_or_404(Order, id=order_id)
-    context={
-        'order':order,
-    }
-    return render(request, 'User side/order_success.html',context)
+    try:
+        order = get_object_or_404(Order,id=order_id)
+        context={
+            'order':order,
+        }
+        return render(request, 'User side/order_success.html',context)
+    except Http404:
+        messages.error(request,"Order not Found")
+        return redirect('home page')
 
 @login_required
 @never_cache
 def download_invoice_pdf(request, order_id):
+    try:
+        order = order = get_object_or_404(Order,id=order_id)
+        order_items = OrderItem.objects.filter(order=order)
+        sub_total = 0
+        for order_item in order_items:
+            if order_item.is_listed:
+                sub_total = sub_total + order_item.price
 
-    order = get_object_or_404(Order, id=order_id)
+        context = {
+            'order': order,
+            'sub_total':sub_total,
+            'colors':colors
+        }
 
-    context = {
-        'order': order,
-    }
+        # Render HTML content from template with context data
+        html = render_to_string('User side/invoice_pdf.html', context)
+        config = pdfkit.configuration(wkhtmltopdf=r'C:\Program Files\wkhtmltopdf\bin\wkhtmltopdf.exe')
 
-    # Render HTML content from template with context data
-    html = render_to_string('User side/invoice_pdf.html', context)
-    config = pdfkit.configuration(wkhtmltopdf=r'C:\Program Files\wkhtmltopdf\bin\wkhtmltopdf.exe')
+        # Generate PDF from HTML using pdfkit
+        pdf = pdfkit.from_string(html, False, configuration=config)
 
-    # Generate PDF from HTML using pdfkit
-    pdf = pdfkit.from_string(html, False, configuration=config)
+        # Create HTTP response with the PDF
+        response = HttpResponse(pdf, content_type='application/pdf')
+        response['Content-Disposition'] = 'attachment; filename="invoice.pdf"'
 
-    # Create HTTP response with the PDF
-    response = HttpResponse(pdf, content_type='application/pdf')
-    response['Content-Disposition'] = 'attachment; filename="invoice.pdf"'
-
-    return response
+        return response
+    except Http404:
+        messages.error(request,"Order not Found")
+        return redirect('order_history')
 
 @login_required
 @never_cache
 def request_refund(request, order_id):
-    order = get_object_or_404(Order, id=order_id, user=request.user)
-    if order.status == 'Delivered' or order.payment_method == 'Razorpay' or order.payment_method == 'Wallet':
-        order.refund_requested = True
-        order.status = 'Refund processed'
-        order.save()
-        messages.success(request, "Refund request submitted successfully.")
-    else:
-        messages.error(request, "Order cannot be refunded.")
-    return redirect('order_detail',order_id=order_id)
+    try:
+        order = get_object_or_404(Order, id=order_id, user=request.user)
+        order_items=OrderItem.objects.filter(order=order).all()
+        if order.status == 'Delivered' or order.payment_method == 'Razorpay' or order.payment_method == 'Wallet':
+            order.refund_requested = True
+            for order_item in order_items:
+                order_item.refund_requested = True
+                order_item.save()
 
+            order.status = 'Refund processed'
+            order.save()
+            messages.success(request, "Refund request submitted successfully.")
+        else:
+            messages.error(request, "Order cannot be refunded.")
+        return redirect('order_detail',order_id=order_id)
+    except Http404:
+        messages.error(request,"Order not Found")
+        return redirect('order_history')
+
+@login_required
+@never_cache
+def request_refund_item(request, item_id):
+    try:
+        order_item = get_object_or_404(OrderItem, id=item_id)
+        order=order_item.order
+        if order.status == 'Delivered' or order.payment_method == 'Razorpay' or order.payment_method == 'Wallet':
+            order_item.refund_requested = True
+            order_item.save()
+            messages.success(request, "Refund request submitted successfully.")
+        else:
+            messages.error(request, "Order cannot be refunded.")
+        return redirect('order_detail',order_id=order.id)
+    except Http404:
+        messages.error(request,"Order not Found")
+        return redirect('order_history')

@@ -45,64 +45,6 @@
         <div class="loader"></div>
     </div>
 
-    <!-- Humberger Begin -->
-    <div class="humberger__menu__overlay"></div>
-    <div class="humberger__menu__wrapper">
-        <div class="humberger__menu__logo">
-            <a href="#"><img src="{%static 'img/logo.png'%}" alt=""></a>
-        </div>
-        <div class="humberger__menu__cart">
-            <ul>
-                <li><a href="{%url 'wishlist'%}"><i class="fa fa-heart"></i> <span>1</span></a></li>
-                <li><a href="{%url 'shoping-cart'%}"><i class="fa fa-shopping-bag"></i> <span>3</span></a></li>
-            </ul>
-            <div class="header__cart__price">item: <span>$150.00</span></div>
-        </div>
-        <div class="humberger__menu__widget">
-            <div class="header__top__right__language">
-                <img src="{%static 'img/language.png'%}" alt="">
-                <div>English</div>
-                <span class="arrow_carrot-down"></span>
-                <ul>
-                    <li><a href="#">Spanis</a></li>
-                    <li><a href="#">English</a></li>
-                </ul>
-            </div>
-            <div class="header__top__right__auth">
-                {% if user.is_authenticated %}
-                <a href="{% url 'profile page' user.id %}"><i class="fa fa-user"></i>{{ user.username }}</a>
-                {% else %}
-                <a href="{% url 'login page' %}"><i class="fa fa-user"></i> Login/Signup</a>
-                {% endif %}
-            </div>
-        </div>
-        <nav class="humberger__menu__nav mobile-menu">
-            <ul>
-                <li class="active"><a href="./index.html">Home</a></li>
-                <li><a href="./shop-grid.html">Shop</a></li>
-                <li><a href="./shoping-cart.html">Shoping Cart</a></li>
-                <!-- <li><a href="#">Pages</a>
-                    <ul class="header__menu__dropdown">
-                        <li><a href="./shop-details.html">Shop Details</a></li>
-                        <li><a href="./shoping-cart.html">Shoping Cart</a></li>
-                        <li><a href="./checkout.html">Check Out</a></li>
-                        <li><a href="./blog-details.html">Blog Details</a></li>
-                    </ul>
-                </li>
-                <li><a href="./blog.html">Blog</a></li> -->
-                <li><a href="./contact.html">Contact</a></li>
-            </ul>
-        </nav>
-        <div id="mobile-menu-wrap"></div>
-        <div class="header__top__right__social">
-            <a href="#"><i class="fa fa-facebook"></i></a>
-            <a href="#"><i class="fa fa-twitter"></i></a>
-            <a href="#"><i class="fa fa-linkedin"></i></a>
-            <a href="#"><i class="fa fa-pinterest-p"></i></a>
-        </div>
-    </div>
-    <!-- Humberger End -->
-
     <!-- Header Section Begin -->
     <header class="header">
         <div class="header__top">
@@ -117,13 +59,8 @@
                                 <a href="#"><i class="fa fa-pinterest-p"></i></a>
                             </div>
                             <div class="header__top__right__language">
-                                <img src="{%static 'img/language.png'%}" alt="">
+                                <img src="/media/language.png" alt="">
                                 <div>English</div>
-                                <span class="arrow_carrot-down"></span>
-                                <ul>
-                                    <li><a href="#">Spanis</a></li>
-                                    <li><a href="#">English</a></li>
-                                </ul>
                             </div>
                             <div class="header__top__right__auth">
                                 {% if user.is_authenticated %}
@@ -158,9 +95,7 @@
                                     {% endfor %}
                                 </ul>
                             </li>
-                            <!-- <li><a href="./blog.html">Blog</a></li> -->
                             <li><a href="{%url 'shoping-cart'%}">Shop Cart</a></li>
-                            <!-- <li><a href="./checkout.html">Check Out</a></li> -->
                             <li><a href="{%url 'contact page'%}">Contact</a></li>
                         </ul>
                     </nav>
@@ -221,31 +156,6 @@
                                 {% endfor %}
                             </ul>
                         </div>
-                        <!-- <div class="sidebar__item">
-                            <h4>Price</h4>
-                            <form id="price-filter-form" method="get">
-                                <input type="hidden" name="sort" value="{{ sort_option }}">
-                                <div class="price-range-wrap">
-                                    <div class="price-range ui-slider ui-corner-all ui-slider-horizontal ui-widget ui-widget-content"
-                                        data-min="99" data-max="1000">
-                                        <div class="ui-slider-range ui-corner-all ui-widget-header"></div>
-                                        <span tabindex="0"
-                                            class="ui-slider-handle ui-corner-all ui-state-default"></span>
-                                        <span tabindex="0"
-                                            class="ui-slider-handle ui-corner-all ui-state-default"></span>
-                                    </div>
-                                    <div class="range-slider">
-                                        <div class="price-input">
-                                            <input type="text" id="minamount" name="min_price"
-                                                value="{{request.GET.min_price|default:99 }}">
-                                            <input type="text" id="maxamount" name="max_price"
-                                                value="{{request.GET.max_price|default:1000 }}">
-                                        </div>
-                                    </div>
-                                </div>
-                                <button type="submit" style="display: none;"></button>
-                            </form>
-                        </div> -->
 
                         <div class="sidebar__item">
                             <div class="latest-product__text">
@@ -317,36 +227,26 @@
                     </div>
 
                     <div class="row">
-                        {% for product in offered_products %}
-                            {% for variant in product.variants.all %}
-                                {% if variant.discounted_price %}
-                                    <div class="col-lg-4 col-md-6 col-sm-6">
-                                        <div class="product__item">
-                                            <div class="product__item__pic set-bg" data-setbg="{{ variant.images.first.image.url }}">
-                                                <ul class="product__item__pic__hover">
-                                                    <li><a href="{% url 'wishlist' %}"><i class="fa fa-heart"></i></a></li>
-                                                    <li><a href="{% url 'shoping-cart' %}"><i class="fa fa-shopping-cart"></i></a></li>
-                                                </ul>
-                                            </div>
-                                            <div class="product__item__text">
-                                                <h6><a href="{% url 'product_detail' product.slug %}">{{ product.name }}</a></h6>
-                                                <span style="color: red;">{{ product.offer.discount_percentage }}% OFF</span>
-                                                <p>
-                                                    Rs <span style="text-decoration: line-through;">{{ variant.price|floatformat:2 }}</span> {{ variant.discounted_price|floatformat:2 }}
-                                                </p>
-                                            </div>
-                                        </div>
+                        {% for item in offered_variants %}
+                            <div class="col-lg-4 col-md-6 col-sm-6">
+                                <div class="product__item">
+                                    <div class="product__item__pic set-bg" data-setbg="{{ item.variant.images.first.image.url }}">
+                                      
                                     </div>
-                                {% endif %}
-                            {% endfor %}
+                                    <div class="product__item__text">
+                                        <h6><a href="{% url 'product_detail' item.product.slug %}">{{ item.product.name }}</a></h6>
+                                        <p>
+                                            Rs <span style="text-decoration: line-through;">{{ item.variant.price|floatformat:2 }}</span>
+                                            {{ item.variant.discounted_price|floatformat:2 }}
+                                            <span style="color: red;">{{ item.discount_percentage }}% OFF</span>
+                                        </p>
+                                    </div>
+                                </div>
+                            </div>
                         {% empty %}
                             <p>No offers available at the moment.</p>
                         {% endfor %}
                     </div>
-                    
-                    
-                    
-                    
                     
                     
                     <!-- Pagination -->
@@ -391,7 +291,7 @@
                         <ul>
                             <li>Address: 60-49 Road 11378 New York</li>
                             <li>Phone: +65 11.188.888</li>
-                            <li>Email: hello@colorlib.com</li>
+                            <li>Email: iamaparnasurendran@gmail.com</li>
                         </ul>
                     </div>
                 </div>
@@ -416,31 +316,9 @@
                         </ul>
                     </div>
                 </div>
-                <div class="col-lg-4 col-md-12">
-                    <div class="footer__widget">
-                        <h6>Join Our Newsletter Now</h6>
-                        <p>Get E-mail updates about our latest shop and special offers.</p>
-                        <form action="#">
-                            <input type="text" placeholder="Enter your mail">
-                            <button type="submit" class="site-btn">Subscribe</button>
-                        </form>
-                        <div class="footer__widget__social">
-                            <a href="#"><i class="fa fa-facebook"></i></a>
-                            <a href="#"><i class="fa fa-instagram"></i></a>
-                            <a href="#"><i class="fa fa-twitter"></i></a>
-                            <a href="#"><i class="fa fa-pinterest"></i></a>
-                        </div>
-                    </div>
-                </div>
+                
             </div>
-            <!-- <div class="row">
-                <div class="col-lg-12">
-                    <div class="footer__copyright">
-                        <div class="footer__copyright__text"><p>
-                        <div class="footer__copyright__payment"><img src="img/payment-item.png" alt=""></div>
-                    </div>
-                </div>
-            </div> -->
+           
         </div>
     </footer>
     <!-- Footer Section End -->

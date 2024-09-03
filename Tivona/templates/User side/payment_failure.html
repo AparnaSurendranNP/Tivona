@@ -4,11 +4,9 @@
 
 <head>
     <meta charset="UTF-8">
-    <meta name="description" content="Ogani Template">
-    <meta name="keywords" content="Ogani, unica, creative, html">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
-    <title>Tivona</title>
+    <title>Tinova</title>
 
     <!-- Google Font -->
     <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@200;300;400;600;900&display=swap" rel="stylesheet">
@@ -30,7 +28,6 @@
 </head>
 
 <body>
-    
     <!-- Page Preloder -->
     <div id="preloder">
         <div class="loader"></div>
@@ -43,7 +40,6 @@
                 <div class="row">
                     <div class="col-lg-6">
                         <div class="header__top__left">
-                            
                         </div>
                     </div>
                     <div class="col-lg-6">
@@ -60,10 +56,9 @@
                             </div>
                             <div class="header__top__right__auth">
                                 {% if user.is_authenticated %}
-                                <a href="{% url 'profile page' user.id%}"><i
-                                        class="fa fa-user"></i>{{user.username}}</a>
+                                    <a href="{% url 'profile page' user.id %}"><i class="fa fa-user"></i>{{ user.username }}</a>
                                 {% else %}
-                                <a href="{% url 'login page' %}"><i class="fa fa-user"></i> Login/Signup</a>
+                                    <a href="{% url 'login page' %}"><i class="fa fa-user"></i> Login/Signup</a>
                                 {% endif %}
                             </div>
                         </div>
@@ -78,35 +73,35 @@
                         <a href="{%url 'home page'%}"><img src="{%static 'img/logo.png'%}" alt=""></a>
                     </div>
                 </div>
-                <div class="col-lg-6" style="padding: 20px;">
+                <div class="col-lg-6" style="padding: 20px;" >
                     <nav class="header__menu">
                         <ul>
                             <li><a href="{%url 'home page'%}">Home</a></li>
-                            <li><a href="{%url 'shop page'%}">Store</a>
+                            <li class="active"><a href="{%url 'shoping-cart'%}">Store</a>
                                 <ul class="header__menu__dropdown">
                                     {% for category in categories %}
                                     {% if category.is_listed %}
                                     <li><a href="{% url 'category_detail' category.slug %}">{{ category.name }}</a></li>
                                     {% endif %}
-                                    {% endfor %}
+                                    {% endfor %}          
                                 </ul>
                             </li>
-                            <li class="active"><a href="{%url 'shoping-cart'%}">Shoping Cart</a></li>
+                            <!-- <li><a href="./blog.html">Blog</a></li> -->
+                            <li><a href="{%url 'shoping-cart'%}">Shop Cart</a></li>
+                            <!-- <li><a href="./checkout.html">Check Out</a></li> -->
                             <li><a href="{%url 'contact page'%}">Contact</a></li>
                         </ul>
                     </nav>
                 </div>
-                <div class="col-lg-3" style="padding: 20px;">
+                <div class="col-lg-3" style="padding: 15px;">
                     <div class="header__cart">
                         <ul>
                             <li><a href="{%url 'wishlist'%}"><i class="fa fa-heart"></i></a></li>
-                            <li><a href="{%url 'shoping-cart'%}"><i class="fa fa-shopping-bag"></i></a>
-                            </li>
+                            <li><a href="{%url 'shoping-cart'%}"><i class="fa fa-shopping-bag"></i></a></li>
                         </ul>
                     </div>
                 </div>
             </div>
-
             <div class="humberger__open">
                 <i class="fa fa-bars"></i>
             </div>
@@ -114,89 +109,51 @@
     </header>
     <!-- Header Section End -->
 
-    <!-- Shoping Cart Section Begin -->
-    <section class="shoping-cart spad">
+    <!-- Breadcrumb Section Begin -->
+    <section class="breadcrumb-section set-bg" data-setbg="{{ category.image.url }}">
         <div class="container">
-            <form method="POST" action="{% url 'make_order'%}">
-                {% csrf_token %}
-                <input type="hidden" name="form_type" value="make_order">
-                <div class="row">
-                    <div class="col-lg-12">
-                        <div class="shoping__cart__table">
-                            <table>
-                                <thead>
-                                    <tr>
-                                        <th class="shoping__product" style="display: flex; justify-content: space-around;">Products</th>
-                                        <th>Price</th>
-                                        <th>Quantity</th>
-                                        <th>Total</th>
-                                        <th></th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    {% for cartItem in cartItems %}
-                                    <tr>
-                                        <td class="shoping__cart__item">
-                                            <div class="shoping__cart__detail" style="display:flex; justify-content: center; align-items: center; justify-content: space-between; padding-right: 50%">
-                                                <div style="width: 100px; height: 100px;">
-                                                    <img src="{{ cartItem.variant.images.first.image.url }}" alt="">
-                                                </div>
-                                                <h5><a href="{% url 'product_detail' cartItem.product.slug %}" 
-                                                    style="color: black;">{{ cartItem.product.name }}</a></h5>
-                                            </div>
-                                        </td>
-                                        {%if cartItem.discounted_price%}
-                                        <td class="shoping__cart__price">
-                                            ₹ {{ cartItem.discounted_price }}
-                                        </td>
-                                        {%else%}
-                                        <td class="shoping__cart__price">
-                                            ₹ {{ cartItem.variant.price }}
-                                        </td>
-                                        {%endif%}
-                                        <td class="shoping__cart__quantity">
-                                            <div class="quantity">
-                                                <div class="proo-qty">
-                                                    <input type="hidden" name="cart_item_id_{{ cartItem.id }}" value="{{ cartItem.id }}">
-                                                    <input type="number" id="quantity_{{ cartItem.id }}" name="quantity_{{ cartItem.id }}" value="{{ cartItem.quantity }}" min="1">
-                                                </div>
-                                            </div>
-                                        </td>
-                                        <td class="shoping__cart__total">
-                                            {{ cartItem.total_item_price }}
-                                        </td>
-                                        <td class="shoping__cart__item__close">
-                                            <a href="{% url 'remove_cart' cartItem.id %}" class="btn btn-danger mb-2">Remove </a>
-                                            
-                                        </td>
-                                    </tr>
-                                    {% endfor %}
-                                </tbody>
-                            </table>
+            <div class="row">
+                <div class="col-lg-12 text-center">
+                    <div class="breadcrumb__text">
+                    <h2>{{category.name}}</h2>
+                        <div class="breadcrumb__option">
+                            <a href="{%url 'home page'%}">Home</a>
+                            <span>Shop</span>
                         </div>
                     </div>
                 </div>
-                <div class="row">
-                    <div class="col-lg-12">
-                        <div class="shoping__cart__btns">
-                            <a href="{% url 'shop page' %}" class="primary-btn cart-btn">CONTINUE SHOPPING</a>
-                        </div>
-                    </div>
-                    <div class="col-lg-6">
-                        <div class="shoping__checkout">
-                            <h5>Cart Total</h5>
-                            <ul>
-                                <li>Total <span>₹ {{ total }}</span></li>
-                            </ul>
-                            <button type="submit" class="primary-btn">PROCEED TO CHECKOUT</button>
-                        </div>
-                    </div>
-                </div>
-            </form>
+            </div>
         </div>
     </section>
-
-    <!-- Shoping Cart Section End -->
+    <!-- Breadcrumb Section End -->
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-md-8">
+                <div class="card mt-5">
+                    <div class="card-header">
+                        Payment Error
+                    </div>
+                    <div class="card-body">
+                        <h5 class="card-title"> Payment Pending
+                        </h5>
+                        <p class="card-text">Your order details:</p>
+                        <ul class="list-group mb-3">
+                            <li class="list-group-item"><strong>Order ID:</strong> {{ order.id }}</li>
+                            <li class="list-group-item"><strong>Order Date:</strong> {{ order.created_at }}</li>
+                            <li class="list-group-item"><strong>Discount:</strong> {{ order.discount }}</li>
+                            <li class="list-group-item"><strong>Total Amount:</strong> Rs {{ order.total_amount }}</li>
+                            <li class="list-group-item"><strong>Payment Method:</strong> {{ order.payment_method }}</li>
+                            <li class="list-group-item"><strong
+                                {% if order.status == "Payment Failed" %} style="color: red;" {%endif%}>
+                                 Status: {{ order.status }} </strong> </li>
+                        </ul>
+                        <a href="{% url 'retry_payment' order.id %}" class="btn btn-primary">Retry Payment</a>
+                        <a href="{% url 'order_history' %}" class="btn btn-primary">View Order History</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
 
     <!-- Footer Section Begin -->
     <footer class="footer spad">
@@ -235,7 +192,6 @@
                         </ul>
                     </div>
                 </div>
-                
             </div>
         </div>
     </footer>
@@ -253,11 +209,11 @@
 
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.all.min.js"></script>
     <script>
-        document.addEventListener('DOMContentLoaded', function() {
+        document.addEventListener('DOMContentLoaded', function () {
             {% if messages %}
-                {% for message in messages %}
-                    Swal.fire('{{ message }}');
-                {% endfor %}
+            {% for message in messages %}
+            Swal.fire('{{ message }}');
+            {% endfor %}
             {% endif %}
         });
     </script>
