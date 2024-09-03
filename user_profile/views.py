@@ -13,57 +13,85 @@ from products.utils import colors
 from decimal import Decimal
 from django.core.paginator import Paginator
 from user_profile.models import Wallet,WalletTransaction
+from django.http import Http404
 
 # Create your views here.
 @never_cache
 @login_required
 def profile(request,user_id):
-    user = get_object_or_404(CustomUser,id=user_id)
-    categories=Category.objects.all()
-    return render(request,'User side/profile.html',{'categories':categories,'user':user})
+    try:
+        user = get_object_or_404(CustomUser,id=user_id)
+        categories=Category.objects.all()
+        return render(request,'User side/profile.html',{'categories':categories,'user':user})
+    
+    except Http404:
+        messages.error(request, "User not found.")
+        return redirect('home page')
+    
+    except Exception as e:
+        messages.error(request, "An unexpected error occurred: " + str(e))
+        return redirect('home page')
+
 
 @never_cache
 @login_required
 def update_profile(request,user_id):
+    try:
 
-    user = get_object_or_404(CustomUser,id=user_id)
+        user = get_object_or_404(CustomUser,id=user_id)
 
-    if request.method == 'POST':
-        username = request.POST.get('username').strip()
-        phone = request.POST.get('phone').replace(" ", "").strip()
+        if request.method == 'POST':
+            username = request.POST.get('username').strip()
+            phone = request.POST.get('phone').replace(" ", "").strip()
 
-        
-        if not username.isalpha():
-            messages.error(request,"username should contain only letters.")
-            return redirect('update_profile',user_id=user_id)
+            
+            if not username.isalpha():
+                messages.error(request,"username should contain only letters.")
+                return redirect('update_profile',user_id=user_id)
 
-        if not is_valid_phone(phone):
-            messages.error(request, "Invalid phone number format. Please enter a valid phone number.")
-            return redirect('update_profile',user_id=user_id)
+            if not is_valid_phone(phone):
+                messages.error(request, "Invalid phone number format. Please enter a valid phone number.")
+                return redirect('update_profile',user_id=user_id)
 
-        if CustomUser.objects.filter(username=username).exclude(id=user_id).exists():
-            messages.error(request, "Username already exists! Try another username.")
-            return redirect('update_profile',user_id=user_id)
+            if CustomUser.objects.filter(username=username).exclude(id=user_id).exists():
+                messages.error(request, "Username already exists! Try another username.")
+                return redirect('update_profile',user_id=user_id)
 
-        if CustomUser.objects.filter(phone=phone).exclude(id=user_id).exists():
-            messages.error(request, "Phone number already exists.")
-            return redirect('update_profile',user_id=user_id)
-        
-        user.username=username
-        user.phone=phone
-        user.save()
-        messages.success(request,"Profile Updated successfully!")
-        redirect('profile page',user_id=user_id)
-        
-    return render(request,'User side/update_profile.html',{'user':user})
+            if CustomUser.objects.filter(phone=phone).exclude(id=user_id).exists():
+                messages.error(request, "Phone number already exists.")
+                return redirect('update_profile',user_id=user_id)
+            
+            user.username=username
+            user.phone=phone
+            user.save()
+            messages.success(request,"Profile Updated successfully!")
+            return redirect('profile page',user_id=user_id)
+            
+        return render(request,'User side/update_profile.html',{'user':user})
+    
+    except Http404:
+        messages.error(request, "User not found.")
+        return redirect('home page')
+    
+    except Exception as e:
+        messages.error(request, "An unexpected error occurred: " + str(e))
+        return redirect('home page')
 
 @never_cache
 @login_required
 def address(request,user_id):
-    user=get_object_or_404(CustomUser,id=user_id)
-    categories= Category.objects.all()
-    address=Address.objects.filter(user_id=user_id)
-    return render(request,'User side/address_manage.html',{'user':user,'categories':categories,'addresses':address})
+    try:
+        user=get_object_or_404(CustomUser,id=user_id)
+        categories= Category.objects.all()
+        address=Address.objects.filter(user_id=user_id)
+        return render(request,'User side/address_manage.html',{'user':user,'categories':categories,'addresses':address})
+    except Http404:
+        messages.error(request, "User not found.")
+        return redirect('home page')
+    
+    except Exception as e:
+        messages.error(request, "An unexpected error occurred: " + str(e))
+        return redirect('home page')
 
 
 from django.http import JsonResponse
@@ -87,276 +115,374 @@ def get_address_details(pin_code):
 @never_cache
 @login_required
 def add_address(request,user_id):
-    if request.method == 'POST':
-        customer_name=request.POST.get('name').strip()
-        customer_phone=request.POST.get('phone').replace(" ", "").strip()
-        customer_address=request.POST.get('address').strip()
-        street=request.POST.get('street').strip()
-        city=request.POST.get('city').strip()
-        state=request.POST.get('state').strip()
-        pin_code=request.POST.get('pin_code').replace(" ", "").strip()
-        country=request.POST.get('country').strip()
-        source_page = request.POST.get('source_page')
-
+    try:
         user=get_object_or_404(CustomUser,id=user_id)
+        if request.method == 'POST':
+            customer_name=request.POST.get('name').strip()
+            customer_phone=request.POST.get('phone').replace(" ", "").strip()
+            customer_address=request.POST.get('address').strip()
+            street=request.POST.get('street').strip()
+            city=request.POST.get('city').strip()
+            state=request.POST.get('state').strip()
+            pin_code=request.POST.get('pin_code').replace(" ", "").strip()
+            country=request.POST.get('country').strip()
+            source_page = request.POST.get('source_page')
 
-        if not all([customer_name,customer_phone,customer_address,street,city,state,pin_code,country]):
-            if source_page == 'make_order':
-                messages.error(request, "All fields are required.")
-                return redirect ('make_order',{'address':address})   
-            else:
-                messages.error(request, "All fields are required.")
-                return redirect('address_manage',user_id=user_id)
+            if not all([customer_name,customer_phone,customer_address,street,city,state,pin_code,country]):
+                if source_page == 'make_order':
+                    messages.error(request, "All fields are required.")
+                    return redirect ('make_order',{'address':address})   
+                else:
+                    messages.error(request, "All fields are required.")
+                    return redirect('address_manage',user_id=user_id)
 
-        if '00000000' in customer_phone:
-            if source_page == 'make_order':
-                messages.error(request, "Invalid number format. Please enter a valid phone number.")
-                return redirect ('make_order',{'address':address})   
-            else:
-                messages.error(request, "Invalid number format. Please enter a valid phone number.")
-                return redirect('address_manage',user_id=user_id)
+            if '00000000' in customer_phone:
+                if source_page == 'make_order':
+                    messages.error(request, "Invalid number format. Please enter a valid phone number.")
+                    return redirect ('make_order',{'address':address})   
+                else:
+                    messages.error(request, "Invalid number format. Please enter a valid phone number.")
+                    return redirect('address_manage',user_id=user_id)
 
-        if not is_valid_phone(customer_phone):
+            if not is_valid_phone(customer_phone):
+                if source_page == 'make_order':
+                    messages.error(request, "Invalid phone number format. Please enter a valid phone number.")
+                    return redirect ('make_order',{'address':address})
+                else:
+                    messages.error(request, "Invalid phone number format. Please enter a valid phone number.")
+                    return redirect('address_manage',user_id=user_id)
+            
+            if not city.isalpha() or not state.isalpha() or not country.isalpha():
+                if source_page == 'make_order':
+                    messages.error(request,"city or state or country should contain only letters.")
+                    return redirect ('make_order',{'address':address})   
+                else:
+                    messages.error(request,"city or state or country should contain only letters.")
+                    return redirect('address_manage',user_id=user_id)
+            
+            if not pin_code.isdigit() or len(pin_code) != 6: 
+                if source_page == 'make_order':
+                    messages.error(request,"Invalid pin code. Please enter a valid 6-digit pin code.")
+                    return redirect ('make_order',{'address':address})   
+                else:
+                    messages.error(request,"Invalid pin code. Please enter a valid 6-digit pin code.")
+                    return redirect('address_manage',user_id=user_id)
+
+            #change the existing primary address as normal address
+            Address.objects.filter(user_id=user_id,primary_address=True).update(primary_address=False)
+
+            Address.objects.create(
+                name=customer_name,
+                phone=customer_phone,
+                address=customer_address,
+                street=street,
+                city=city,
+                state=state,
+                pin_code=pin_code,
+                country=country,
+                user=user,
+                primary_address=True
+                )
             if source_page == 'make_order':
-                messages.error(request, "Invalid phone number format. Please enter a valid phone number.")
-                return redirect ('make_order',{'address':address})
+                messages.success(request, "Address added successfully.")
+                return redirect ('make_order')   
             else:
-                messages.error(request, "Invalid phone number format. Please enter a valid phone number.")
+                messages.success(request, "Address added successfully.")
                 return redirect('address_manage',user_id=user_id)
         
-        if not city.isalpha() or not state.isalpha() or not country.isalpha():
-            if source_page == 'make_order':
-                messages.error(request,"city or state or country should contain only letters.")
-                return redirect ('make_order',{'address':address})   
-            else:
-                messages.error(request,"city or state or country should contain only letters.")
-                return redirect('address_manage',user_id=user_id)
-        
-        if not pin_code.isdigit() or len(pin_code) != 6: 
-            if source_page == 'make_order':
-                messages.error(request,"Invalid pin code. Please enter a valid 6-digit pin code.")
-                return redirect ('make_order',{'address':address})   
-            else:
-                messages.error(request,"Invalid pin code. Please enter a valid 6-digit pin code.")
-                return redirect('address_manage',user_id=user_id)
+        address = Address.objects.filter(user_id=user_id)
+        categories= Category.objects.all()
+        return render(request,'User side/address_manage.html',{'user':user,'categories':categories,'addresses':address})
+    except Http404:
+        messages.error(request,"User not found")
+        return redirect('home page')
+    except Exception as e:
+        messages.error(request, "An unexpected error occurred: " + str(e))
+        return redirect('home page')
 
-        #change the existing primary address as normal address
-        Address.objects.filter(user_id=user_id,primary_address=True).update(primary_address=False)
-
-        Address.objects.create(
-            name=customer_name,
-            phone=customer_phone,
-            address=customer_address,
-            street=street,
-            city=city,
-            state=state,
-            pin_code=pin_code,
-            country=country,
-            user=user,
-            primary_address=True
-            )
-        if source_page == 'make_order':
-            messages.success(request, "Address added successfully.")
-            return redirect ('make_order')   
-        else:
-            messages.success(request, "Address added successfully.")
-            return redirect('address_manage',user_id=user_id)
-    
-    address = Address.objects.filter(user_id=user_id)
-    categories= Category.objects.all()
-    return render(request,'User side/address_manage.html',{'user':user,'categories':categories,'addresses':address})
 
 @never_cache
 @login_required
 def edit_address(request,address_id):
 
-    address=get_object_or_404(Address,id=address_id)
-    user_id=address.user_id
+    try:
+        address=get_object_or_404(Address,id=address_id)
+        user_id=address.user_id
 
-    if request.method == 'POST':
-        customer_name=request.POST.get('name',address.name).strip()
-        customer_phone=request.POST.get('phone',address.phone).replace(" ", "").strip()
-        customer_address=request.POST.get('address',address.address).strip()
-        street=request.POST.get('street',address.street).strip()
-        city=request.POST.get('city',address.city).strip()
-        state=request.POST.get('state',address.state).strip()
-        pin_code=request.POST.get('pin_code',address.pin_code).strip()
-        country=request.POST.get('country',address.country).strip()
-        source_page = request.POST.get('source_page') 
+        if request.method == 'POST':
+            customer_name=request.POST.get('name',address.name).strip()
+            customer_phone=request.POST.get('phone',address.phone).replace(" ", "").strip()
+            customer_address=request.POST.get('address',address.address).strip()
+            street=request.POST.get('street',address.street).strip()
+            city=request.POST.get('city',address.city).strip()
+            state=request.POST.get('state',address.state).strip()
+            pin_code=request.POST.get('pin_code',address.pin_code).strip()
+            country=request.POST.get('country',address.country).strip()
+            source_page = request.POST.get('source_page') 
 
 
-        if not all([customer_name,customer_phone,customer_address,street,city,state,pin_code,country]):
-            messages.error(request, "All fields are required.")
-            return redirect('address_manage',user_id=user_id)
+            if not all([customer_name,customer_phone,customer_address,street,city,state,pin_code,country]):
+                messages.error(request, "All fields are required.")
+                return redirect('address_manage',user_id=user_id)
 
-        if '00000000' in customer_phone:
-            messages.error(request, "Incorrect phone number.")
+            if '00000000' in customer_phone:
+                messages.error(request, "Incorrect phone number.")
+                if source_page == 'make_order':
+                    return redirect('make_order')
+                else:
+                    return redirect('address_manage', user_id=request.user.id)
+
+            if not is_valid_phone(customer_phone):
+                messages.error(request, "Invalid phone number format. Please enter a valid phone number.")
+                return redirect('address_manage',user_id=user_id)
+            
+            if not city.isalpha() or not state.isalpha() or not country.isalpha():
+                messages.error(request,"city or state or country should contain only letters.")
+                return redirect('address_manage',user_id=user_id)
+            
+            if not pin_code.isdigit() or len(pin_code) != 6:
+                messages.error(request,"Invalid pin code. Please enter a valid 6-digit pin code.") 
+                return redirect('address_manage',user_id=user_id)
+            
+            
+            address.name = customer_name
+            address.phone = customer_phone
+            address.address = customer_address
+            address.street = street
+            address.city = city
+            address.state = state
+            address.pin_code = pin_code
+            address.country = country
+            address.save()
+            messages.success(request,"Address edit successfully")
             if source_page == 'make_order':
                 return redirect('make_order')
             else:
                 return redirect('address_manage', user_id=request.user.id)
-
-        if not is_valid_phone(customer_phone):
-            messages.error(request, "Invalid phone number format. Please enter a valid phone number.")
-            return redirect('address_manage',user_id=user_id)
-        
-        if not city.isalpha() or not state.isalpha() or not country.isalpha():
-            messages.error(request,"city or state or country should contain only letters.")
-            return redirect('address_manage',user_id=user_id)
-        
-        if not pin_code.isdigit() or len(pin_code) != 6:
-            messages.error(request,"Invalid pin code. Please enter a valid 6-digit pin code.") 
-            return redirect('address_manage',user_id=user_id)
-        
-        
-        address.name = customer_name
-        address.phone = customer_phone
-        address.address = customer_address
-        address.street = street
-        address.city = city
-        address.state = state
-        address.pin_code = pin_code
-        address.country = country
-        address.save()
-        messages.success(request,"Address edit successfully")
-        if source_page == 'make_order':
-            return redirect('make_order')
-        else:
-            return redirect('address_manage', user_id=request.user.id)
-        
-    user=get_object_or_404(CustomUser,id=user_id)
-    categories = Category.objects.all()
-    return render(request, 'User side/edit_address.html',{'user':user,'address': address,'categories': categories})
+            
+        user=get_object_or_404(CustomUser,id=user_id)
+        categories = Category.objects.all()
+        return render(request, 'User side/edit_address.html',{'user':user,'address': address,'categories': categories})
+    except Http404:
+        messages.error(request,"Address not found")
+        return redirect('address_manage',user_id=request.user.id)
+    except Exception as e:
+        messages.error(request, "An unexpected error occurred: " + str(e))
+        return redirect('address_manage',user_id=request.user.id)
 
 @never_cache 
 @login_required       
 def delete_address(request, address_id):
-    address = get_object_or_404(Address,id=address_id)
-    user_id = address.user_id
+    try:
+        address = get_object_or_404(Address,id=address_id)
+        user_id = address.user_id
 
-    if request.method == 'POST':
-        address.is_listed = not address.is_listed  # Toggle the is_listed flag
-        address.primary_address=False
-        address.save() 
-        addresses = Address.objects.filter(user_id=user_id, is_listed=True)
-        if not addresses.filter(primary_address=True).exists() and addresses.exists():
-            last_address = addresses.last()
-            last_address.primary_address = True
-            last_address.save()
+        if request.method == 'POST':
+            address.is_listed = not address.is_listed  # Toggle the is_listed flag
+            address.primary_address=False
+            address.save() 
+            addresses = Address.objects.filter(user_id=user_id, is_listed=True)
+            if not addresses.filter(primary_address=True).exists() and addresses.exists():
+                last_address = addresses.last()
+                last_address.primary_address = True
+                last_address.save()
+            return redirect('address_manage',user_id=user_id)
+        
         return redirect('address_manage',user_id=user_id)
-    
-    return redirect('address_manage',user_id=user_id)
+    except Http404:
+        messages.error(request,"Address not found")
+        return redirect('address_manage',user_id=request.user.id)
+    except Exception as e:
+        messages.error(request,"An unexpected error occured :" + str(e))
+        return redirect('address_manage',user_id=request.user.id)
 
 @never_cache
 @login_required
 def change_password(request,user_id):
+    try:
 
-    user = get_object_or_404(CustomUser,id=user_id)
-    if request.method == 'POST':
-        current_password = request.POST.get('currentpass')
-        new_password = request.POST.get('newpass')
-        confirm_password = request.POST.get('confirmpass')
+        user = get_object_or_404(CustomUser,id=user_id)
+        if request.method == 'POST':
+            current_password = request.POST.get('currentpass')
+            new_password = request.POST.get('newpass')
+            confirm_password = request.POST.get('confirmpass')
 
-        # Validate inputs
-        if not user.check_password(current_password):
-            messages.error(request,"Current password is incorrect.")
-            return render(request, 'User side/change_password.html',{'user_id': user_id})
+            # Validate inputs
+            if not user.check_password(current_password):
+                messages.error(request,"Current password is incorrect.")
+                return render(request, 'User side/change_password.html',{'user_id': user_id})
 
-        if new_password != confirm_password:
-            messages.error(request, "New passwords do not match.")
-            return render(request, 'User side/change_password.html',{'user_id': user_id})
+            if new_password != confirm_password:
+                messages.error(request, "New passwords do not match.")
+                return render(request, 'User side/change_password.html',{'user_id': user_id})
 
-        if not is_strong_password(new_password):
-            messages.error(request, "Password must be at least 8 characters long, contain letters, numbers, and special characters.")
-            return render(request, 'User side/change_password.html',{'user_id': user_id})
+            if not is_strong_password(new_password):
+                messages.error(request, "Password must be at least 8 characters long, contain letters, numbers, and special characters.")
+                return render(request, 'User side/change_password.html',{'user_id': user_id})
+            
+            if not current_password or not new_password or not confirm_password:
+                messages.error(request, "All fields are required.")
+                return render(request,'User side/change_password.html',{'user_id':user_id})
+
+            # Change password
+            user.set_password(new_password)
+            user.save()
+            # Update session authentication hash
+            update_session_auth_hash(request,user)
+
+            messages.success(request, "Password changed successfully!")
+            return redirect('profile page',user_id=user_id)
         
-        if not current_password or not new_password or not confirm_password:
-            messages.error(request, "All fields are required.")
-            return render(request,'User side/change_password.html',{'user_id':user_id})
-
-        # Change password
-        user.set_password(new_password)
-        user.save()
-        # Update session authentication hash
-        update_session_auth_hash(request,user)
-
-        messages.success(request, "Password changed successfully!")
-        return redirect('profile page',user_id=user_id)
+        categories= Category.objects.all()
+        return render(request, 'User side/change_password.html',{'user_id': user_id,'categories':categories})
+    except Http404:
+        messages.error(request,"User not found")
+        return redirect('profile page',user_id=request.user.id)
+    except Exception as e:
+        messages.error(request,"An unexpected error occured :" + str(e))
+        return redirect('profile page',user_id=request.user.id)
     
-    categories= Category.objects.all()
-    return render(request, 'User side/change_password.html',{'user_id': user_id,'categories':categories})
 
 @never_cache
 @login_required
 def order_history(request):
-    user = request.user
-    orders = Order.objects.filter(user=user).order_by('-created_at')
-    paginator = Paginator(orders,3)
-    page_number=request.GET.get('page')
-    page_obj=paginator.get_page(page_number)
-    context={
-        'page_obj':page_obj,
-    }
-    return render(request, 'User side/order_history.html',context)
+    try:
+        user = request.user
+        orders = Order.objects.filter(user=user).order_by('-created_at')
+        paginator = Paginator(orders,3)
+        page_number=request.GET.get('page')
+        page_obj=paginator.get_page(page_number)
+        context={
+            'page_obj':page_obj,
+        }
+        return render(request, 'User side/order_history.html',context)
+    except Exception as e:
+        messages.error(request,"An unexpected error occured :" + str(e))
+        return redirect('profile page',user_id=request.user.id)
 
 @login_required
 @never_cache
 def order_detail(request,order_id):
-    order = get_object_or_404(Order, id=order_id)
-    order_items = OrderItem.objects.filter(order=order)
-    Del_charge = Decimal(50) 
-    sub_total = (order.total_amount + order.discount) - order.tax_amount - Del_charge
-    expected_date = order.created_at + timedelta(days=5)
-    context = {
-        'order': order,
-        'order_items':order_items,
-        'expected_date':expected_date,
-        'sub_total':sub_total,
-        'colors':colors
-    }
-    return render(request,'User side/order_detail.html',context)
+    try:
+        order = get_object_or_404(Order, id=order_id)
+        order_items = OrderItem.objects.filter(order=order)
+        Del_charge = Decimal(50) 
+        sub_total = 0
+        order_item_price = 0
+        for order_item in order_items:
+            if order_item.is_listed:
+                order_item_price = order_item.price * order_item.quantity
+                sub_total = sub_total + order_item_price
+                
+        item_is_listed_count = order_items.filter(is_listed =True).count()
+        expected_date = order.created_at + timedelta(days=5)
+        context = {
+            'order': order,
+            'order_items':order_items,
+            'expected_date':expected_date,
+            'sub_total':sub_total,
+            'item_is_listed_count':item_is_listed_count,
+            'colors':colors
+        }
+        return render(request,'User side/order_detail.html',context)
+    
+    except Http404:
+        messages.error(request, "Order not found.")
+        return redirect('order_history')
+
+    except Exception as e:
+        messages.error(request, "An unexpected error occurred: " + str(e))
+        return redirect('order_history')
 
 @login_required
 def order_cancel(request,order_id):
-    order=get_object_or_404(Order,pk=order_id)
-    if request.method=='POST':
-        order.is_listed = not order.is_listed
-        order.status=" order cancelled " 
-        order.save()
-        order_items = OrderItem.objects.filter(order=order)
-        for order_item in order_items:
+    try:
+        order = get_object_or_404(Order, id=order_id)
+        if request.method=='POST':
+            order.is_listed = not order.is_listed
+            order.status="Cancelled" 
+            order.save()
+            order_items = OrderItem.objects.filter(order=order)
+            for order_item in order_items:
+                order_item.is_listed = not order_item.is_listed
+                order_item.save()
+                variant = order_item.variant
+                variant.stock = variant.stock + order_item.quantity
+                variant.save()
+
+            return redirect('order_history')
+        return redirect('order_history')
+    
+    except Http404:
+        messages.error(request, "Order not found.")
+        return redirect('order_history')
+    
+    except Exception as e:
+        messages.error(request, "An unexpected error occurred: " + str(e))
+        return redirect('order_detail', order_id=order_id)
+    
+@login_required
+def order_cancel_item(request,item_id):
+    try:
+        order_item = get_object_or_404(OrderItem, id=item_id)
+        order= order_item.order
+        if request.method=='POST':
+            order.total_amount = order.total_amount - order_item.price
+            order.save()
+
+            order_item.is_listed = not order_item.is_listed
+            order_item.save()
             variant = order_item.variant
             variant.stock = variant.stock + order_item.quantity
             variant.save()
 
+            return redirect('order_detail',order_id=order.id)
         return redirect('order_history')
-    return redirect('order_history')
+    
+    except Http404:
+        messages.error(request, "Order not found.")
+        return redirect('order_history')
+    
+    except Exception as e:
+        messages.error(request, "An unexpected error occurred: " + str(e))
+        return redirect('order_detail', order_id=order.id)
     
 @never_cache
 @login_required
 def wallet_details(request):
-    user = request.user
-    wallet = Wallet.objects.filter(user=user).first()
-    context = {
-        'balance_amount' : wallet.balance if wallet else 0
-    }
-    return render(request,'User side/wallet.html',context)
+    try:
+        user = request.user
+        
+        wallet = Wallet.objects.filter(user=user).first()
+        context = {
+            'balance_amount' : wallet.balance if wallet else 0
+        }
+        return render(request,'User side/wallet.html',context)
+    except Exception as e:
+        messages.error(request, "An unexpected error occurred: " + str(e))
+        return redirect('profile page', user_id=request.user.id)
 
 @never_cache
 @login_required
 def wallet_transactions(request):
-    user = request.user
-    wallet = Wallet.objects.filter(user=user).first()
+    try:
 
-    transactions = WalletTransaction.objects.filter(wallet=wallet).order_by('-id')
+        user = request.user
+        wallet = Wallet.objects.filter(user=user).first()
 
-    paginator = Paginator(transactions, 4)
-    page_number = request.GET.get('page')
-    page_obj = paginator.get_page(page_number)
+        transactions = WalletTransaction.objects.filter(wallet=wallet).order_by('-id')
 
-    context = {
-        'page_obj': page_obj,
-        'balance_amount': wallet.balance
-    }
-    return render(request,'User side/wallet_transactions.html',context)
+        paginator = Paginator(transactions, 4)
+        page_number = request.GET.get('page')
+        page_obj = paginator.get_page(page_number)
+
+        context = {
+            'page_obj': page_obj,
+            'balance_amount': wallet.balance
+        }
+        return render(request,'User side/wallet_transactions.html',context)
+    except Exception as e:
+        # Catch any exception and show an error message
+        messages.error(request, f"An unexpected error occurred: {str(e)}")
+        return redirect('home page')
 

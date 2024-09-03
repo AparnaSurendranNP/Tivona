@@ -54,7 +54,7 @@ class Order(models.Model):
     status = models.CharField(max_length=20, default='Pending')
     razorpay_order_id = models.CharField(max_length=10,blank=True,null=True)
     address = models.ForeignKey(Address,on_delete=models.CASCADE, null=True, blank=True)
-    order_address = models.CharField(max_length=50, null=True, blank=True)
+    order_address = models.CharField(max_length=100, null=True, blank=True)
     payment_method = models.CharField(max_length=50, null=True, blank=True)
     coupon = models.ForeignKey(Coupon, on_delete=models.SET_NULL, null=True, blank=True)
     discount = models.DecimalField(max_digits=10, decimal_places=2, default=0.00)
@@ -81,6 +81,9 @@ class OrderItem(models.Model):
     variant = models.ForeignKey(Variant, on_delete=models.CASCADE) 
     quantity = models.PositiveIntegerField(default=1)
     price = models.DecimalField(max_digits=10, decimal_places=2)
+    is_listed = models.BooleanField(default=True)
+    refund_requested = models.BooleanField(default=False)
+    refund_granted = models.BooleanField(default=False)
 
     def __str__(self):
         return f'{self.product.name} - {self.variant.color}'

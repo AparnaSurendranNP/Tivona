@@ -28,16 +28,24 @@ def is_user_superuser(user):
 @login_required(login_url='/admin_login/')
 @user_passes_test(is_user_superuser)
 def block_user(request, pk):
-    if request.method == 'POST':
-        user = get_object_or_404(CustomUser, pk=pk)
+    try:
+        if request.method == 'POST':
+            user = get_object_or_404(CustomUser, pk=pk)
+            
+            # Toggle user's active status
+            user.is_active = not user.is_active
+            user.save()
+            return redirect('admin_view_users')
         
-        # Toggle user's active status
-        user.is_active = not user.is_active
-        user.save()
+        customers=CustomUser.objects.all()
+        return render(request,'Admin side/admin_view_users.html',{'customers':customers})
+    except Http404:
+        messages.error(request, "User not found")
         return redirect('admin_view_users')
     
-    customers=CustomUser.objects.all()
-    return render(request,'Admin side/admin_view_users.html',{'customers':customers})
+    except Exception as e:
+        messages.error(request, "An unexpected error occurred: " + str(e))
+        return redirect('admin_view_users')
 
 @never_cache
 @login_required(login_url='/admin_login/')

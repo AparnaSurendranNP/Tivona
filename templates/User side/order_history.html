@@ -43,14 +43,6 @@
         <div class="header__top">
             <div class="container">
                 <div class="row">
-                    <!-- <div class="col-lg-6">
-                    <div class="header__top__left">
-                        <ul>
-                             <li><i class="fa fa-envelope"></i> hello@.com</li>
-                            <li>Free Shipping for all Order of $99</li>
-                        </ul>
-                    </div>
-                    </div> -->
                     <div class="col-lg-12 col-md-6">
                         <div class="header__top__right">
                             <div class="header__top__right__social">
@@ -60,13 +52,8 @@
                                 <a href="#"><i class="fa fa-pinterest-p"></i></a>
                             </div>
                             <div class="header__top__right__language">
-                                <img src="{%static 'img/language.png'%}" alt="">
+                                <img src="/media/language.png" alt="">
                                 <div>English</div>
-                                <span class="arrow_carrot-down"></span>
-                                <ul>
-                                    <li><a href="#">Spanis</a></li>
-                                    <li><a href="#">English</a></li>
-                                </ul>
                             </div>
                             <div class="header__top__right__auth">
                                 {% if user.is_authenticated %}
@@ -102,7 +89,6 @@
                                 </ul>
                             </li>
                             <li><a href="{%url 'shoping-cart'%}">Shop Cart</a></li>
-                            <!-- <li><a href="./checkout.html">Check Out</a></li> -->
                             <li><a href="{%url 'contact page'%}">Contact</a></li>
                         </ul>
                     </nav>
@@ -114,7 +100,6 @@
                             <li><a href="{%url 'shoping-cart'%}"><i class="fa fa-shopping-bag"></i></a>
                             </li>
                         </ul>
-                        <!-- <div class="header__cart__price">item: <span>$150.00</span></div> -->
                     </div>
                 </div>
             </div>
@@ -124,20 +109,6 @@
         </div>
     </header>
     <div class=" justify-content-center" style="background:url('../static/img/hero/banner.jpg'); ">
-        <!-- <section class="breadcrumb breadcrumb_bg">
-            <div class="container">
-                <div class="row justify-content-center">
-                    <div class="col-lg-8">
-                        <div class="breadcrumb_iner">
-                            <div class="breadcrumb_iner_item">
-                                <h2 class='text-success'>My Account</h2>
-                                <p class='text-dark'>Home <span>-</span> My Account</p>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </section> -->
         <div class=" flex-grow-1 p-5 ">
             {% comment %} <h4 class="font-weight-bold py-3 mb-4">
                 Account settings
@@ -148,8 +119,6 @@
                         <div class="list-group list-group-flush account-settings-links">
                             <a class="list-group-item list-group-item-action " data-toggle="list"
                                 href="{%url 'profile page' user.id%}">Profile</a>
-                            <!-- <a class="list-group-item list-group-item-action active btn-success" data-toggle="list"
-                                href="{url 'update_profile'}">Update Profile</a> -->
                             <a class="list-group-item list-group-item-action" data-toggle="list"
                                 href="{%url 'change_password' user.id%}">Change password</a>
                             <a class="list-group-item list-group-item-action" data-toggle="list"
@@ -163,9 +132,6 @@
                             <div class="p-3 pl-6 px-5 my-6">
                                 <a class="btn text-danger" href="{%url 'logout'%}">Logout</a>
                             </div>
-                            <!-- {% comment %} <a class="list-group-item list-group-item-action" data-toggle="list" href="#account-social-links">Social links</a>
-                            <a class="list-group-item list-group-item-action" data-toggle="list" href="#account-connections">Connections</a>
-                            <a class="list-group-item list-group-item-action" data-toggle="list" href="#account-notifications">Notifications</a> {% endcomment %} -->
                         </div>
                     </div>
                     {% comment %} Order Area {% endcomment %}
@@ -193,8 +159,12 @@
                                                     <td>{{order.created_at}}</td>
                                                     <td>₹ {{order.total_amount}}</td>
                                                     {%if order.is_listed%}
-                                                    <td {%if order.status == "Pending" %} style="color: red;" {%elif order.status == "Delivered" %} style="color:green;"
-                                                    {%else%} style="color:orange;" {%endif%}>{{order.status}} </td>
+                                                    <td {%if order.status == "Pending" %} style="color: red;" 
+                                                        {%elif order.status == "Delivered" %} style="color:green;"
+                                                        {%elif order.status == "Payment Failed" %} style="color:red;"
+                                                        {%else%} style="color:orange;" {%endif%}>
+                                                        {{order.status}} 
+                                                    </td>
                                                     {%else%}
                                                     <td style="color: red;">Order Cancelled</td>
                                                     {%endif%}
@@ -208,9 +178,7 @@
                                 </div>
                                 <div
                                     class="grid px-4 py-3 text-xs font-semibold tracking-wide text-gray-500 uppercase border-t dark:border-gray-700 bg-gray-50 sm:grid-cols-9 dark:text-gray-400 dark:bg-gray-800">
-                                    <!-- <span class="flex items-center col-span-3">
-                                    Showing 21-30 of 100
-                                    </span> -->
+
                                     <span class="col-span-4"></span>
                                     <!-- Pagination -->
                                     <div class="product__pagination">
@@ -252,7 +220,7 @@
                         <ul>
                             <li>Address: 60-49 Road 11378 New York</li>
                             <li>Phone: +65 11.188.888</li>
-                            <li>Email: hello@colorlib.com</li>
+                            <li>Email: iamaparnasurendran@gmail.com</li>
                         </ul>
                     </div>
                 </div>
@@ -277,22 +245,7 @@
                         </ul>
                     </div>
                 </div>
-                <div class="col-lg-4 col-md-12">
-                    <div class="footer__widget">
-                        <h6>Join Our Newsletter Now</h6>
-                        <p>Get E-mail updates about our latest shop and special offers.</p>
-                        <form action="#">
-                            <input type="text" placeholder="Enter your mail">
-                            <button type="submit" class="site-btn">Subscribe</button>
-                        </form>
-                        <div class="footer__widget__social">
-                            <a href="#"><i class="fa fa-facebook"></i></a>
-                            <a href="#"><i class="fa fa-instagram"></i></a>
-                            <a href="#"><i class="fa fa-twitter"></i></a>
-                            <a href="#"><i class="fa fa-pinterest"></i></a>
-                        </div>
-                    </div>
-                </div>
+                
             </div>
         </div>
     </footer>

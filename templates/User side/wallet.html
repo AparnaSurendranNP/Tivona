@@ -43,14 +43,6 @@
         <div class="header__top">
             <div class="container">
                 <div class="row">
-                    <!-- <div class="col-lg-6">
-                    <div class="header__top__left">
-                        <ul>
-                             <li><i class="fa fa-envelope"></i> hello@.com</li>
-                            <li>Free Shipping for all Order of $99</li>
-                        </ul>
-                    </div>
-                </div> -->
                     <div class="col-lg-12 col-md-6">
                         <div class="header__top__right">
                             <div class="header__top__right__social">
@@ -60,13 +52,8 @@
                                 <a href="#"><i class="fa fa-pinterest-p"></i></a>
                             </div>
                             <div class="header__top__right__language">
-                                <img src="{%static 'img/language.png'%}" alt="">
+                                <img src="/media/language.png" alt="">
                                 <div>English</div>
-                                <span class="arrow_carrot-down"></span>
-                                <ul>
-                                    <li><a href="#">Spanis</a></li>
-                                    <li><a href="#">English</a></li>
-                                </ul>
                             </div>
                             <div class="header__top__right__auth">
                                 {% if user.is_authenticated %}
@@ -102,7 +89,6 @@
                                 </ul>
                             </li>
                             <li><a href="{%url 'shoping-cart'%}">Shop Cart</a></li>
-                            <!-- <li><a href="./checkout.html">Check Out</a></li> -->
                             <li><a href="{%url 'contact page'%}">Contact</a></li>
                         </ul>
                     </nav>
@@ -113,7 +99,6 @@
                             <li><a href="{%url 'contact page'%}"><i class="fa fa-heart"></i></a></li>
                             <li><a href="{%url 'shoping-cart'%}"><i class="fa fa-shopping-bag"></i></a></li>
                         </ul>
-                        <!-- <div class="header__cart__price">item: <span>$150.00</span></div> -->
                     </div>
                 </div>
             </div>
@@ -123,20 +108,7 @@
         </div>
     </header>
     <div class=" justify-content-center" style="background:url('../static/img/hero/banner.jpg'); ">
-        <!-- <section class="breadcrumb breadcrumb_bg">
-            <div class="container">
-                <div class="row justify-content-center">
-                    <div class="col-lg-8">
-                        <div class="breadcrumb_iner">
-                            <div class="breadcrumb_iner_item">
-                                <h2 class='text-success'>My Account</h2>
-                                <p class='text-dark'>Home <span>-</span> My Account</p>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </section> -->
+    
         <div class=" flex-grow-1 p-5 ">
             {% comment %}
             <h4 class="font-weight-bold py-3 mb-4">
@@ -162,9 +134,6 @@
                             <div class="p-3 pl-6 px-6 my-6">
                                 <a class="btn text-danger" href="{%url 'logout'%}">Logout</a>
                             </div>
-                            <!-- {% comment %} <a class="list-group-item list-group-item-action" data-toggle="list" href="#account-social-links">Social links</a>
-                            <a class="list-group-item list-group-item-action" data-toggle="list" href="#account-connections">Connections</a>
-                            <a class="list-group-item list-group-item-action" data-toggle="list" href="#account-notifications">Notifications</a> {% endcomment %} -->
                         </div>
                     </div>
                     <div class="col-md-9">

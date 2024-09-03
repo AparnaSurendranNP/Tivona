@@ -216,17 +216,6 @@
                     </li>
                     <li class="relative px-6 py-3">
                         <a class="inline-flex items-center w-full text-sm font-semibold transition-colors duration-150 hover:text-gray-800 dark:hover:text-gray-200"
-                            href="{url 'banners'}">
-                            <svg class="w-5 h-5" aria-hidden="true" fill="none" stroke-linecap="round"
-                                stroke-linejoin="round" stroke-width="2" viewBox="0 0 24 24" stroke="currentColor">
-
-                                <path d="M4 6h16M4 10h16M4 14h16M4 18h16"></path>
-                            </svg>
-                            <span class="ml-4">Banners</span>
-                        </a>
-                    </li>
-                    <li class="relative px-6 py-3">
-                        <a class="inline-flex items-center w-full text-sm font-semibold transition-colors duration-150 hover:text-gray-800 dark:hover:text-gray-200"
                           href="{%url 'report'%}">
                           <svg class="w-5 h-5" aria-hidden="true" fill="none" stroke-linecap="round" stroke-linejoin="round"
                             stroke-width="2" viewBox="0 0 24 24" stroke="currentColor">
@@ -419,6 +408,7 @@
                                 <p><strong>Order Date:</strong> {{ order.created_at }}</p>
                                 {%if order.is_listed%}
                                 <p {%if order.status == "Pending" %} style="color: red;" {%elif order.status == "Delivered" %} style="color:green;"
+                                {%elif order.status == "Payment Failed" %} style="color:red;"
                                 {%else%} style="color:orange;" {%endif%}
                                 ><strong>Status:</strong> {{ order.status }}</p>
                                 {%else%}
@@ -437,7 +427,17 @@
                                         {% endfor %}
                                         <br>
                                         Quantity: {{item.quantity}}<br>
-                                        Price: ₹ {{ item.price }}
+                                        Price: ₹ {{ item.price }}<br>
+                                        {%if not item.is_listed%}
+                                            {%if item.refund_granted %}
+                                            <h5 style="color: red;">Item Amount Refunded</h5>
+                                            {%else%}
+                                            <h5 style="color: red;">Item Cancelled</h5>
+                                            {%endif%}
+                                        {%endif%}
+                                        {%if item.refund_requested and not item.refund_granted and not order.refund_requested %}
+                                        <a href="{% url 'approve_refund_item' item.id %}"><button class="btn btn-success">Approve Refund</button></a>
+                                        {%endif%}
                                     </li>
                                     {% endfor %}
                                 </ul>
@@ -452,7 +452,7 @@
                                 <p><strong>Total Amount (including tax):</strong> ₹ {{ order.total_amount }}</p>
                                 <a href="{% url 'admin_orders' %}"><button class="btn btn-danger">Back</button></a>
                                 {%if order.is_listed and order.status != "Delivered" %}
-                                {%if order.status != "Return processed" %}
+                                {%if order.status != "Refund processed" %}
                                 <button type="button" class="btn btn-success" data-toggle="modal"
                                     data-target="#changeStatusModal">
                                     Change Status
@@ -488,14 +488,16 @@
                         <div class="form-group">
                             <label for="status">Order Status : </label>
                             <select class="form-control border-2" id="status" name="status">
-                                <option value="Pending" style="color: red;" {% if order.status == "Pending" %}selected{% endif %}>Pending
-                                </option>
+                                {%if order.status != "Payment Failed"%}
+                                <option value="Pending" style="color: red;" {% if order.status == "Pending" %}selected{% endif %}>
+                                    Pending</option>
                                 <option value="Processing" style="color: orange;" {% if order.status == "Processing" %}selected{% endif %}>
                                     Processing</option>
                                 <option value="Shipped" style="color: orange;" {% if order.status == "Shipped" %}selected{% endif %}>
                                     Shipped</option>
                                 <option value="Delivered" style="color:green ;" {% if order.status == "Delivered" %}selected{% endif %}>
                                     Delivered</option>
+                                {%endif%}
                                 <option value="Cancelled" style="color: red;" {% if order.status == "Cancelled" %}selected{% endif %}>
                                     Cancelled</option>
                             </select>

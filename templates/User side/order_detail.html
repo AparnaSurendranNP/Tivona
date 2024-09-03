@@ -29,14 +29,6 @@
         <div class="header__top">
             <div class="container">
                 <div class="row">
-                    <!-- <div class="col-lg-6">
-                    <div class="header__top__left">
-                        <ul>
-                             <li><i class="fa fa-envelope"></i> hello@.com</li>
-                            <li>Free Shipping for all Order of $99</li>
-                        </ul>
-                    </div>
-                </div> -->
                     <div class="col-lg-12 col-md-6">
                         <div class="header__top__right">
                             <div class="header__top__right__social">
@@ -46,13 +38,8 @@
                                 <a href="#"><i class="fa fa-pinterest-p"></i></a>
                             </div>
                             <div class="header__top__right__language">
-                                <img src="{%static 'img/language.png'%}" alt="">
+                                <img src="/media/language.png" alt="">
                                 <div>English</div>
-                                <span class="arrow_carrot-down"></span>
-                                <ul>
-                                    <li><a href="#">Spanis</a></li>
-                                    <li><a href="#">English</a></li>
-                                </ul>
                             </div>
                             <div class="header__top__right__auth">
                                 {% if user.is_authenticated %}
@@ -110,20 +97,6 @@
         </div>
     </header>
     <div class=" justify-content-center" style="background:url('../static/img/hero/banner.jpg'); ">
-        <!-- <section class="breadcrumb breadcrumb_bg">
-            <div class="container">
-                <div class="row justify-content-center">
-                    <div class="col-lg-8">
-                        <div class="breadcrumb_iner">
-                            <div class="breadcrumb_iner_item">
-                                <h2 class='text-success'>My Account</h2>
-                                <p class='text-dark'>Home <span>-</span> My Account</p>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </section> -->
         <div class="flex-grow-1 p-5">
             <div class="card overflow-hidden">
                 <div class="row no-gutters row-bordered row-border-light">
@@ -167,12 +140,22 @@
                                         <p><strong>Total Amount (including tax):</strong>₹ {{order.total_amount}}</p>
                                         <p><strong>Payment method :</strong> {{ order.payment_method }}</p>
                                         <p {%if order.status == "Pending" %} style="color: red;" {%elif order.status == "Delivered" %} style="color:green;"
+                                        {%elif order.status == "Payment Failed" %} style="color:red;"
                                         {%else%} style="color:orange;" {%endif%}><strong>Status:</strong> {{ order.status }}</p>
+
+                                        {%if order.status == "Payment Failed"%}
+                                        <a href="{% url 'retry_payment' order.id %}" class="btn btn-primary mb-2">Retry Payment</a>
+                                        {%endif%}
+                                        
                                         <p><strong>Expected Date:</strong>
                                             {%if order.status == "Delivered"%}
                                             already delivered
                                             {%elif order.status == "Pending"%}
                                                 order not confirmed
+                                            {%elif order.status == "Payment Failed"%}
+                                                order not confirmed
+                                            {%elif order.status == "Refunded"%}
+                                                order Cancelled
                                             {%else%}
                                                 {{ expected_date }}
                                             {%endif%}
@@ -190,8 +173,58 @@
                                                 {% endfor %}<br>
                                                 Quantity: {{item.quantity}}<br>
                                                 Price: ₹ {{ item.price }}<br>
-                                            {% endfor %}
+                                                {%if order_items|length > 1 %}
+                                                {%if order.status != "Payment Failed"%}
+                                                    {%if item.is_listed and not item.refund_requested %}
+                                                        {% if item_is_listed_count > 1 %}
+                                                        {% if order.status != "Delivered" %}
+                                                            {% if order.status != "Refund processed" %}
+                                                                {% if order.status != "Refunded" %}
+                                                                    {%if order.payment_method == "Cash on delivery" %}
+                                                                    <form method="POST" action="{% url 'order_cancel_item' item.id %}" style="display:inline;">
+                                                                    {% csrf_token %}
+                                                                    <button type="submit" class="btn btn-danger mb-2">Cancel Item</button>
+                                                                    </form>
+                                                                    {% elif order.payment_method == "Razorpay" %}
+                                                                    <form method="POST" action="{% url 'request_refund_item' item.id %}" style="display:inline;">
+                                                                    {% csrf_token %}
+                                                                    <button type="submit" class="btn btn-danger mb-2">Cancel Item</button>
+                                                                    </form>
+                                                                    {% elif order.payment_method == "Wallet" %}
+                                                                    <form method="POST" action="{% url 'request_refund_item' item.id %}" style="display:inline;">
+                                                                    {% csrf_token %}
+                                                                    <button type="submit" class="btn btn-danger mb-2">Cancel Order</button>
+                                                                    </form>
+                                                                    {%endif%}
+                                                                {%endif%}
+                                                            {%endif%}
+                                                        {%elif order.status == "Delivered" %}
+                                                        <form method="POST" action="{% url 'request_refund_item' item.id %}" style="display:inline;">
+                                                        {% csrf_token %}
+                                                        <button type="submit" class="btn btn-danger mb-2">Return item</button>
+                                                        </form>
+                                                        {%endif%}
+                                                        {%endif%}
+                                                    {% else %}
+                                                        {% if order.status == "Delivered" or order.status == "Refunded" or order.status == "Refund processed" or order.payment_method == "Wallet" or order.payment_method == "Razorpay" %} 
+                                                            {%if item.refund_requested %}
+                                                             {%if item.refund_granted %}
+                                                                <h5 style="color: red;">Refunded</h5>
+                                                             {%else%}
+                                                                <h5 style="color: red;">Refund Processed</h5>
+                                                             {%endif%}
+                                                            {% else %}
+                                                            <h5 style="color: red;">Returned</h5>
+                                                            {%endif%}
+                                                        {%else%}
+                                                        <h5 style="color: red;">item Cancelled</h5>
+                                                        {%endif%}
+                                                    {%endif%}
+                                                {%endif%}
+                                                {%endif%}
+                                            {%endfor%}
                                         </ul>
+                                        {%if order.status != "Payment Failed"%}
                                         {%if order.is_listed %}
                                             {% if order.status != "Delivered" %}
                                                 {% if order.status != "Refund processed" %}
@@ -217,7 +250,7 @@
                                             {%elif order.status == "Delivered" %}
                                                 <form method="POST" action="{% url 'request_refund' order.id %}" style="display:inline;">
                                                 {% csrf_token %}
-                                                <button type="submit" class="btn btn-danger mb-2">Return</button>
+                                                <button type="submit" class="btn btn-danger mb-2">Return all</button>
                                                 </form>
                                             {%endif%}
                                         {% else %}
@@ -227,15 +260,17 @@
                                                 {% else %}
                                                 <h3 style="color: red;">Returned</h3>
                                                 {%endif%}
-                                        <!-- <a href="{% url 'order_cancel' order.id %}" class="btn btn-danger">Cancel Order</a> -->
                                             {%else%}
-                                            <h3 style="color: red;">order cancelled</h3>
+                                            <h3 style="color: red;">Order Cancelled</h3>
                                             {%endif%}
                                         {%endif%}
-                                        <a href="{% url 'order_history' %}" class="btn btn-secondary mb-2">Back to Order
+                                        {%endif%}
+                                        <a href="{% url 'order_history' %}" class="btn btn-secondary mb-2 mt-2">Back to Order
                                             History</a>
                                     </div>
-                                    <a href="{% url 'download_invoice' order.id %}" class="btn btn-primary">Download Invoice</a>
+                                    {%if order.status != "Payment Failed"%}
+                                    <a href="{% url 'download_invoice' order.id %}" class="btn btn-success">Download Invoice</a>
+                                    {%endif%}
                                 </div>
                             </div>
                         </div>
@@ -258,7 +293,7 @@
                         <ul>
                             <li>Address: 60-49 Road 11378 New York</li>
                             <li>Phone: +65 11.188.888</li>
-                            <li>Email: hello@colorlib.com</li>
+                            <li>Email: iamaparnasurendran@gmail.com</li>
                         </ul>
                     </div>
                 </div>
@@ -283,22 +318,7 @@
                         </ul>
                     </div>
                 </div>
-                <div class="col-lg-4 col-md-12">
-                    <div class="footer__widget">
-                        <h6>Join Our Newsletter Now</h6>
-                        <p>Get E-mail updates about our latest shop and special offers.</p>
-                        <form action="#">
-                            <input type="text" placeholder="Enter your mail">
-                            <button type="submit" class="site-btn">Subscribe</button>
-                        </form>
-                        <div class="footer__widget__social">
-                            <a href="#"><i class="fa fa-facebook"></i></a>
-                            <a href="#"><i class="fa fa-instagram"></i></a>
-                            <a href="#"><i class="fa fa-twitter"></i></a>
-                            <a href="#"><i class="fa fa-pinterest"></i></a>
-                        </div>
-                    </div>
-                </div>
+                
             </div>
         </div>
     </footer>

@@ -13,6 +13,7 @@ urlpatterns =[
     path('order_history/',views.order_history,name='order_history'),
     path('order/<int:order_id>/', views.order_detail, name='order_detail'),
     path('order_cancel/<int:order_id>/',views.order_cancel,name='order_cancel'),
+    path('order_cancel_item/<int:item_id>/',views.order_cancel_item,name='order_cancel_item'),
     path('wallet_details/',views.wallet_details,name='wallet_details'),
     path('wallet_transactions/',views.wallet_transactions,name='wallet_transactions')
     

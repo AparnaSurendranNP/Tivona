@@ -39,7 +39,7 @@
 </style>
 
 <body>
-    
+
     <div class="flex h-screen bg-gray-50 dark:bg-gray-900">
         <!-- Desktop sidebar -->
         <aside class="z-20 hidden w-64 overflow-y-auto bg-white dark:bg-gray-800 md:block flex-shrink-0">
@@ -137,25 +137,14 @@
                     </li>
                     <li class="relative px-6 py-3">
                         <a class="inline-flex items-center w-full text-sm font-semibold transition-colors duration-150 hover:text-gray-800 dark:hover:text-gray-200"
-                            href="{url 'banners'}">
+                            href="{%url 'report'%}">
                             <svg class="w-5 h-5" aria-hidden="true" fill="none" stroke-linecap="round"
                                 stroke-linejoin="round" stroke-width="2" viewBox="0 0 24 24" stroke="currentColor">
-
-                                <path d="M4 6h16M4 10h16M4 14h16M4 18h16"></path>
+                                <path
+                                    d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01">
+                                </path>
                             </svg>
-                            <span class="ml-4">Banners</span>
-                        </a>
-                    </li>
-                    <li class="relative px-6 py-3">
-                        <a class="inline-flex items-center w-full text-sm font-semibold transition-colors duration-150 hover:text-gray-800 dark:hover:text-gray-200"
-                          href="{%url 'report'%}">
-                          <svg class="w-5 h-5" aria-hidden="true" fill="none" stroke-linecap="round" stroke-linejoin="round"
-                            stroke-width="2" viewBox="0 0 24 24" stroke="currentColor">
-                            <path
-                              d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01">
-                            </path>
-                          </svg>
-                          <span class="ml-4">Report</span>
+                            <span class="ml-4">Report</span>
                         </a>
                     </li>
                 </ul>
@@ -332,52 +321,7 @@
                             <div class="card">
                                 <div class="card-body">
                                     <h1 class="card-title justify-center mb-2"><b>Offers</b></h1>
-
-                                    <!-- <a href="#addCategoryOffer" class="btn btn-success mb-4 mt-2">Add Category Offer</a> -->
                                     <a href="#addProductOffer" class="btn btn-success mb-4 mt-2">Add Product Offer</a>
-
-                                    <!-- Category Offers Table -->
-                                    <!-- <h2 class="mt-4">Category Offers</h2>
-                                    <div class="table-responsive mt-4">
-                                        <table class="table datatable">
-                                            <thead>
-                                                <tr>
-                                                    <th scope="col">ID</th>
-                                                    <th scope="col">Category Name</th>
-                                                    <th scope="col">Discount</th>
-                                                    <th scope="col">Valid From</th>
-                                                    <th scope="col">Valid To</th>
-                                                    <th scope="col">Is Active</th>
-                                                    <th scope="col">Action</th>
-                                                </tr>
-                                            </thead>
-                                            <tbody>
-                                                {% for offer in category_offers %}
-                                                <tr>
-                                                    <th scope="row">{{ forloop.counter }}</th>
-                                                    <td>{{ offer.category.name }}</td>
-                                                    <td>{{ offer.discount_percentage }}%</td>
-                                                    <td>{{ offer.valid_from }}</td>
-                                                    <td>{{ offer.valid_to }}</td>
-                                                    <td>{{ offer.is_active }}</td>
-                                                    <td>
-                                                        <form method="POST"
-                                                            action="{% url 'change_category_offer_status' offer.id %}"
-                                                            style="display:inline;">
-                                                            {% csrf_token %}
-                                                            <button type="submit" class="btn btn-success mb-2">
-                                                                {% if offer.is_active %} Deactivate {% else %} Activate
-                                                                {% endif %}
-                                                            </button>
-                                                        </form>
-                                                        <a href="{% url 'edit_category_offer' offer.id %}"
-                                                            class="btn btn-primary"> Edit </a>
-                                                    </td>
-                                                </tr>
-                                                {% endfor %}
-                                            </tbody>
-                                        </table>
-                                    </div> -->
 
                                     <!-- Product Offers Table -->
                                     <h2 class="mt-4">Product Offers</h2>
@@ -450,54 +394,9 @@
                             </div>
                         </div>
                     </div>
-                </div>
-            </section>
-        </main>
-    </div>
-
-
-    <!-- Add Category Offer Modal -->
-    <div id="addCategoryOffer" class="modal-bg">
-        <div class="modal-content">
-            <form action="{% url 'add_category_offer' %}" method="post">
-                {% csrf_token %}
-                <div class="modal-header flex justify-between items-center mb-4">
-                    <h4 class="text-xl font-semibold">Add Category Offer</h4>
-                    <a href="#" class="close-btn">&times;</a>
-                </div>
-                <div class="modal-body">
-                    <div class="form-group mb-4">
-                        <label for="category" class="block text-gray-700">Select Category</label>
-                        <select id="category" name="category" class="form-control w-full px-4 py-2 border rounded-md"
-                            required>
-                            {% for category in categories %}
-                            <option value="{{ category.id }}">{{ category.name }}</option>
-                            {% endfor %}
-                        </select>
-                    </div>
-                    <div class="form-group mb-4">
-                        <label for="discount_percentage" class="block text-gray-700">Discount Percentage</label>
-                        <input type="number" id="discount_percentage" name="discount_percentage"
-                            class="form-control w-full px-4 py-2 border rounded-md" required>
-                    </div>
-                    <div class="form-group mb-4">
-                        <label for="valid_from" class="block text-gray-700">Valid From</label>
-                        <input type="date" id="valid_from" name="valid_from"
-                            class="form-control w-full px-4 py-2 border rounded-md" required>
-                    </div>
-                    <div class="form-group mb-4">
-                        <label for="valid_to" class="block text-gray-700">Valid To</label>
-                        <input type="date" id="valid_to" name="valid_to"
-                            class="form-control w-full px-4 py-2 border rounded-md" required>
-                    </div>
-                </div>
-                <div class="modal-footer flex justify-end">
-                    <a href="#" class="btn btn-default px-4 py-2 bg-gray-200 text-gray-800 rounded-md">Cancel</a>
-                    <button type="submit"
-                        class="btn btn-success ml-2 px-4 py-2 bg-purple-600 text-white rounded-md">Add</button>
-                </div>
-            </form>
         </div>
+        </section>
+        </main>
     </div>
 
     <!-- Add Product Offer Modal -->
@@ -551,36 +450,49 @@
     </div>
 
     <script>
-        document.getElementById('product').addEventListener('change', function() {
+        document.getElementById('product').addEventListener('change', function () {
             var productId = this.value;
             var variantSelect = document.getElementById('variant');
-    
+
             // Clear previous variants
             variantSelect.innerHTML = '<option value="">-- Select Variant --</option>';
-    
+
             if (productId) {
                 // Fetch variants for the selected product
                 fetch(`/get-variants/${productId}/`)
                     .then(response => response.json())
                     .then(data => {
-                        data.variants.forEach(function(variant) {
+                        data.variants.forEach(function (variant) {
                             var option = document.createElement('option');
-                            option.value = variant.id;
-                            option.text = variant.color;
+                            option.value = variant.color;  // Set the value to the actual color hex code
+                            option.text = variant.color_name + " (" + variant.color + ")";  // Show color name with hex
                             variantSelect.appendChild(option);
                         });
                     })
                     .catch(error => console.error('Error:', error));
             }
         });
+
+        // Additional check before form submission
+        document.querySelector('form').addEventListener('submit', function (e) {
+            var variantSelect = document.getElementById('variant');
+            if (!variantSelect.value) {
+                e.preventDefault();  // Prevent form submission
+                alert('Please select a variant.');
+            } else {
+                console.log('Selected Variant Hex Code:', variantSelect.value);  // Log the selected variant hex code
+            }
+        });
+
+
     </script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.all.min.js"></script>
     <script>
-        document.addEventListener('DOMContentLoaded', function() {
+        document.addEventListener('DOMContentLoaded', function () {
             {% if messages %}
-                {% for message in messages %}
-                    Swal.fire('{{ message }}');
-                {% endfor %}
+            {% for message in messages %}
+            Swal.fire('{{ message }}');
+            {% endfor %}
             {% endif %}
         });
     </script>
