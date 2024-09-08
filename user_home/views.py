@@ -17,7 +17,6 @@ from django.utils import timezone
 
 @never_cache
 def index(request):
-    try:
         categories=Category.objects.all()
         products_list=Product.objects.all().order_by('name')
 
@@ -34,9 +33,6 @@ def index(request):
             'latest_products': latest_products,
         }
         return render(request,'User side/index.html',context)
-    except Exception as e:
-        messages.error(request, "An unexpected error occurred: " + str(e))
-        return redirect('home page')
 
 @never_cache
 def shop(request):
