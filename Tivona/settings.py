@@ -27,10 +27,17 @@ SECRET_KEY = 'django-insecure-fmmc!%sw1fzh*@ospjdg&t327$*!$)*&@)(wzqb0u)vc+q!5mn
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ['localhost', '127.0.0.1']
+ALLOWED_HOSTS = ['13.49.49.54','0.0.0.0','localhost']
+CSRF_TRUSTED_ORIGINS = [
+	'http://13.49.49.54',
+	'https://13.49.49.54',
+	'http://tivona.shop',
+	'https://tivona.shop',
+	'http://www.tivona.shop',
+	'https://www.tivona.shop',
+]
 
 AUTH_USER_MODEL='user_accounts.CustomUser'
- 
 
 import environ
 
@@ -49,7 +56,7 @@ EMAIL_HOST_PASSWORD = env('EMAIL_HOST_PASSWORD')
 
 RAZORPAY_KEY_ID = 'rzp_test_A5kGTWFna2tp56'
 RAZORPAY_SECRET_KEY = 'JKVwBfTrbKuinkU72jkPunIP'
- 
+
 
 # Application definition
 
