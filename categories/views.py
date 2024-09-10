@@ -130,7 +130,7 @@ def add_category(request):
             messages.error(request, error_message)
         
     category=Category.objects.all()
-    return render(request, 'Admin side/admin_categories.html',{'categories':category})
+    return redirect('admin_categories')
 
 @never_cache
 @login_required(login_url='/admin_login/')

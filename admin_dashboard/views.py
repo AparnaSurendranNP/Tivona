@@ -815,8 +815,8 @@ def report(request):
     page_obj = paginator.get_page(page_number)
 
     # Compute total values
-    total_discount_amount = orders.aggregate(total_discount=Sum('total_discount'))['total_discount'] or 0
-    total_sales_amount = orders.aggregate(total_sales=Sum('total_amount'))['total_sales'] or 0
+    total_discount_amount = orders.aggregate(total_discount=Sum('discount'))['total_discount'] or 0
+    total_sales_amount = orders.aggregate(total_sales=Sum('order_items__price'))['total_sales'] or 0
     total_profit = total_sales_amount - total_discount_amount
 
     if request.GET.get('generate_report') == '1':

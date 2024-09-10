@@ -21,11 +21,13 @@ class UserManager(BaseUserManager):
         user.save(using=self._db)
         return user
     
-    def create_superuser(self, username, password, **extra_fields):
+    def create_superuser(self, username,password, **extra_fields):
+        email = 'iamaparnasurendran@gmail.com'
+        phone = extra_fields.get('phone','9497355185')
         extra_fields.setdefault('is_staff', True)
         extra_fields.setdefault('is_superuser', True)
 
         if password is None:
             raise ValueError('Superuser must have a password.')
         
-        return self.create_user(username, password=password, **extra_fields)
+        return self.create_user(username,email=email,password=password,phone=phone, **extra_fields)

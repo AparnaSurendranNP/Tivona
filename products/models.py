@@ -6,7 +6,7 @@ from image_cropping import ImageRatioField
 from django.utils.text import slugify
 
 class Product(models.Model):
-    name = models.CharField(max_length=20)
+    name = models.CharField(max_length=50)
     image = models.ImageField(upload_to='product_image/', blank=False, null=False)
     cropping = ImageRatioField('image', '430x360')
     description = models.TextField()

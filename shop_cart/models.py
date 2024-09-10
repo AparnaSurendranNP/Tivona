@@ -52,7 +52,7 @@ class Order(models.Model):
     user = models.ForeignKey(CustomUser, on_delete=models.CASCADE)
     created_at = models.DateTimeField(auto_now_add=True)
     status = models.CharField(max_length=20, default='Pending')
-    razorpay_order_id = models.CharField(max_length=10,blank=True,null=True)
+    razorpay_order_id = models.CharField(max_length=20,blank=True,null=True)
     address = models.ForeignKey(Address,on_delete=models.CASCADE, null=True, blank=True)
     order_address = models.CharField(max_length=100, null=True, blank=True)
     payment_method = models.CharField(max_length=50, null=True, blank=True)
