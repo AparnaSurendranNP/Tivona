@@ -27,7 +27,8 @@ SECRET_KEY = 'django-insecure-fmmc!%sw1fzh*@ospjdg&t327$*!$)*&@)(wzqb0u)vc+q!5mn
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ['3.110.108.8','0.0.0.0']
+#ALLOWED_HOSTS = ['3.110.108.8','0.0.0.0']
+ALLOWED_HOSTS = ['localhost','127.0.0.1']
 
 CSRF_TRUSTED_ORIGINS = [
 	'http://3.110.108.8',
@@ -188,6 +189,8 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/5.0/howto/static-files/
 
 STATIC_URL = 'static/'
+
+STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
 
 # folder which store static files
 STATICFILES_DIRS=[
