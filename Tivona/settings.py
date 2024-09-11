@@ -32,10 +32,10 @@ ALLOWED_HOSTS = ['3.110.108.8','0.0.0.0']
 CSRF_TRUSTED_ORIGINS = [
 	'http://3.110.108.8',
 	'https://3.110.108.8',
-	'http://tivona.shop',
-	'https://tivona.shop',
-	'http://www.tivona.shop',
-	'https://www.tivona.shop',
+	'http://tivona.tivona.shop',
+	'https://tivona.tivona.shop',
+	'http://www.tivona.tivona.shop',
+	'https://www.tivona.tivona.shop',
 ]
 
 AUTH_USER_MODEL='user_accounts.CustomUser'
