@@ -904,7 +904,7 @@ def generate_pdf_report(context):
     html = render_to_string('Admin side/report_pdf.html', context)
 
     # Path to wkhtmltopdf executable
-    config = pdfkit.configuration(wkhtmltopdf=r'C:\Program Files\wkhtmltopdf\bin\wkhtmltopdf.exe')
+    config = pdfkit.configuration(wkhtmltopdf='/usr/bin/wkhtmltopdf')
 
     # Generate PDF from HTML using pdfkit
     pdf = pdfkit.from_string(html, False, configuration=config)
