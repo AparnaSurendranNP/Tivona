@@ -28,7 +28,7 @@ SECRET_KEY = 'django-insecure-fmmc!%sw1fzh*@ospjdg&t327$*!$)*&@)(wzqb0u)vc+q!5mn
 DEBUG = True
 
 ALLOWED_HOSTS = ['3.110.108.8','0.0.0.0']
-#ALLOWED_HOSTS = ['localhost','127.0.0.1']
+
 CSRF_TRUSTED_ORIGINS = [
 	'http://3.110.108.8',
 	'https://3.110.108.8',
