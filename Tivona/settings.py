@@ -29,8 +29,8 @@ DEBUG = True
 
 ALLOWED_HOSTS = ['3.110.108.8','0.0.0.0','localhost']
 CSRF_TRUSTED_ORIGINS = [
-	'http://13.49.49.54',
-	'https://13.49.49.54',
+	'http://3.110.108.8',
+	'https://3.110.108.8',
 	'http://tivona.shop',
 	'https://tivona.shop',
 	'http://www.tivona.shop',
