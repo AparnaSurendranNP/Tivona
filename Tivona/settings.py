@@ -27,7 +27,7 @@ SECRET_KEY = 'django-insecure-fmmc!%sw1fzh*@ospjdg&t327$*!$)*&@)(wzqb0u)vc+q!5mn
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ['13.49.49.54','0.0.0.0','localhost']
+ALLOWED_HOSTS = ['3.110.108.8','0.0.0.0','localhost']
 CSRF_TRUSTED_ORIGINS = [
 	'http://13.49.49.54',
 	'https://13.49.49.54',
