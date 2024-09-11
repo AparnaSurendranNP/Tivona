@@ -587,7 +587,7 @@ def download_invoice_pdf(request, order_id):
         # Render HTML content from template with context data
         html = render_to_string('User side/invoice_pdf.html', context)
         #config = pdfkit.configuration(wkhtmltopdf=r'C:\Program Files\wkhtmltopdf\bin\wkhtmltopdf.exe')
-        #config = pdfkit.configuration(wkhtmltopdf='/usr/local/bin/wkhtmltopdf')
+
         config = pdfkit.configuration(wkhtmltopdf='/usr/bin/wkhtmltopdf')
 
 
