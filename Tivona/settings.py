@@ -146,7 +146,7 @@ DATABASES = {
         'USER': 'aparna',
         'PASSWORD': 'ap@12345',
         'HOST': 'localhost',
-        'PORT': '5433',
+        'PORT': '5432',
     }
 }
 
